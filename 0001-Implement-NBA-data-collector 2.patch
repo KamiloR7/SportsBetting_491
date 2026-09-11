@@ -1,0 +1,771 @@
+From 8ef9e97f0adb83e37d0387b3dedd30b5aad8692b Mon Sep 17 00:00:00 2001
+From: aymasadek <asadek4@student.cccd.edu>
+Date: Thu, 10 Sep 2026 19:44:46 -0700
+Subject: [PATCH] Implement NBA data collector
+
+---
+ .gitignore                               |   8 +-
+ README.md                                |  59 ++-
+ pyproject.toml                           |  16 +
+ src/sportsbetting/__init__.py            |   3 +
+ src/sportsbetting/collectors/__init__.py |   1 +
+ src/sportsbetting/collectors/nba.py      | 439 +++++++++++++++++++++++
+ tests/test_nba_collector.py              | 177 +++++++++
+ 7 files changed, 701 insertions(+), 2 deletions(-)
+ create mode 100644 pyproject.toml
+ create mode 100644 src/sportsbetting/__init__.py
+ create mode 100644 src/sportsbetting/collectors/__init__.py
+ create mode 100644 src/sportsbetting/collectors/nba.py
+ create mode 100644 tests/test_nba_collector.py
+
+diff --git a/.gitignore b/.gitignore
+index fa1a9c1..1ed2ffc 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -61,4 +61,10 @@ htmlcov/
+ # =========================
+ *.db
+ *.sqlite
+-*.sqlite3
+\ No newline at end of file
++*.sqlite3
++
++# =========================
++# Data Collector Outputs
++# =========================
++data/raw/**/*.json
++data/raw/**/*.jsonl
+diff --git a/README.md b/README.md
+index 12fafec..1e304dc 100644
+--- a/README.md
++++ b/README.md
+@@ -1 +1,58 @@
+-# SportsBetting_491
+\ No newline at end of file
++# SportsBetting_491
++
++Sports betting data collection and modeling utilities.
++
++## NBA Team and Match Data Collector
++
++The NBA collector fetches team and match/game data from ESPN's public NBA feeds
++and writes normalized JSON files that the rest of the project can consume.
++
++This is a good MVP data source because it does not require an API key. For a
++production betting product, use the same normalized output shape with a licensed
++provider such as Sportradar, SportsDataIO, or another rights-cleared source.
++
++### What it collects
++
++- NBA teams
++- NBA scheduled/live/final matches for an inclusive date range
++- Basic match status, venue, season, home/away teams, and scores
++
++### Run locally
++
++```bash
++PYTHONPATH=src python3 -m sportsbetting.collectors.nba --start-date 2026-10-20 --end-date 2026-10-21
++```
++
++By default, output is written to:
++
++- `data/raw/nba/teams.json`
++- `data/raw/nba/matches.json`
++- `data/raw/nba/metadata.json`
++
++You can choose another destination:
++
++```bash
++PYTHONPATH=src python3 -m sportsbetting.collectors.nba \
++  --start-date 2026-10-20 \
++  --end-date 2026-10-21 \
++  --output-dir outputs/nba
++```
++
++Or print to stdout:
++
++```bash
++PYTHONPATH=src python3 -m sportsbetting.collectors.nba --start-date 2026-10-20 --stdout
++```
++
++### Install as a CLI
++
++```bash
++python3 -m pip install -e .
++collect-nba-data --start-date 2026-10-20 --end-date 2026-10-21
++```
++
++### Tests
++
++```bash
++python3 -m unittest discover tests
++```
+diff --git a/pyproject.toml b/pyproject.toml
+new file mode 100644
+index 0000000..f420b27
+--- /dev/null
++++ b/pyproject.toml
+@@ -0,0 +1,16 @@
++[build-system]
++requires = ["setuptools>=68"]
++build-backend = "setuptools.build_meta"
++
++[project]
++name = "sportsbetting-491"
++version = "0.1.0"
++description = "Sports betting data collectors and utilities."
++readme = "README.md"
++requires-python = ">=3.9"
++
++[project.scripts]
++collect-nba-data = "sportsbetting.collectors.nba:main"
++
++[tool.setuptools.packages.find]
++where = ["src"]
+diff --git a/src/sportsbetting/__init__.py b/src/sportsbetting/__init__.py
+new file mode 100644
+index 0000000..9009a59
+--- /dev/null
++++ b/src/sportsbetting/__init__.py
+@@ -0,0 +1,3 @@
++"""SportsBetting 491 data collection package."""
++
++__all__ = ["collectors"]
+diff --git a/src/sportsbetting/collectors/__init__.py b/src/sportsbetting/collectors/__init__.py
+new file mode 100644
+index 0000000..b4caadb
+--- /dev/null
++++ b/src/sportsbetting/collectors/__init__.py
+@@ -0,0 +1 @@
++"""Data collectors for league and event feeds."""
+diff --git a/src/sportsbetting/collectors/nba.py b/src/sportsbetting/collectors/nba.py
+new file mode 100644
+index 0000000..69249e3
+--- /dev/null
++++ b/src/sportsbetting/collectors/nba.py
+@@ -0,0 +1,439 @@
++"""Collect normalized NBA team and match data from ESPN public feeds.
++
++The ESPN feeds are useful for MVP/prototype data collection because they do not
++require an API key. For a commercial production launch, keep the normalized
++models in this module and swap the fetch layer to a licensed provider.
++"""
++
++from __future__ import annotations
++
++import argparse
++import json
++import time
++from dataclasses import asdict, dataclass
++from datetime import date, datetime, timezone, timedelta
++from pathlib import Path
++from typing import Any, Callable, Iterable, Mapping, Sequence
++from urllib.error import HTTPError, URLError
++from urllib.parse import urlencode
++from urllib.request import Request, urlopen
++
++ESPN_NBA_BASE_URL = "https://site.web.api.espn.com/apis/site/v2/sports/basketball/nba"
++DEFAULT_TIMEOUT_SECONDS = 20
++DEFAULT_RETRIES = 2
++
++JsonMapping = Mapping[str, Any]
++JsonFetcher = Callable[[str, int], JsonMapping]
++
++
++class NBACollectorError(RuntimeError):
++    """Raised when the collector cannot fetch or parse NBA data."""
++
++
++@dataclass(frozen=True)
++class NBATeam:
++    """Normalized NBA team record."""
++
++    source: str
++    source_team_id: str
++    abbreviation: str | None
++    display_name: str
++    short_name: str | None
++    name: str | None
++    location: str | None
++    color: str | None
++    alternate_color: str | None
++    logo_url: str | None
++
++
++@dataclass(frozen=True)
++class NBAMatch:
++    """Normalized NBA match/game record."""
++
++    source: str
++    source_match_id: str
++    source_uid: str | None
++    scheduled_at: str | None
++    season_year: int | None
++    season_type: int | None
++    name: str | None
++    short_name: str | None
++    status_state: str | None
++    status_name: str | None
++    status_detail: str | None
++    completed: bool
++    neutral_site: bool
++    venue_name: str | None
++    venue_city: str | None
++    venue_state: str | None
++    home_team_id: str | None
++    home_team_abbreviation: str | None
++    home_team_name: str | None
++    home_score: int | None
++    away_team_id: str | None
++    away_team_abbreviation: str | None
++    away_team_name: str | None
++    away_score: int | None
++
++
++class ESPNNBACollector:
++    """Fetch and normalize NBA teams and matches from ESPN's site API."""
++
++    def __init__(
++        self,
++        *,
++        base_url: str = ESPN_NBA_BASE_URL,
++        timeout_seconds: int = DEFAULT_TIMEOUT_SECONDS,
++        max_retries: int = DEFAULT_RETRIES,
++        retry_backoff_seconds: float = 0.5,
++        fetcher: JsonFetcher | None = None,
++    ) -> None:
++        self.base_url = base_url.rstrip("/")
++        self.timeout_seconds = timeout_seconds
++        self.max_retries = max_retries
++        self.retry_backoff_seconds = retry_backoff_seconds
++        self._fetcher = fetcher or _default_fetch_json
++
++    def collect_teams(self, *, limit: int = 100) -> tuple[NBATeam, ...]:
++        """Collect all NBA teams from ESPN and return normalized records."""
++
++        payload = self._get_json("teams", {"limit": limit})
++        teams = _parse_teams(payload)
++        return tuple(sorted(teams, key=lambda team: team.abbreviation or team.display_name))
++
++    def collect_matches(
++        self,
++        start_date: date,
++        end_date: date | None = None,
++        *,
++        limit: int = 300,
++    ) -> tuple[NBAMatch, ...]:
++        """Collect NBA matches for each day in the inclusive date range."""
++
++        end = end_date or start_date
++        if end < start_date:
++            raise ValueError("end_date must be on or after start_date")
++
++        matches_by_id: dict[str, NBAMatch] = {}
++        for match_date in _date_range(start_date, end):
++            payload = self._get_json(
++                "scoreboard",
++                {
++                    "dates": match_date.strftime("%Y%m%d"),
++                    "limit": limit,
++                },
++            )
++            for match in _parse_matches(payload):
++                matches_by_id[match.source_match_id] = match
++
++        return tuple(
++            sorted(
++                matches_by_id.values(),
++                key=lambda match: (match.scheduled_at or "", match.source_match_id),
++            )
++        )
++
++    def _get_json(self, resource: str, params: Mapping[str, Any] | None = None) -> JsonMapping:
++        url = self._build_url(resource, params or {})
++        last_error: Exception | None = None
++
++        for attempt in range(self.max_retries + 1):
++            try:
++                payload = self._fetcher(url, self.timeout_seconds)
++                if not isinstance(payload, Mapping):
++                    raise NBACollectorError(f"Expected JSON object from ESPN, got {type(payload).__name__}")
++                return payload
++            except HTTPError as exc:
++                last_error = exc
++                if exc.code not in {429, 500, 502, 503, 504} or attempt >= self.max_retries:
++                    raise NBACollectorError(f"ESPN request failed with HTTP {exc.code}: {url}") from exc
++            except (URLError, TimeoutError, json.JSONDecodeError) as exc:
++                last_error = exc
++                if attempt >= self.max_retries:
++                    raise NBACollectorError(f"ESPN request failed: {url}") from exc
++
++            time.sleep(self.retry_backoff_seconds * (attempt + 1))
++
++        raise NBACollectorError(f"ESPN request failed: {url}") from last_error
++
++    def _build_url(self, resource: str, params: Mapping[str, Any]) -> str:
++        query = urlencode(
++            {
++                key: value
++                for key, value in params.items()
++                if value is not None and value != ""
++            }
++        )
++        url = f"{self.base_url}/{resource.lstrip('/')}"
++        return f"{url}?{query}" if query else url
++
++
++def write_collected_data(
++    output_dir: Path,
++    *,
++    teams: Sequence[NBATeam],
++    matches: Sequence[NBAMatch],
++) -> dict[str, Path]:
++    """Write collector output files and return their paths."""
++
++    output_dir.mkdir(parents=True, exist_ok=True)
++    teams_path = output_dir / "teams.json"
++    matches_path = output_dir / "matches.json"
++    metadata_path = output_dir / "metadata.json"
++
++    _write_json(teams_path, [asdict(team) for team in teams])
++    _write_json(matches_path, [asdict(match) for match in matches])
++    _write_json(
++        metadata_path,
++        {
++            "source": "espn",
++            "collected_at": _utc_now_iso(),
++            "team_count": len(teams),
++            "match_count": len(matches),
++        },
++    )
++
++    return {
++        "teams": teams_path,
++        "matches": matches_path,
++        "metadata": metadata_path,
++    }
++
++
++def _default_fetch_json(url: str, timeout_seconds: int) -> JsonMapping:
++    request = Request(
++        url,
++        headers={
++            "Accept": "application/json",
++            "User-Agent": (
++                "Mozilla/5.0 (compatible; SportsBetting491-NBACollector/0.1; "
++                "+https://github.com/KamiloR7/SportsBetting_491)"
++            ),
++        },
++    )
++    with urlopen(request, timeout=timeout_seconds) as response:
++        return json.load(response)
++
++
++def _parse_teams(payload: JsonMapping) -> list[NBATeam]:
++    teams: list[NBATeam] = []
++    sports = _as_list(payload.get("sports"))
++
++    for sport in sports:
++        for league in _as_list(_as_mapping(sport).get("leagues")):
++            for team_entry in _as_list(_as_mapping(league).get("teams")):
++                team = _as_mapping(team_entry).get("team", team_entry)
++                team_map = _as_mapping(team)
++                source_team_id = _clean(team_map.get("id"))
++                display_name = _clean(team_map.get("displayName"))
++
++                if not source_team_id or not display_name:
++                    continue
++
++                teams.append(
++                    NBATeam(
++                        source="espn",
++                        source_team_id=source_team_id,
++                        abbreviation=_clean(team_map.get("abbreviation")),
++                        display_name=display_name,
++                        short_name=_clean(team_map.get("shortDisplayName")),
++                        name=_clean(team_map.get("name")),
++                        location=_clean(team_map.get("location")),
++                        color=_normalize_hex_color(team_map.get("color")),
++                        alternate_color=_normalize_hex_color(team_map.get("alternateColor")),
++                        logo_url=_first_logo_url(team_map),
++                    )
++                )
++
++    return teams
++
++
++def _parse_matches(payload: JsonMapping) -> list[NBAMatch]:
++    matches: list[NBAMatch] = []
++
++    for event in _as_list(payload.get("events")):
++        event_map = _as_mapping(event)
++        source_match_id = _clean(event_map.get("id"))
++        if not source_match_id:
++            continue
++
++        competitions = _as_list(event_map.get("competitions"))
++        competition = _as_mapping(competitions[0]) if competitions else {}
++        home = _competitor_by_side(competition, "home")
++        away = _competitor_by_side(competition, "away")
++        status_type = _as_mapping(_as_mapping(event_map.get("status")).get("type"))
++        season = _as_mapping(event_map.get("season"))
++        venue = _as_mapping(competition.get("venue"))
++        venue_address = _as_mapping(venue.get("address"))
++
++        matches.append(
++            NBAMatch(
++                source="espn",
++                source_match_id=source_match_id,
++                source_uid=_clean(event_map.get("uid")),
++                scheduled_at=_normalize_datetime(event_map.get("date")),
++                season_year=_int_or_none(season.get("year")),
++                season_type=_int_or_none(season.get("type")),
++                name=_clean(event_map.get("name")),
++                short_name=_clean(event_map.get("shortName")),
++                status_state=_clean(status_type.get("state")),
++                status_name=_clean(status_type.get("name")),
++                status_detail=_clean(status_type.get("detail")),
++                completed=bool(status_type.get("completed")),
++                neutral_site=bool(competition.get("neutralSite")),
++                venue_name=_clean(venue.get("fullName") or venue.get("name")),
++                venue_city=_clean(venue_address.get("city")),
++                venue_state=_clean(venue_address.get("state")),
++                home_team_id=_team_id(home),
++                home_team_abbreviation=_team_value(home, "abbreviation"),
++                home_team_name=_team_value(home, "displayName"),
++                home_score=_int_or_none(_as_mapping(home).get("score")),
++                away_team_id=_team_id(away),
++                away_team_abbreviation=_team_value(away, "abbreviation"),
++                away_team_name=_team_value(away, "displayName"),
++                away_score=_int_or_none(_as_mapping(away).get("score")),
++            )
++        )
++
++    return matches
++
++
++def _competitor_by_side(competition: JsonMapping, side: str) -> JsonMapping:
++    for competitor in _as_list(competition.get("competitors")):
++        competitor_map = _as_mapping(competitor)
++        if competitor_map.get("homeAway") == side:
++            return competitor_map
++    return {}
++
++
++def _team_id(competitor: JsonMapping) -> str | None:
++    return _team_value(competitor, "id")
++
++
++def _team_value(competitor: JsonMapping, key: str) -> str | None:
++    team = _as_mapping(_as_mapping(competitor).get("team"))
++    return _clean(team.get(key))
++
++
++def _first_logo_url(team: JsonMapping) -> str | None:
++    for logo in _as_list(team.get("logos")):
++        href = _clean(_as_mapping(logo).get("href"))
++        if href:
++            return href
++    return _clean(team.get("logo"))
++
++
++def _normalize_hex_color(value: Any) -> str | None:
++    color = _clean(value)
++    if not color:
++        return None
++    return color if color.startswith("#") else f"#{color}"
++
++
++def _normalize_datetime(value: Any) -> str | None:
++    timestamp = _clean(value)
++    if not timestamp:
++        return None
++
++    try:
++        parsed = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
++    except ValueError:
++        return timestamp
++
++    if parsed.tzinfo is None:
++        parsed = parsed.replace(tzinfo=timezone.utc)
++    return parsed.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
++
++
++def _date_range(start: date, end: date) -> Iterable[date]:
++    current = start
++    while current <= end:
++        yield current
++        current += timedelta(days=1)
++
++
++def _as_list(value: Any) -> list[Any]:
++    return value if isinstance(value, list) else []
++
++
++def _as_mapping(value: Any) -> JsonMapping:
++    return value if isinstance(value, Mapping) else {}
++
++
++def _clean(value: Any) -> str | None:
++    if value is None:
++        return None
++    cleaned = str(value).strip()
++    return cleaned or None
++
++
++def _int_or_none(value: Any) -> int | None:
++    try:
++        return int(value)
++    except (TypeError, ValueError):
++        return None
++
++
++def _utc_now_iso() -> str:
++    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
++
++
++def _write_json(path: Path, payload: Any) -> None:
++    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
++
++
++def _parse_date(value: str) -> date:
++    try:
++        return date.fromisoformat(value)
++    except ValueError as exc:
++        raise argparse.ArgumentTypeError("dates must use YYYY-MM-DD format") from exc
++
++
++def _build_arg_parser() -> argparse.ArgumentParser:
++    today = date.today().isoformat()
++    parser = argparse.ArgumentParser(description="Collect NBA team and match data from ESPN.")
++    parser.add_argument("--start-date", type=_parse_date, default=_parse_date(today), help="Start date in YYYY-MM-DD format.")
++    parser.add_argument("--end-date", type=_parse_date, help="End date in YYYY-MM-DD format. Defaults to start date.")
++    parser.add_argument("--output-dir", type=Path, default=Path("data/raw/nba"), help="Directory for JSON output files.")
++    parser.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT_SECONDS, help="HTTP timeout in seconds.")
++    parser.add_argument("--retries", type=int, default=DEFAULT_RETRIES, help="Number of retries for transient HTTP failures.")
++    parser.add_argument("--stdout", action="store_true", help="Print collected data instead of writing JSON files.")
++    return parser
++
++
++def main(argv: Sequence[str] | None = None) -> int:
++    parser = _build_arg_parser()
++    args = parser.parse_args(argv)
++
++    collector = ESPNNBACollector(timeout_seconds=args.timeout, max_retries=args.retries)
++    teams = collector.collect_teams()
++    matches = collector.collect_matches(args.start_date, args.end_date)
++
++    if args.stdout:
++        print(
++            json.dumps(
++                {
++                    "teams": [asdict(team) for team in teams],
++                    "matches": [asdict(match) for match in matches],
++                    "metadata": {
++                        "source": "espn",
++                        "collected_at": _utc_now_iso(),
++                        "team_count": len(teams),
++                        "match_count": len(matches),
++                    },
++                },
++                indent=2,
++                sort_keys=True,
++            )
++        )
++        return 0
++
++    paths = write_collected_data(args.output_dir, teams=teams, matches=matches)
++    print(f"Wrote {len(teams)} teams to {paths['teams']}")
++    print(f"Wrote {len(matches)} matches to {paths['matches']}")
++    print(f"Wrote metadata to {paths['metadata']}")
++    return 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/tests/test_nba_collector.py b/tests/test_nba_collector.py
+new file mode 100644
+index 0000000..0f94392
+--- /dev/null
++++ b/tests/test_nba_collector.py
+@@ -0,0 +1,177 @@
++from __future__ import annotations
++
++import json
++import sys
++import tempfile
++import unittest
++from datetime import date
++from pathlib import Path
++from urllib.parse import parse_qs, urlparse
++
++sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
++
++from sportsbetting.collectors.nba import ESPNNBACollector, write_collected_data
++
++
++TEAMS_PAYLOAD = {
++    "sports": [
++        {
++            "leagues": [
++                {
++                    "teams": [
++                        {
++                            "team": {
++                                "id": "13",
++                                "abbreviation": "LAL",
++                                "displayName": "Los Angeles Lakers",
++                                "shortDisplayName": "Lakers",
++                                "name": "Lakers",
++                                "location": "Los Angeles",
++                                "color": "552583",
++                                "alternateColor": "fdb927",
++                                "logos": [{"href": "https://example.test/lakers.png"}],
++                            }
++                        },
++                        {
++                            "team": {
++                                "id": "9",
++                                "abbreviation": "GS",
++                                "displayName": "Golden State Warriors",
++                                "shortDisplayName": "Warriors",
++                                "name": "Warriors",
++                                "location": "Golden State",
++                            }
++                        },
++                    ]
++                }
++            ]
++        }
++    ]
++}
++
++
++SCOREBOARD_PAYLOAD = {
++    "events": [
++        {
++            "id": "401766122",
++            "uid": "s:40~l:46~e:401766122",
++            "date": "2026-10-21T02:00Z",
++            "name": "Golden State Warriors at Los Angeles Lakers",
++            "shortName": "GS @ LAL",
++            "season": {"year": 2026, "type": 2},
++            "status": {
++                "type": {
++                    "state": "pre",
++                    "name": "STATUS_SCHEDULED",
++                    "detail": "Tue, October 20th at 10:00 PM EDT",
++                    "completed": False,
++                }
++            },
++            "competitions": [
++                {
++                    "neutralSite": False,
++                    "venue": {
++                        "fullName": "Crypto.com Arena",
++                        "address": {"city": "Los Angeles", "state": "CA"},
++                    },
++                    "competitors": [
++                        {
++                            "homeAway": "home",
++                            "score": "0",
++                            "team": {
++                                "id": "13",
++                                "abbreviation": "LAL",
++                                "displayName": "Los Angeles Lakers",
++                            },
++                        },
++                        {
++                            "homeAway": "away",
++                            "score": "0",
++                            "team": {
++                                "id": "9",
++                                "abbreviation": "GS",
++                                "displayName": "Golden State Warriors",
++                            },
++                        },
++                    ],
++                }
++            ],
++        }
++    ]
++}
++
++
++class ESPNNBACollectorTest(unittest.TestCase):
++    def test_collect_teams_normalizes_team_fields(self) -> None:
++        collector = ESPNNBACollector(fetcher=_fake_fetcher, retry_backoff_seconds=0)
++
++        teams = collector.collect_teams()
++
++        self.assertEqual(len(teams), 2)
++        self.assertEqual(teams[1].source_team_id, "13")
++        self.assertEqual(teams[1].display_name, "Los Angeles Lakers")
++        self.assertEqual(teams[1].color, "#552583")
++        self.assertEqual(teams[1].alternate_color, "#fdb927")
++        self.assertEqual(teams[1].logo_url, "https://example.test/lakers.png")
++
++    def test_collect_matches_normalizes_scoreboard_fields(self) -> None:
++        collector = ESPNNBACollector(fetcher=_fake_fetcher, retry_backoff_seconds=0)
++
++        matches = collector.collect_matches(date(2026, 10, 20))
++
++        self.assertEqual(len(matches), 1)
++        match = matches[0]
++        self.assertEqual(match.source_match_id, "401766122")
++        self.assertEqual(match.scheduled_at, "2026-10-21T02:00:00Z")
++        self.assertEqual(match.season_year, 2026)
++        self.assertEqual(match.home_team_abbreviation, "LAL")
++        self.assertEqual(match.away_team_abbreviation, "GS")
++        self.assertEqual(match.home_score, 0)
++        self.assertFalse(match.completed)
++        self.assertEqual(match.venue_city, "Los Angeles")
++
++    def test_collect_matches_walks_date_range_and_dedupes_by_match_id(self) -> None:
++        calls: list[str] = []
++
++        def fetcher(url: str, timeout: int) -> dict:
++            calls.append(url)
++            return SCOREBOARD_PAYLOAD if "scoreboard" in url else TEAMS_PAYLOAD
++
++        collector = ESPNNBACollector(fetcher=fetcher, retry_backoff_seconds=0)
++
++        matches = collector.collect_matches(date(2026, 10, 20), date(2026, 10, 21))
++
++        self.assertEqual(len(matches), 1)
++        scoreboard_dates = [
++            parse_qs(urlparse(call).query)["dates"][0]
++            for call in calls
++            if "scoreboard" in call
++        ]
++        self.assertEqual(scoreboard_dates, ["20261020", "20261021"])
++
++    def test_write_collected_data_creates_json_outputs(self) -> None:
++        collector = ESPNNBACollector(fetcher=_fake_fetcher, retry_backoff_seconds=0)
++        teams = collector.collect_teams()
++        matches = collector.collect_matches(date(2026, 10, 20))
++
++        with tempfile.TemporaryDirectory() as temp_dir:
++            paths = write_collected_data(Path(temp_dir), teams=teams, matches=matches)
++
++            self.assertTrue(paths["teams"].exists())
++            self.assertTrue(paths["matches"].exists())
++            self.assertTrue(paths["metadata"].exists())
++            self.assertEqual(len(json.loads(paths["teams"].read_text())), 2)
++            self.assertEqual(len(json.loads(paths["matches"].read_text())), 1)
++            self.assertEqual(json.loads(paths["metadata"].read_text())["source"], "espn")
++
++
++def _fake_fetcher(url: str, timeout: int) -> dict:
++    if url.endswith("/teams?limit=100"):
++        return TEAMS_PAYLOAD
++    if "scoreboard" in url:
++        return SCOREBOARD_PAYLOAD
++    raise AssertionError(f"Unexpected URL: {url}")
++
++
++if __name__ == "__main__":
++    unittest.main()
+-- 
+2.50.1 (Apple Git-155)
+
