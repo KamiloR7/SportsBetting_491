@@ -62,3 +62,13 @@ htmlcov/
 *.db
 *.sqlite
 *.sqlite3
+
+# =========================
+# Sports Data
+# =========================
+
+# Downloaded raw datasets
+data/raw/*.csv
+
+# Generated model-ready datasets
+data/processed/*.csv
