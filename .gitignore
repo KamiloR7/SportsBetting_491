@@ -63,8 +63,19 @@ htmlcov/
 *.sqlite
 *.sqlite3
 
+
+# =========================
+# Generated Models
+# =========================
+*.pkl
+*.joblib
+
+
 # =========================
 # Sports Data
 # =========================
-data/raw/*.csv
-data/processed/*.csv
+data/raw/*
+!data/raw/.gitkeep
+
+data/processed/*
+!data/processed/.gitkeep
