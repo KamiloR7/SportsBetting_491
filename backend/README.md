@@ -2,33 +2,44 @@
 
 This directory contains the FastAPI backend for the CPSC 491 Sports Match Prediction application.
 
-The backend is currently an **initial Sprint 1 scaffold**: the application, configuration, and database connection setup are in place, but API routes, ORM models, services, tests, and prediction functionality have not been implemented yet. These will be added incrementally in future sprints.
+The Sprint 1 backend currently includes:
+
+* FastAPI application setup
+* Environment-based PostgreSQL configuration
+* SQLAlchemy database connection/session management
+* PostgreSQL schema for the multi-sport application
+* Initial seed data for sports, leagues, and teams
+* Read-only API endpoints for sports, leagues, and teams
+* FastAPI Swagger/OpenAPI documentation
+* Health-check endpoint
+
+Prediction functionality, authentication, write endpoints, and production deployment are planned for future sprints.
 
 ---
 
 ## Technology Stack
 
-- **FastAPI** — web framework used to build the API
-- **PostgreSQL** — relational database for storing sports, teams, matches, and predictions
-- **SQLAlchemy** — Python SQL toolkit / ORM used to talk to PostgreSQL
-- **Pydantic Settings** — loads and validates configuration from environment variables
-- **Uvicorn** — ASGI server used to run the FastAPI app locally
-- **Alembic** — planned for managing future database migrations
-- **pytest / httpx** — planned for automated backend testing
+* **FastAPI** — web framework used to build the API
+* **PostgreSQL** — relational database for storing sports, teams, matches, and predictions
+* **SQLAlchemy** — Python SQL toolkit used to communicate with PostgreSQL
+* **Pydantic Settings** — loads and validates configuration from environment variables
+* **Uvicorn** — ASGI server used to run the FastAPI application locally
+* **Alembic** — available for future database migration support
+* **pytest / httpx** — available for future automated backend testing
 
 ---
 
 ## Machine-Level Prerequisites
 
-Install these directly on your computer. They are **not** installed by `pip` and are separate from the Python packages listed in `requirements.txt`.
+Install these directly on your computer. They are not installed by `pip`.
 
-- [Git](https://git-scm.com/)
-- Python 3
-- [Homebrew](https://brew.sh/) (used for the macOS setup steps below)
-- PostgreSQL 17
-- [pgAdmin 4](https://www.pgadmin.org/) — optional, but recommended for visually browsing the database
+* Git
+* Python 3
+* Homebrew (for the macOS PostgreSQL setup below)
+* PostgreSQL 17
+* pgAdmin 4 — optional, but recommended for browsing and querying the database
 
-Python packages such as FastAPI and SQLAlchemy should **not** be installed manually one at a time. They are declared in `backend/requirements.txt` and installed together in one step (see [First-Time Backend Setup](#first-time-backend-setup)).
+Python packages such as FastAPI and SQLAlchemy are declared in `backend/requirements.txt` and should be installed together.
 
 ---
 
@@ -42,27 +53,33 @@ brew services start postgresql@17
 pg_isready
 ```
 
-`pg_isready` should report that PostgreSQL is accepting connections. If it doesn't, see [Troubleshooting](#troubleshooting).
+`pg_isready` should report that PostgreSQL is accepting connections.
 
-This backend also requires a local `sports_betting` database with the project schema loaded. Full step-by-step instructions (including pgAdmin setup) are documented in:
+This backend requires a local database named:
 
+```text
+sports_betting
 ```
+
+The database must have the project schema loaded before database-dependent API routes will work.
+
+Full PostgreSQL and pgAdmin setup instructions are available in:
+
+```text
 backend/DATABASE_SETUP_README.md
 ```
 
-At minimum, you must create the `sports_betting` database and load the schema from:
+The schema is located at:
 
-```
+```text
 backend/app/database/sports_prediction_schema.sql
 ```
-
-before any database-dependent backend functionality will work.
 
 ---
 
 ## First-Time Backend Setup
 
-Run the following from the **repository root**:
+Run the following commands from the repository root:
 
 ```bash
 python3 -m venv backend/venv
@@ -73,18 +90,20 @@ cp backend/.env.example backend/.env
 
 What each command does:
 
-1. `python3 -m venv backend/venv` — creates an isolated Python virtual environment inside `backend/venv`
-2. `source backend/venv/bin/activate` — activates that virtual environment for your current terminal session
-3. `pip install -r backend/requirements.txt` — installs all backend Python dependencies at once
-4. `cp backend/.env.example backend/.env` — creates your personal local environment file from the committed example
+1. `python3 -m venv backend/venv` — creates an isolated Python environment
+2. `source backend/venv/bin/activate` — activates the virtual environment
+3. `pip install -r backend/requirements.txt` — installs the backend dependencies
+4. `cp backend/.env.example backend/.env` — creates your local environment configuration file
+
+After creating `.env`, update it with your own PostgreSQL credentials.
 
 ---
 
 ## Environment Variables
 
-After copying `.env.example` to `.env`, edit `backend/.env` with your own local PostgreSQL connection details:
+Edit `backend/.env`:
 
-```
+```env
 DATABASE_HOST=localhost
 DATABASE_PORT=5432
 DATABASE_NAME=sports_betting
@@ -92,12 +111,73 @@ DATABASE_USER=postgres
 DATABASE_PASSWORD=your_local_password
 ```
 
-Important notes:
+Important:
 
-- `.env.example` contains only placeholder values and **is safe to commit**.
-- `backend/.env` contains your local configuration and **must not be committed**. It is already excluded via `.gitignore`.
-- Database credentials must never be hard-coded into Python files — they are always read from environment variables via `app/core/config.py`.
-- Each teammate will likely have different local PostgreSQL credentials, so `.env` is personal to your machine.
+* `.env.example` contains placeholder values and is safe to commit.
+* `backend/.env` contains local credentials and must not be committed.
+* `.env` is excluded through `.gitignore`.
+* Database credentials must never be hard-coded into Python files.
+* Each teammate may have different PostgreSQL credentials.
+
+Configuration is loaded through:
+
+```text
+backend/app/core/config.py
+```
+
+---
+
+## Load the Database Schema
+
+Before running the database-dependent endpoints, create the `sports_betting` database and load:
+
+```text
+backend/app/database/sports_prediction_schema.sql
+```
+
+See:
+
+```text
+backend/DATABASE_SETUP_README.md
+```
+
+for the complete pgAdmin/PostgreSQL setup procedure.
+
+---
+
+## Seed Initial Data
+
+After the schema has been loaded and `.env` is configured, populate the initial reference data.
+
+From `backend/`:
+
+```bash
+python -m app.database.seed_data
+```
+
+Expected output:
+
+```text
+Seed data applied (sports, leagues, teams).
+```
+
+The seed script currently inserts initial reference data for:
+
+* Basketball — NBA
+* American Football — NFL
+* Baseball — MLB
+* Hockey — NHL
+* Soccer — English Premier League (EPL)
+
+It also inserts a small Sprint 1 development set of teams for each sport.
+
+The seed script is designed to avoid creating duplicate records when run more than once.
+
+Seed implementation:
+
+```text
+backend/app/database/seed_data.py
+```
 
 ---
 
@@ -110,35 +190,53 @@ cd backend
 uvicorn app.main:app --reload
 ```
 
-A successful startup will print messages similar to:
+Or, if already inside `backend/`:
 
+```bash
+uvicorn app.main:app --reload
 ```
+
+A successful startup should include:
+
+```text
 Uvicorn running on http://127.0.0.1:8000
 Application startup complete.
 ```
+
+Press `Ctrl+C` to stop the server.
 
 ---
 
 ## Development URLs
 
-While the server is running, the following are available:
+While FastAPI is running:
 
-```
-API:          http://127.0.0.1:8000
+```text
 Swagger Docs: http://127.0.0.1:8000/docs
 OpenAPI JSON: http://127.0.0.1:8000/openapi.json
 Health Check: http://127.0.0.1:8000/health
+Sports:       http://127.0.0.1:8000/sports
+Leagues:      http://127.0.0.1:8000/leagues
+Teams:        http://127.0.0.1:8000/teams
 ```
 
-FastAPI automatically generates the interactive Swagger UI at `/docs` from the app's route definitions — no extra setup is required.
+There is currently no route defined for:
+
+```text
+http://127.0.0.1:8000/
+```
+
+so visiting the root URL will return `404 Not Found`. This is expected.
+
+FastAPI automatically generates the interactive Swagger interface at `/docs`.
 
 ---
 
-## Health Endpoint
+## API Endpoints
 
-The backend currently implements:
+### Health Check
 
-```
+```http
 GET /health
 ```
 
@@ -150,32 +248,110 @@ Expected response:
 }
 ```
 
-This endpoint currently only confirms that the FastAPI server itself is running and responding to requests. It does **not** check PostgreSQL connectivity or any database state.
+This endpoint confirms that the FastAPI application is running. It does not currently perform a PostgreSQL health check.
+
+### Sports
+
+```http
+GET /sports
+```
+
+Returns the sports currently stored in PostgreSQL.
+
+Example response structure:
+
+```json
+[
+  {
+    "id": 1,
+    "name": "Basketball",
+    "slug": "basketball"
+  }
+]
+```
+
+### Leagues
+
+```http
+GET /leagues
+```
+
+Returns leagues and their associated sport information.
+
+Example response structure:
+
+```json
+[
+  {
+    "id": 1,
+    "name": "National Basketball Association",
+    "abbreviation": "NBA",
+    "country": "USA",
+    "active": true,
+    "sport": {
+      "id": 1,
+      "name": "Basketball",
+      "slug": "basketball"
+    }
+  }
+]
+```
+
+### Teams
+
+```http
+GET /teams
+```
+
+Returns teams and their associated sport information.
+
+Example response structure:
+
+```json
+[
+  {
+    "id": 1,
+    "name": "Los Angeles Lakers",
+    "abbreviation": "LAL",
+    "city": "Los Angeles",
+    "active": true,
+    "sport": {
+      "id": 1,
+      "name": "Basketball",
+      "slug": "basketball"
+    }
+  }
+]
+```
+
+The current database schema associates teams directly with sports through `teams.sport_id`.
 
 ---
 
 ## Python Dependencies
 
+Install all backend dependencies with:
+
 ```bash
 pip install -r backend/requirements.txt
 ```
 
-installs the dependencies currently declared in `backend/requirements.txt`:
+Current dependencies include:
 
-- `fastapi`
-- `uvicorn[standard]`
-- `sqlalchemy`
-- `psycopg2-binary`
-- `pydantic-settings`
-- `alembic`
-- `pytest`
-- `httpx`
+* `fastapi`
+* `uvicorn[standard]`
+* `sqlalchemy`
+* `psycopg2-binary`
+* `pydantic-settings`
+* `alembic`
+* `pytest`
+* `httpx`
 
 ---
 
 ## Virtual Environment Workflow
 
-Activate the virtual environment every time you start backend development.
+Activate the virtual environment whenever working on the backend.
 
 From the repository root:
 
@@ -183,15 +359,19 @@ From the repository root:
 source backend/venv/bin/activate
 ```
 
-Or, if you are already inside `backend/`:
+From inside `backend/`:
 
 ```bash
 source venv/bin/activate
 ```
 
-When active, your terminal prompt will be prefixed with `(venv)`.
+When active, the terminal prompt should begin with:
 
-To leave the virtual environment:
+```text
+(venv)
+```
+
+To deactivate:
 
 ```bash
 deactivate
@@ -201,7 +381,7 @@ deactivate
 
 ## Current Backend Structure
 
-```
+```text
 backend/
 ├── .env.example
 ├── DATABASE_SETUP_README.md
@@ -214,9 +394,12 @@ backend/
 │   │   └── config.py
 │   ├── database/
 │   │   ├── db.py
+│   │   ├── seed_data.py
 │   │   └── sports_prediction_schema.sql
 │   ├── routes/
+│   │   └── sports.py
 │   ├── schemas/
+│   │   └── sports.py
 │   ├── models/
 │   ├── services/
 │   └── ml/
@@ -224,83 +407,163 @@ backend/
 └── tests/
 ```
 
-- **`app/main.py`** — creates the FastAPI application instance and defines the `/health` endpoint
-- **`app/core/`** — application configuration; `config.py` loads database settings from environment variables via Pydantic Settings
-- **`app/database/`** — SQLAlchemy engine/session setup (`db.py`) and the raw PostgreSQL schema (`sports_prediction_schema.sql`)
-- **`app/routes/`** — placeholder for future FastAPI route modules (no routes defined yet)
-- **`app/models/`** — placeholder for future SQLAlchemy ORM models (none defined yet)
-- **`app/schemas/`** — placeholder for future Pydantic request/response schemas (none defined yet)
-- **`app/services/`** — placeholder for future business logic / service layer code (none defined yet)
-- **`app/ml/`** — existing data preparation and model training scripts (e.g. NFL data prep and a baseline training script) used for offline machine learning experimentation; not currently wired into the FastAPI app
-- **`tests/`** — placeholder for future automated tests using pytest/httpx
-- **`.env.example`** — committed template of required environment variables
-- **`requirements.txt`** — pinned list of Python dependencies for the backend
-- **`DATABASE_SETUP_README.md`** — full PostgreSQL and schema setup guide
+### Important Files
+
+* **`app/main.py`** — creates the FastAPI application, registers API routers, and defines `/health`
+* **`app/core/config.py`** — loads environment-based database configuration
+* **`app/database/db.py`** — creates the SQLAlchemy engine and database session dependency
+* **`app/database/sports_prediction_schema.sql`** — PostgreSQL database schema
+* **`app/database/seed_data.py`** — inserts initial sports, leagues, and teams
+* **`app/routes/sports.py`** — implements the `/sports`, `/leagues`, and `/teams` routes
+* **`app/schemas/sports.py`** — Pydantic response schemas for the reference-data endpoints
+* **`app/models/`** — reserved for future ORM models
+* **`app/services/`** — reserved for future business/service logic
+* **`app/ml/`** — offline machine-learning experimentation code; not currently connected to FastAPI
+* **`tests/`** — reserved for automated backend tests
+* **`.env.example`** — committed environment-variable template
+* **`requirements.txt`** — Python backend dependencies
+* **`DATABASE_SETUP_README.md`** — PostgreSQL and schema setup instructions
+
+---
+
+## Verifying the Backend
+
+After configuring the database, loading the schema, and running the seed script:
+
+```bash
+uvicorn app.main:app --reload
+```
+
+Then verify:
+
+```text
+GET /health
+GET /sports
+GET /leagues
+GET /teams
+```
+
+All four routes should return HTTP:
+
+```text
+200 OK
+```
+
+The easiest way to test them manually is through:
+
+```text
+http://127.0.0.1:8000/docs
+```
 
 ---
 
 ## Troubleshooting
 
-**PostgreSQL isn't running**
+### PostgreSQL isn't running
 
 ```bash
 brew services start postgresql@17
 pg_isready
 ```
 
-**Python package/module not found**
+### Python package/module not found
 
-Make sure your virtual environment is active, then reinstall dependencies:
+Make sure the virtual environment is active.
+
+From the repository root:
 
 ```bash
+source backend/venv/bin/activate
 pip install -r backend/requirements.txt
 ```
 
-**`.env` doesn't exist**
+### `.env` doesn't exist
+
+From the repository root:
 
 ```bash
 cp backend/.env.example backend/.env
 ```
 
-**Port 8000 already in use**
+Then edit the new file with your PostgreSQL credentials.
 
-Another development server may already be running. Stop it, or start Uvicorn temporarily on a different port:
+### Port 8000 already in use
+
+Stop the other process or temporarily use another port:
 
 ```bash
 uvicorn app.main:app --reload --port 8001
 ```
 
-**Database connection fails**
+### Database connection fails
 
-1. Verify PostgreSQL is running (`pg_isready`)
-2. Verify the values in `backend/.env` are correct
-3. Confirm the `sports_betting` database exists and the schema has been loaded
-4. See `backend/DATABASE_SETUP_README.md` for full setup steps
+1. Verify PostgreSQL is running with `pg_isready`
+2. Check the values in `backend/.env`
+3. Confirm the `sports_betting` database exists
+4. Confirm the schema has been loaded
+5. See `backend/DATABASE_SETUP_README.md`
+
+### API routes return database errors
+
+Confirm that:
+
+1. PostgreSQL is running
+2. `.env` contains the correct credentials
+3. The schema has been loaded
+4. The seed script has been run:
+
+```bash
+python -m app.database.seed_data
+```
 
 ---
 
 ## Quick Start
 
-For a teammate who has already installed PostgreSQL and set up the `sports_betting` database:
+For a teammate who already has PostgreSQL 17 installed:
 
 ```bash
 python3 -m venv backend/venv
 source backend/venv/bin/activate
 pip install -r backend/requirements.txt
 cp backend/.env.example backend/.env
-# Edit backend/.env with your local PostgreSQL credentials
+```
+
+Edit:
+
+```text
+backend/.env
+```
+
+with your local PostgreSQL credentials.
+
+Create the `sports_betting` database and load:
+
+```text
+backend/app/database/sports_prediction_schema.sql
+```
+
+Then:
+
+```bash
 cd backend
+python -m app.database.seed_data
 uvicorn app.main:app --reload
 ```
 
-Then visit:
+Open:
 
-```
+```text
 http://127.0.0.1:8000/docs
 ```
 
-and test:
+Verify:
 
-```
+```text
 GET /health
+GET /sports
+GET /leagues
+GET /teams
 ```
+
+All endpoints should return `200 OK` when the backend and database are configured correctly.
