@@ -16,9 +16,10 @@ function SplashScreen() {
     <div className="splash-screen">
       <div className="logo-container">
 
-        <h1>ParIAI</h1>
+        <h1>Vigor</h1>
+        <img src="/your-logo.png" alt="Vigor Logo" />
 
-        <p>AI Sports Match Predictions</p>
+        <p>Bet Smarter. Play the Odds.</p>
 
       </div>
     </div>

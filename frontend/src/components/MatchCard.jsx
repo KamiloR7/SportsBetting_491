@@ -8,33 +8,34 @@ function MatchCard({ match }) {
   }
 
   return (
-    <div
-      className="match-card"
-      onClick={openMatch}
-    >
+    <div className="match-card" onClick={openMatch}>
+      <p className="league-name">{match.league}</p>
 
-      <p className="league-name">
-        {match.league}
-      </p>
+      <h2>
+        {match.homeTeam} vs {match.awayTeam}
+      </h2>
 
-      <div className="match-teams">
+      <div className="probabilities">
+        <p>
+          {match.homeTeam}: {match.probabilities.homeWin}%
+        </p>
 
-        <h2>{match.homeTeam}</h2>
+        {match.league === "Premier League" && (
+          <p>
+            Draw: {match.probabilities.draw}%
+          </p>
+        )}
 
-        <span>VS</span>
-
-        <h2>{match.awayTeam}</h2>
-
+        <p>
+          {match.awayTeam}: {match.probabilities.awayWin}%
+        </p>
       </div>
 
       <p>
         {match.date} • {match.time}
       </p>
 
-      <button>
-        View Match
-      </button>
-
+      <button>View Match</button>
     </div>
   );
 }
