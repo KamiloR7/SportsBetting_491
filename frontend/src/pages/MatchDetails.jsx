@@ -1,8 +1,14 @@
 import { useParams } from "react-router-dom";
+import { useState } from "react";
+
 import mockMatches from "../data/testMatches";
+import BettingOptions from "../components/BettingOptions";
 
 function MatchDetails() {
   const { id } = useParams();
+
+  const [selectedBet, setSelectedBet] =
+    useState(null);
 
   const match = mockMatches.find(
     (match) =>
@@ -11,6 +17,10 @@ function MatchDetails() {
 
   if (!match) {
     return <h2>Match not found</h2>;
+  }
+
+  function handleSelectBet(bet) {
+    setSelectedBet(bet);
   }
 
   return (
@@ -28,23 +38,30 @@ function MatchDetails() {
         {match.date} • {match.time}
       </p>
 
-      <div className="team-context">
+      <BettingOptions
+        match={match}
+        onSelectBet={handleSelectBet}
+      />
 
-        <div>
-          <h3>{match.homeTeam}</h3>
-          <p>Recent Form: W W L W W</p>
+      {selectedBet && (
+        <div className="selected-bet">
+
+          <h2>Selected Bet</h2>
+
+          <p>
+            {selectedBet.selection}
+          </p>
+
+          <p>
+            Odds: {selectedBet.odds}
+          </p>
+
+          <button>
+            Add to Bet Slip
+          </button>
+
         </div>
-
-        <div>
-          <h3>{match.awayTeam}</h3>
-          <p>Recent Form: W L W L W</p>
-        </div>
-
-      </div>
-
-      <button>
-        Run AI Prediction
-      </button>
+      )}
 
     </div>
   );
