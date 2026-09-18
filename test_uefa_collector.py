@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from src.collectors.uefa_collector import (
+from uefa_collector import (
     CollectorResult,
     UEFACollector,
     UEFACollectorError,

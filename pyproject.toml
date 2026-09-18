@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sportsbetting-491"
+version = "0.1.0"
+description = "Sports betting data collectors and utilities."
+readme = "README.md"
+requires-python = ">=3.9"
+
+[project.scripts]
+collect-nba-data = "sportsbetting.collectors.nba:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = [".", "src", "backend"]
+testpaths = ["tests", "backend/tests", "test_nfl_collector.py", "test_uefa_collector.py"]
