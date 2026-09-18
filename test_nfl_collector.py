@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from src.collectors.nfl_collector import (
+from nfl_collector import (
     CollectorResult,
     NFLCollector,
     NFLCollectorError,
