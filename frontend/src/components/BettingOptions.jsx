@@ -112,7 +112,7 @@ function BettingOptions({ match, onSelectBet }) {
 
           <div className="betting-market">
 
-            <h3>Point Spread</h3>
+            <h3>Spread</h3>
 
             <button
               onClick={() =>
@@ -155,7 +155,7 @@ function BettingOptions({ match, onSelectBet }) {
           <div className="betting-market">
 
             <h3>
-              Total: {match.odds.total}
+              Total
             </h3>
 
             <button
