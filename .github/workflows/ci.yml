@@ -22,7 +22,7 @@ jobs:
           python-version: "3.12"
 
       - name: Show build version
-        run: echo "Build ID: build-${{ github.run_number }}-${GITHUB_SHA::7}"
+        run: "echo \"Build ID: build-${{ github.run_number }}-${GITHUB_SHA::7}\""
 
       - name: Install test dependencies
         run: |
