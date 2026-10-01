@@ -21,8 +21,20 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Show build version
-        run: "echo \"Build ID: build-${{ github.run_number }}-${GITHUB_SHA::7}\""
+      - name: Generate build metadata
+        run: |-
+          SHORT_SHA="${GITHUB_SHA::7}"
+          BUILD_ID="build-${GITHUB_RUN_NUMBER}-${SHORT_SHA}"
+
+          echo "BUILD_ID=$BUILD_ID" >> "$GITHUB_ENV"
+
+          mkdir -p build
+          echo "build_id=$BUILD_ID" > build/build-info.txt
+          echo "run_number=$GITHUB_RUN_NUMBER" >> build/build-info.txt
+          echo "commit=$GITHUB_SHA" >> build/build-info.txt
+          echo "branch=$GITHUB_REF_NAME" >> build/build-info.txt
+
+          echo "Build ID: $BUILD_ID"
 
       - name: Install test dependencies
         run: |
@@ -34,3 +46,9 @@ jobs:
 
       - name: Run automated tests
         run: python -m pytest -v
+
+      - name: Upload build metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.BUILD_ID }}
+          path: build/build-info.txt
