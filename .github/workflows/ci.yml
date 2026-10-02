@@ -8,6 +8,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,13 +27,14 @@ jobs:
       - name: Generate build metadata
         run: |-
           SHORT_SHA="${GITHUB_SHA::7}"
-          BUILD_ID="build-${GITHUB_RUN_NUMBER}-${SHORT_SHA}"
+          BUILD_ID="build-${GITHUB_RUN_NUMBER}-${GITHUB_RUN_ATTEMPT}-${SHORT_SHA}"
 
           echo "BUILD_ID=$BUILD_ID" >> "$GITHUB_ENV"
 
           mkdir -p build
           echo "build_id=$BUILD_ID" > build/build-info.txt
           echo "run_number=$GITHUB_RUN_NUMBER" >> build/build-info.txt
+          echo "run_attempt=$GITHUB_RUN_ATTEMPT" >> build/build-info.txt
           echo "commit=$GITHUB_SHA" >> build/build-info.txt
           echo "branch=$GITHUB_REF_NAME" >> build/build-info.txt
 
@@ -40,13 +44,23 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pytest
+          pip install -e .
           pip install -r backend/requirements.txt
 
       - name: Validate Python code
         run: python -m compileall -q .
 
       - name: Run automated tests
-        run: python -m pytest -v
+        env:
+          PYTHONPATH: backend
+        run: python -m pytest -v --junitxml=build/test-results.xml
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tests-${{ env.BUILD_ID }}
+          path: build/test-results.xml
 
       - name: Upload build metadata
         uses: actions/upload-artifact@v4

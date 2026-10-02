@@ -1,6 +1,7 @@
 fastapi
 uvicorn[standard]
 pandas
+scikit-learn
 sqlalchemy
 psycopg2-binary
 pydantic-settings

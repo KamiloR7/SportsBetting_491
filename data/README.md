@@ -2,6 +2,15 @@
 
 Raw and generated sports datasets are not committed to GitHub.
 
+## Sprint 2 Multi-Sport Dataset Contract
+
+The shared loader expects `data/raw/nfl_games.csv`, `data/raw/mlb_games.csv`, and
+`data/raw/epl_games.csv`, with unique `game_id`, parseable `game_date`,
+`home_team`, `away_team`, `home_score`, and `away_score` fields.
+Convert source-specific column names to this contract before loading.
+The unit tests use synthetic fixtures; they do not establish real-data model accuracy.
+MLB/EPL source acquisition and provenance remain follow-up work.
+
 ## NFL Baseline Data
 
 The NFL match prediction baseline uses historical NFL regular-season game data.
