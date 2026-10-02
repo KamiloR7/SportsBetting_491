@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import logging
 from datetime import datetime, timezone
 from typing import Any, Mapping
 
 from sqlalchemy import text
+
+logger = logging.getLogger(__name__)
 
 
 STATUS_MAP = {
@@ -128,6 +131,12 @@ def upsert_match(conn, match: Mapping[str, Any]) -> int:
     game_id = str(match["game_id"])
     source_name = str(match.get("source") or "unknown")
 
+    logger.info(
+    "Processing match %s from source %s",
+    game_id,
+    source_name,
+)
+
     sport_name = str(match["sport"])
     league_name = str(match["league"])
 
@@ -150,7 +159,13 @@ def upsert_match(conn, match: Mapping[str, Any]) -> int:
     data_source_id = _resolve_data_source_id(conn, source_name)
 
     db_status = STATUS_MAP.get(str(match["status"]))
+
     if db_status is None:
+        logger.error(
+            "Unsupported match status %s for match %s",
+            match["status"],
+            game_id,
+        )
         raise ValueError(f"Unsupported match status: {match['status']}")
 
     kickoff_utc = match.get("kickoff_utc")
@@ -164,6 +179,8 @@ def upsert_match(conn, match: Mapping[str, Any]) -> int:
     )
 
     if existing_match_id is not None:
+        logger.info("Updating existing match %s", game_id)
+
         conn.execute(
             text(
                 """
@@ -193,6 +210,7 @@ def upsert_match(conn, match: Mapping[str, Any]) -> int:
         )
 
         return existing_match_id
+    logger.info("Inserting new match %s", game_id)
 
     row = conn.execute(
         text(

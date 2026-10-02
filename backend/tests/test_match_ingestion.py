@@ -117,3 +117,15 @@ def test_completed_status_maps_to_final():
     )
 
     assert match_insert["status"] == "final"
+
+def test_invalid_status_is_rejected():
+    conn = FakeConnection()
+    match = sample_match()
+    match["status"] = "unknown"
+
+    try:
+        upsert_match(conn, match)
+    except ValueError as exc:
+        assert "Unsupported match status" in str(exc)
+    else:
+        raise AssertionError("Expected ValueError")
