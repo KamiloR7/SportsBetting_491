@@ -9,7 +9,9 @@ The shared loader expects `data/raw/nfl_games.csv`, `data/raw/mlb_games.csv`, an
 `home_team`, `away_team`, `home_score`, and `away_score` fields.
 Convert source-specific column names to this contract before loading.
 The unit tests use synthetic fixtures; they do not establish real-data model accuracy.
-MLB/EPL source acquisition and provenance remain follow-up work.
+The completed local workflow now downloads real historical data for all three
+sports. See [Sprint 2 completion evidence](../docs/ml-planning/sprint2_completion_evidence.md)
+for sources, checksums, reproducible commands, held-out metrics and limitations.
 
 ## NFL Baseline Data
 

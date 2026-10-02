@@ -1,0 +1,456 @@
+{
+  "source": {
+    "git_head": "9e1e1f781d2f2de9bf7ddf3adfd47e52eca897cf",
+    "uncommitted_ml_changes": true,
+    "ml_source_sha256": "0af9f4ded7edfe42f5a67a6ffd537924b6d33c751a08347ebd35f0f75972f404",
+    "files": {
+      "evaluation/evaluate_multisport_models.py": "ae602addc3b129160da9c9f258e99b94c9bc5d8f86feee8accb4d9ae78b880e8",
+      "features/download_multisport_data.py": "1450237d3b5a256a781730e92b5d20bd8a156172aa7611dbac028c43d35dae7e",
+      "features/engineer_multisport_features.py": "daad6b9469e71faaf96a42053a41136a51aa716dea91cb1b88ba42293853b083",
+      "features/prepare_multisport_data.py": "eeb6b3004efe2465232e792e9cd9e7a80145e94c6d79bc39c0eaec1f9f18cf78",
+      "features/prepare_nfl_data.py": "e20e74110e500514ef7caf7750bf7a88021ee427509e4fbfa0bb25c031e48054",
+      "predict_multisport.py": "ee2857096c380a1ea3e62c3cb0baceff4b2766c00db75acd95a83966734d7bf9",
+      "run_multisport_pipeline.py": "86a6a7082565f35a794da3df2b1c709fdef75763a7f1889b96e02cc7b6a68806",
+      "training/train_multisport_baseline.py": "3ddf84dc53d4a7c6746742b7a64a36e52aae4502f7d75ecad9985b854aa1ed06",
+      "training/train_nfl_baseline.py": "69da96f62f7f91191f5660f213deebca617e486e4d445ce4a534ecad3b21c2d9"
+    }
+  },
+  "python_version": "3.12.14",
+  "evaluation_protocol": "Fixed trained model, chronological holdout, expanding prior-day observed results. No same-day results or holdout-based tuning.",
+  "target": "Home win versus not-home-win (draw included in not-home-win).",
+  "sports": {
+    "NFL": {
+      "dataset": {
+        "sources": [
+          {
+            "url": "https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv",
+            "sha256": "4fefc0180964799fafd2e9c0bba16ed2b1aad4cde8ecbf6e4423a0d6cc0b8b72",
+            "source_rows": 7548,
+            "selected_rows": 544,
+            "excluded_incomplete": 0
+          }
+        ],
+        "rows": 544,
+        "date_min": "2023-09-07T00:00:00+00:00",
+        "date_max": "2025-01-05T00:00:00+00:00",
+        "dataset_sha256": "5e42bb55fb21a300f553c39771f83c59f9b2eb92339b76fc40358d6b040ca69c"
+      },
+      "metadata": {
+        "artifact_version": "f35e4b52fca3d0c170e5",
+        "classes": [
+          0,
+          1
+        ],
+        "dataset_sha256": "5e42bb55fb21a300f553c39771f83c59f9b2eb92339b76fc40358d6b040ca69c",
+        "feature_columns": [
+          "home_win_rate",
+          "away_win_rate",
+          "home_avg_score",
+          "away_avg_score",
+          "home_avg_allowed",
+          "away_avg_allowed"
+        ],
+        "model_sha256": "f264ada635020fb5d86feb08360e1ed1c6a14fc0ac56ef3990e9008222f6e68e",
+        "model_type": "logistic_regression",
+        "pandas_version": "3.0.6",
+        "python_version": "3.12.14",
+        "random_state": 42,
+        "sklearn_version": "1.9.1",
+        "source": {
+          "files": {
+            "evaluation/evaluate_multisport_models.py": "ae602addc3b129160da9c9f258e99b94c9bc5d8f86feee8accb4d9ae78b880e8",
+            "features/download_multisport_data.py": "1450237d3b5a256a781730e92b5d20bd8a156172aa7611dbac028c43d35dae7e",
+            "features/engineer_multisport_features.py": "daad6b9469e71faaf96a42053a41136a51aa716dea91cb1b88ba42293853b083",
+            "features/prepare_multisport_data.py": "eeb6b3004efe2465232e792e9cd9e7a80145e94c6d79bc39c0eaec1f9f18cf78",
+            "features/prepare_nfl_data.py": "e20e74110e500514ef7caf7750bf7a88021ee427509e4fbfa0bb25c031e48054",
+            "predict_multisport.py": "ee2857096c380a1ea3e62c3cb0baceff4b2766c00db75acd95a83966734d7bf9",
+            "run_multisport_pipeline.py": "86a6a7082565f35a794da3df2b1c709fdef75763a7f1889b96e02cc7b6a68806",
+            "training/train_multisport_baseline.py": "3ddf84dc53d4a7c6746742b7a64a36e52aae4502f7d75ecad9985b854aa1ed06",
+            "training/train_nfl_baseline.py": "69da96f62f7f91191f5660f213deebca617e486e4d445ce4a534ecad3b21c2d9"
+          },
+          "git_head": "9e1e1f781d2f2de9bf7ddf3adfd47e52eca897cf",
+          "ml_source_sha256": "0af9f4ded7edfe42f5a67a6ffd537924b6d33c751a08347ebd35f0f75972f404",
+          "uncommitted_ml_changes": true
+        },
+        "split": "chronological_nearest_80_20_whole_dates",
+        "sport": "NFL",
+        "target": {
+          "0": "not_home_win_including_draw",
+          "1": "home_win"
+        },
+        "test_class_counts": {
+          "0": 50,
+          "1": 57
+        },
+        "test_end": "2025-01-05T00:00:00+00:00",
+        "test_rows": 107,
+        "test_start": "2024-11-18T00:00:00+00:00",
+        "train_class_counts": {
+          "0": 198,
+          "1": 239
+        },
+        "train_end": "2024-11-17T00:00:00+00:00",
+        "train_rows": 437,
+        "train_start": "2023-09-07T00:00:00+00:00"
+      },
+      "metrics": {
+        "test_rows": 107,
+        "accuracy": 0.6635514018691588,
+        "precision": 0.6296296296296297,
+        "recall": 0.8947368421052632,
+        "f1": 0.7391304347826086,
+        "probability_mean_sum": 1,
+        "brier_score": 0.22184665728263908,
+        "log_loss": 0.6351124371804038,
+        "confusion_matrix_labels_0_1": [
+          [
+            20,
+            30
+          ],
+          [
+            6,
+            51
+          ]
+        ],
+        "calibration_bins": [
+          {
+            "lower": 0,
+            "upper": 0.2,
+            "count": 0,
+            "mean_probability": null,
+            "observed_home_win_rate": null
+          },
+          {
+            "lower": 0.2,
+            "upper": 0.4,
+            "count": 5,
+            "mean_probability": 0.3727395785775108,
+            "observed_home_win_rate": 0.2
+          },
+          {
+            "lower": 0.4,
+            "upper": 0.6000000000000001,
+            "count": 70,
+            "mean_probability": 0.5263978576147984,
+            "observed_home_win_rate": 0.5
+          },
+          {
+            "lower": 0.6000000000000001,
+            "upper": 0.8,
+            "count": 32,
+            "mean_probability": 0.6491440985157433,
+            "observed_home_win_rate": 0.65625
+          },
+          {
+            "lower": 0.8,
+            "upper": 1,
+            "count": 0,
+            "mean_probability": null,
+            "observed_home_win_rate": null
+          }
+        ],
+        "training_prevalence_baseline": {
+          "probability": 0.5469107551487414,
+          "accuracy": 0.5327102803738317,
+          "brier_score": 0.24913169104169816,
+          "log_loss": 0.6914119428075258
+        }
+      },
+      "reload_predictions_identical": true,
+      "artifact_directory": "build/sprint2-models/nfl-f35e4b52fca3d0c170e5",
+      "evaluation_file": "build/sprint2-models/nfl-f35e4b52fca3d0c170e5/nfl_evaluation.json",
+      "draws_encoded_as_not_home_win": 0
+    },
+    "MLB": {
+      "dataset": {
+        "sources": [
+          {
+            "url": "https://statsapi.mlb.com/api/v1/schedule?sportId=1&season=2024&gameType=R",
+            "sha256": "9733d248b6a6d1635eb91802f504d70ebedc49b5aa87e7ae962cafb40b18879b",
+            "source_rows": 2469,
+            "excluded": {
+              "not_completed_regular_season": 37,
+              "resumed_game_leakage_guard": 6
+            }
+          }
+        ],
+        "rows": 2426,
+        "date_min": "2024-03-20T00:00:00+00:00",
+        "date_max": "2024-09-30T00:00:00+00:00",
+        "dataset_sha256": "6dad78b156002cc5b9bbe7ae88694550258ac99659d60ae42c26d31ef479c416"
+      },
+      "metadata": {
+        "artifact_version": "1ed880eb8ce31e47452f",
+        "classes": [
+          0,
+          1
+        ],
+        "dataset_sha256": "6dad78b156002cc5b9bbe7ae88694550258ac99659d60ae42c26d31ef479c416",
+        "feature_columns": [
+          "home_win_rate",
+          "away_win_rate",
+          "home_avg_score",
+          "away_avg_score",
+          "home_avg_allowed",
+          "away_avg_allowed"
+        ],
+        "model_sha256": "1474006f9e7368e9a276a76a8f867a878ceb127f8ebcb1d78f589cf67edf44da",
+        "model_type": "logistic_regression",
+        "pandas_version": "3.0.6",
+        "python_version": "3.12.14",
+        "random_state": 42,
+        "sklearn_version": "1.9.1",
+        "source": {
+          "files": {
+            "evaluation/evaluate_multisport_models.py": "ae602addc3b129160da9c9f258e99b94c9bc5d8f86feee8accb4d9ae78b880e8",
+            "features/download_multisport_data.py": "1450237d3b5a256a781730e92b5d20bd8a156172aa7611dbac028c43d35dae7e",
+            "features/engineer_multisport_features.py": "daad6b9469e71faaf96a42053a41136a51aa716dea91cb1b88ba42293853b083",
+            "features/prepare_multisport_data.py": "eeb6b3004efe2465232e792e9cd9e7a80145e94c6d79bc39c0eaec1f9f18cf78",
+            "features/prepare_nfl_data.py": "e20e74110e500514ef7caf7750bf7a88021ee427509e4fbfa0bb25c031e48054",
+            "predict_multisport.py": "ee2857096c380a1ea3e62c3cb0baceff4b2766c00db75acd95a83966734d7bf9",
+            "run_multisport_pipeline.py": "86a6a7082565f35a794da3df2b1c709fdef75763a7f1889b96e02cc7b6a68806",
+            "training/train_multisport_baseline.py": "3ddf84dc53d4a7c6746742b7a64a36e52aae4502f7d75ecad9985b854aa1ed06",
+            "training/train_nfl_baseline.py": "69da96f62f7f91191f5660f213deebca617e486e4d445ce4a534ecad3b21c2d9"
+          },
+          "git_head": "9e1e1f781d2f2de9bf7ddf3adfd47e52eca897cf",
+          "ml_source_sha256": "0af9f4ded7edfe42f5a67a6ffd537924b6d33c751a08347ebd35f0f75972f404",
+          "uncommitted_ml_changes": true
+        },
+        "split": "chronological_nearest_80_20_whole_dates",
+        "sport": "MLB",
+        "target": {
+          "0": "not_home_win_including_draw",
+          "1": "home_win"
+        },
+        "test_class_counts": {
+          "0": 236,
+          "1": 246
+        },
+        "test_end": "2024-09-30T00:00:00+00:00",
+        "test_rows": 482,
+        "test_start": "2024-08-25T00:00:00+00:00",
+        "train_class_counts": {
+          "0": 924,
+          "1": 1020
+        },
+        "train_end": "2024-08-24T00:00:00+00:00",
+        "train_rows": 1944,
+        "train_start": "2024-03-20T00:00:00+00:00"
+      },
+      "metrics": {
+        "test_rows": 482,
+        "accuracy": 0.5518672199170125,
+        "precision": 0.5376884422110553,
+        "recall": 0.8699186991869918,
+        "f1": 0.6645962732919255,
+        "probability_mean_sum": 1,
+        "brier_score": 0.24686768607386772,
+        "log_loss": 0.6868473714662024,
+        "confusion_matrix_labels_0_1": [
+          [
+            52,
+            184
+          ],
+          [
+            32,
+            214
+          ]
+        ],
+        "calibration_bins": [
+          {
+            "lower": 0,
+            "upper": 0.2,
+            "count": 0,
+            "mean_probability": null,
+            "observed_home_win_rate": null
+          },
+          {
+            "lower": 0.2,
+            "upper": 0.4,
+            "count": 0,
+            "mean_probability": null,
+            "observed_home_win_rate": null
+          },
+          {
+            "lower": 0.4,
+            "upper": 0.6000000000000001,
+            "count": 473,
+            "mean_probability": 0.526246332547669,
+            "observed_home_win_rate": 0.5052854122621564
+          },
+          {
+            "lower": 0.6000000000000001,
+            "upper": 0.8,
+            "count": 9,
+            "mean_probability": 0.6215839713650655,
+            "observed_home_win_rate": 0.7777777777777778
+          },
+          {
+            "lower": 0.8,
+            "upper": 1,
+            "count": 0,
+            "mean_probability": null,
+            "observed_home_win_rate": null
+          }
+        ],
+        "training_prevalence_baseline": {
+          "probability": 0.5246913580246914,
+          "accuracy": 0.5103734439834025,
+          "brier_score": 0.25009739432241695,
+          "log_loss": 0.6933426243317881
+        }
+      },
+      "reload_predictions_identical": true,
+      "artifact_directory": "build/sprint2-models/mlb-1ed880eb8ce31e47452f",
+      "evaluation_file": "build/sprint2-models/mlb-1ed880eb8ce31e47452f/mlb_evaluation.json",
+      "draws_encoded_as_not_home_win": 0
+    },
+    "EPL": {
+      "dataset": {
+        "sources": [
+          {
+            "url": "https://www.football-data.co.uk/mmz4281/2324/E0.csv",
+            "sha256": "b2e057b0ed959f198b0f63d2391c01239f3608e6de5db68edab3f88e04d07ff3",
+            "source_rows": 380,
+            "excluded_incomplete_or_other_division": 0
+          },
+          {
+            "url": "https://www.football-data.co.uk/mmz4281/2425/E0.csv",
+            "sha256": "d0c8ce4a96d886cf60cf101f570f4a3893844226f91c7bd769eb568c49edbfa4",
+            "source_rows": 380,
+            "excluded_incomplete_or_other_division": 0
+          }
+        ],
+        "rows": 760,
+        "date_min": "2023-08-11T00:00:00+00:00",
+        "date_max": "2025-05-25T00:00:00+00:00",
+        "dataset_sha256": "fd59ac576d09e402c331a5a62222ffa5d0daebb29a658c3fa780a53020404713"
+      },
+      "metadata": {
+        "artifact_version": "8fe44dc6fa087a157dfd",
+        "classes": [
+          0,
+          1
+        ],
+        "dataset_sha256": "fd59ac576d09e402c331a5a62222ffa5d0daebb29a658c3fa780a53020404713",
+        "feature_columns": [
+          "home_win_rate",
+          "away_win_rate",
+          "home_avg_score",
+          "away_avg_score",
+          "home_avg_allowed",
+          "away_avg_allowed"
+        ],
+        "model_sha256": "0fc7af34b59c0b09e5d566ce4eee85bc7ac8cdc426b1394e1753ffd44a7846bf",
+        "model_type": "logistic_regression",
+        "pandas_version": "3.0.6",
+        "python_version": "3.12.14",
+        "random_state": 42,
+        "sklearn_version": "1.9.1",
+        "source": {
+          "files": {
+            "evaluation/evaluate_multisport_models.py": "ae602addc3b129160da9c9f258e99b94c9bc5d8f86feee8accb4d9ae78b880e8",
+            "features/download_multisport_data.py": "1450237d3b5a256a781730e92b5d20bd8a156172aa7611dbac028c43d35dae7e",
+            "features/engineer_multisport_features.py": "daad6b9469e71faaf96a42053a41136a51aa716dea91cb1b88ba42293853b083",
+            "features/prepare_multisport_data.py": "eeb6b3004efe2465232e792e9cd9e7a80145e94c6d79bc39c0eaec1f9f18cf78",
+            "features/prepare_nfl_data.py": "e20e74110e500514ef7caf7750bf7a88021ee427509e4fbfa0bb25c031e48054",
+            "predict_multisport.py": "ee2857096c380a1ea3e62c3cb0baceff4b2766c00db75acd95a83966734d7bf9",
+            "run_multisport_pipeline.py": "86a6a7082565f35a794da3df2b1c709fdef75763a7f1889b96e02cc7b6a68806",
+            "training/train_multisport_baseline.py": "3ddf84dc53d4a7c6746742b7a64a36e52aae4502f7d75ecad9985b854aa1ed06",
+            "training/train_nfl_baseline.py": "69da96f62f7f91191f5660f213deebca617e486e4d445ce4a534ecad3b21c2d9"
+          },
+          "git_head": "9e1e1f781d2f2de9bf7ddf3adfd47e52eca897cf",
+          "ml_source_sha256": "0af9f4ded7edfe42f5a67a6ffd537924b6d33c751a08347ebd35f0f75972f404",
+          "uncommitted_ml_changes": true
+        },
+        "split": "chronological_nearest_80_20_whole_dates",
+        "sport": "EPL",
+        "target": {
+          "0": "not_home_win_including_draw",
+          "1": "home_win"
+        },
+        "test_class_counts": {
+          "0": 85,
+          "1": 66
+        },
+        "test_end": "2025-05-25T00:00:00+00:00",
+        "test_rows": 151,
+        "test_start": "2025-02-01T00:00:00+00:00",
+        "train_class_counts": {
+          "0": 345,
+          "1": 264
+        },
+        "train_end": "2025-01-26T00:00:00+00:00",
+        "train_rows": 609,
+        "train_start": "2023-08-11T00:00:00+00:00"
+      },
+      "metrics": {
+        "test_rows": 151,
+        "accuracy": 0.6556291390728477,
+        "precision": 0.6296296296296297,
+        "recall": 0.5151515151515151,
+        "f1": 0.5666666666666667,
+        "probability_mean_sum": 1,
+        "brier_score": 0.21005184255783632,
+        "log_loss": 0.6050573311651515,
+        "confusion_matrix_labels_0_1": [
+          [
+            65,
+            20
+          ],
+          [
+            32,
+            34
+          ]
+        ],
+        "calibration_bins": [
+          {
+            "lower": 0,
+            "upper": 0.2,
+            "count": 11,
+            "mean_probability": 0.15574565627176995,
+            "observed_home_win_rate": 0
+          },
+          {
+            "lower": 0.2,
+            "upper": 0.4,
+            "count": 49,
+            "mean_probability": 0.3138360029119601,
+            "observed_home_win_rate": 0.2653061224489796
+          },
+          {
+            "lower": 0.4,
+            "upper": 0.6000000000000001,
+            "count": 67,
+            "mean_probability": 0.493673693359298,
+            "observed_home_win_rate": 0.5671641791044776
+          },
+          {
+            "lower": 0.6000000000000001,
+            "upper": 0.8,
+            "count": 23,
+            "mean_probability": 0.6799796293799919,
+            "observed_home_win_rate": 0.6086956521739131
+          },
+          {
+            "lower": 0.8,
+            "upper": 1,
+            "count": 1,
+            "mean_probability": 0.829153248338664,
+            "observed_home_win_rate": 1
+          }
+        ],
+        "training_prevalence_baseline": {
+          "probability": 0.43349753694581283,
+          "accuracy": 0.5629139072847682,
+          "brier_score": 0.24605471800267392,
+          "log_loss": 0.6852360408534571
+        }
+      },
+      "reload_predictions_identical": true,
+      "artifact_directory": "build/sprint2-models/epl-8fe44dc6fa087a157dfd",
+      "evaluation_file": "build/sprint2-models/epl-8fe44dc6fa087a157dfd/epl_evaluation.json",
+      "draws_encoded_as_not_home_win": 175
+    }
+  }
+}

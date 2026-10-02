@@ -1,45 +1,54 @@
-"""Create leakage-safe features and chronological train/test splits."""
+"""Prior-day features and date-grouped chronological holdout."""
 from __future__ import annotations
 
 import pandas as pd
 
-FEATURE_COLUMNS = ["home_win_rate", "away_win_rate", "home_avg_score", "away_avg_score", "home_avg_allowed", "away_avg_allowed"]
+from app.ml.features.prepare_multisport_data import validate_games
 
-
-def _history(games: pd.DataFrame, team: str, date: pd.Timestamp) -> pd.DataFrame:
-    prior = games[games["game_date"] < date]
-    home = prior[prior["home_team"] == team].assign(team_score=lambda x: x["home_score"], opponent_score=lambda x: x["away_score"])
-    away = prior[prior["away_team"] == team].assign(team_score=lambda x: x["away_score"], opponent_score=lambda x: x["home_score"])
-    return pd.concat([home, away], ignore_index=True)
-
-
-def _stats(games: pd.DataFrame, team: str, date: pd.Timestamp) -> dict[str, float]:
-    history = _history(games, team, date)
-    if history.empty:
-        return {"win_rate": 0.0, "avg_score": 0.0, "avg_allowed": 0.0}
-    return {"win_rate": float((history["team_score"] > history["opponent_score"]).mean()), "avg_score": float(history["team_score"].mean()), "avg_allowed": float(history["opponent_score"].mean())}
+FEATURE_COLUMNS = [
+    "home_win_rate", "away_win_rate", "home_avg_score", "away_avg_score",
+    "home_avg_allowed", "away_avg_allowed",
+]
 
 
 def create_features(games: pd.DataFrame) -> pd.DataFrame:
-    """Create pre-game features using only matches before each match."""
-    required = {"game_id", "game_date", "home_team", "away_team", "home_score", "away_score"}
-    missing = required - set(games.columns)
-    if missing:
-        raise ValueError(f"Missing feature input columns: {', '.join(sorted(missing))}")
-    ordered = games.copy()
-    ordered["game_date"] = pd.to_datetime(ordered["game_date"], utc=True)
-    ordered = ordered.sort_values(["game_date", "game_id"]).reset_index(drop=True)
+    ordered = validate_games("NFL", games)
+    ordered["game_date"] = ordered["game_date"].dt.normalize()
+    history = {}
     rows = []
-    for _, game in ordered.iterrows():
-        home, away = _stats(ordered, game["home_team"], game["game_date"]), _stats(ordered, game["away_team"], game["game_date"])
-        rows.append({"game_id": game["game_id"], "game_date": game["game_date"], "home_team": game["home_team"], "away_team": game["away_team"], "home_win_rate": home["win_rate"], "away_win_rate": away["win_rate"], "home_avg_score": home["avg_score"], "away_avg_score": away["avg_score"], "home_avg_allowed": home["avg_allowed"], "away_avg_allowed": away["avg_allowed"], "outcome": int(game["home_score"] > game["away_score"])})
+    for _, day_games in ordered.groupby("game_date", sort=True):
+        for game in day_games.to_dict("records"):
+            row = {key: game[key] for key in ("game_id", "game_date", "home_team", "away_team")}
+            for side in ("home", "away"):
+                count, wins, scored, allowed = history.get(game[f"{side}_team"], (0, 0, 0, 0))
+                row[f"{side}_win_rate"] = wins / count if count else 0.0
+                row[f"{side}_avg_score"] = scored / count if count else 0.0
+                row[f"{side}_avg_allowed"] = allowed / count if count else 0.0
+            row["outcome"] = int(game["home_score"] > game["away_score"])
+            rows.append(row)
+        for game in day_games.to_dict("records"):
+            for side, opponent in (("home", "away"), ("away", "home")):
+                team = game[f"{side}_team"]
+                count, wins, scored, allowed = history.get(team, (0, 0, 0, 0))
+                score, conceded = game[f"{side}_score"], game[f"{opponent}_score"]
+                history[team] = (count + 1, wins + int(score > conceded), scored + score, allowed + conceded)
     return pd.DataFrame(rows)
 
 
 def chronological_split(data: pd.DataFrame, test_fraction: float = 0.2) -> tuple[pd.DataFrame, pd.DataFrame]:
-    """Split older matches for training and newer matches for testing."""
     if not 0 < test_fraction < 1:
         raise ValueError("test_fraction must be between 0 and 1")
-    ordered = data.sort_values(["game_date", "game_id"]).reset_index(drop=True)
-    index = min(max(1, int(len(ordered) * (1 - test_fraction))), len(ordered) - 1)
-    return ordered.iloc[:index].copy(), ordered.iloc[index:].copy()
+    if len(data) < 2:
+        raise ValueError("At least two rows are required")
+    ordered = data.copy()
+    ordered["game_date"] = pd.to_datetime(ordered["game_date"], format="ISO8601", utc=True, errors="raise").dt.normalize()
+    if ordered["game_date"].isna().any():
+        raise ValueError("Missing game_date")
+    ordered = ordered.sort_values(["game_date", "game_id"]).reset_index(drop=True)
+    boundaries = [index for index in range(1, len(ordered))
+                  if ordered.loc[index, "game_date"] != ordered.loc[index - 1, "game_date"]]
+    if not boundaries:
+        raise ValueError("At least two distinct game dates are required")
+    target = len(ordered) * (1 - test_fraction)
+    boundary = min(boundaries, key=lambda index: abs(index - target))
+    return ordered.iloc[:boundary].copy(), ordered.iloc[boundary:].copy()

@@ -1,5 +1,8 @@
 # Sprint 2 review evidence — October 1, 2026
 
+Historical PR #15 evidence. For the later local implementation closing its
+real-data gaps, see [Sprint 2 completion evidence](sprint2_completion_evidence.md).
+
 ## Scope
 
 Recovered the local multi-sport dataset validator, prior-game features,

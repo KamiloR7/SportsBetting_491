@@ -1,0 +1,59 @@
+{
+  "retrieved_at_utc": "2026-10-02T03:11:13.826454+00:00",
+  "sports": {
+    "NFL": {
+      "sources": [
+        {
+          "url": "https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv",
+          "sha256": "4fefc0180964799fafd2e9c0bba16ed2b1aad4cde8ecbf6e4423a0d6cc0b8b72",
+          "source_rows": 7548,
+          "selected_rows": 544,
+          "excluded_incomplete": 0
+        }
+      ],
+      "rows": 544,
+      "date_min": "2023-09-07T00:00:00+00:00",
+      "date_max": "2025-01-05T00:00:00+00:00",
+      "dataset_sha256": "5e42bb55fb21a300f553c39771f83c59f9b2eb92339b76fc40358d6b040ca69c"
+    },
+    "MLB": {
+      "sources": [
+        {
+          "url": "https://statsapi.mlb.com/api/v1/schedule?sportId=1&season=2024&gameType=R",
+          "sha256": "9733d248b6a6d1635eb91802f504d70ebedc49b5aa87e7ae962cafb40b18879b",
+          "source_rows": 2469,
+          "excluded": {
+            "not_completed_regular_season": 37,
+            "resumed_game_leakage_guard": 6
+          }
+        }
+      ],
+      "rows": 2426,
+      "date_min": "2024-03-20T00:00:00+00:00",
+      "date_max": "2024-09-30T00:00:00+00:00",
+      "dataset_sha256": "6dad78b156002cc5b9bbe7ae88694550258ac99659d60ae42c26d31ef479c416"
+    },
+    "EPL": {
+      "sources": [
+        {
+          "url": "https://www.football-data.co.uk/mmz4281/2324/E0.csv",
+          "sha256": "b2e057b0ed959f198b0f63d2391c01239f3608e6de5db68edab3f88e04d07ff3",
+          "source_rows": 380,
+          "excluded_incomplete_or_other_division": 0
+        },
+        {
+          "url": "https://www.football-data.co.uk/mmz4281/2425/E0.csv",
+          "sha256": "d0c8ce4a96d886cf60cf101f570f4a3893844226f91c7bd769eb568c49edbfa4",
+          "source_rows": 380,
+          "excluded_incomplete_or_other_division": 0
+        }
+      ],
+      "rows": 760,
+      "date_min": "2023-08-11T00:00:00+00:00",
+      "date_max": "2025-05-25T00:00:00+00:00",
+      "dataset_sha256": "fd59ac576d09e402c331a5a62222ffa5d0daebb29a658c3fa780a53020404713"
+    }
+  },
+  "usage": "Educational local analysis only. Public access does not grant redistribution rights. Raw provider data is not committed.",
+  "date_policy": "Provider match calendar dates; prior-day features exclude all same-day results. Resumed MLB games excluded."
+}
