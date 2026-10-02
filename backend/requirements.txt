@@ -8,3 +8,4 @@ pydantic-settings
 alembic
 bcrypt
 email-validator
+pytest
