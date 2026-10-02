@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from src.collectors.uefa_collector import (
+from uefa_collector import (
     CollectorResult,
     UEFACollector,
     UEFACollectorError,
@@ -75,6 +75,26 @@ def make_matches_payload():
     }
 
 
+def make_premier_league_teams_payload():
+    payload = make_teams_payload()
+    payload["competition"] = {
+        "id": 2021,
+        "name": "Premier League",
+        "code": "PL",
+    }
+    return payload
+
+
+def make_premier_league_matches_payload():
+    payload = make_matches_payload()
+    payload["competition"] = {
+        "id": 2021,
+        "name": "Premier League",
+        "code": "PL",
+    }
+    return payload
+
+
 def normalized_teams_by_id():
     return {
         str(team["id"]): normalize_team(team)
@@ -136,6 +156,20 @@ def test_collector_injected_loaders_and_validation():
     assert len(result.teams) == 2
     assert len(result.games) == 2
     assert len(checks) == 5
+
+
+def test_premier_league_competition_normalization():
+    collector = UEFACollector(
+        competition_code="PL",
+        team_loader=lambda season: make_premier_league_teams_payload(),
+        match_loader=lambda season: make_premier_league_matches_payload(),
+    )
+
+    result = collector.collect(2026)
+
+    assert result.teams[0]["league"] == "Premier League"
+    assert result.games[0]["league"] == "Premier League"
+    assert result.games[0]["sport"] == "SOCCER"
 
 
 def test_write_csv(tmp_path: Path):
