@@ -1,5 +1,10 @@
 # Sprint 2 Ticket 4: Evaluation, Versioning, and Model Interface
 
+The notes below describe the original PR #15 implementation. The local follow-up
+adds real-data evaluation, Brier/log-loss/calibration analysis, immutable model
+artifacts, dataset/model/source fingerprints and a validated prediction interface.
+See [completion evidence](sprint2_completion_evidence.md) for the current contract.
+
 The evaluation module reports accuracy, precision, recall, F1, test-row count, and a probability-sum check for each sport baseline. It rejects invalid probability outputs and writes JSON evidence containing the sport, model version, source revision, and metrics.
 
 ## Model interface

@@ -18,5 +18,6 @@ def test_rejects_unsupported_sport():
 
 def test_saves_model_and_metadata(tmp_path):
     model, metadata = train_baseline(training_data(), "NFL")
-    assert save_baseline(model, metadata, tmp_path).exists()
-    assert (tmp_path / "nfl_baseline.json").exists()
+    path = save_baseline(model, metadata, tmp_path)
+    assert path.exists()
+    assert path.with_suffix(".json").exists()

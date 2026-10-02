@@ -1,5 +1,8 @@
 # Sprint 2 Member 1 Baseline Review
 
+Historical initial review: the missing-data limitation below was resolved in the
+local follow-up documented in [completion evidence](sprint2_completion_evidence.md).
+
 The repository contains an NFL-only Logistic Regression baseline. Its preparation path creates chronological prior-game team features, uses an 80/20 chronological split, and reports accuracy and win probabilities.
 
 The Sprint 2 requirement is broader: real NFL, MLB, and EPL data. MLB and EPL raw training files are not currently present, so this implementation does not invent data or claim those datasets are ready. It establishes the shared validation gate that they must pass before training.
