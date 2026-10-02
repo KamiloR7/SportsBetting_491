@@ -272,7 +272,11 @@ class UEFACollector:
             return str(competition["name"])
         if self.competition_code == "CL":
             return DEFAULT_LEAGUE_NAME
-        return f"UEFA {self.competition_code}"
+
+        if self.competition_code == "PL":
+            return "Premier League"
+
+        return self.competition_code
 
     def _load_teams_payload(self, season: int) -> Any:
         if self._team_loader:
