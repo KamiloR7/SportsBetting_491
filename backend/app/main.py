@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+from app.routes.auth import router as auth_router
 from app.routes.sports import router as sports_router
 
 app = FastAPI(
@@ -9,6 +10,7 @@ app = FastAPI(
 )
 
 app.include_router(sports_router)
+app.include_router(auth_router)
 
 
 @app.get("/health")
