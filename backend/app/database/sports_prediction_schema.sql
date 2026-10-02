@@ -175,6 +175,7 @@ CREATE TABLE users (
     email VARCHAR(254) NOT NULL UNIQUE,
     username VARCHAR(80) UNIQUE,
     display_name VARCHAR(120),
+    password_hash VARCHAR(255) NOT NULL,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
