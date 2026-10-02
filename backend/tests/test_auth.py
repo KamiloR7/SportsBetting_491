@@ -8,8 +8,8 @@ import bcrypt
 from fastapi import HTTPException
 from pydantic import ValidationError
 
-# Provide test database settings so the backend modules can be imported
-# without requiring the developer's local PostgreSQL credentials.
+# Provide test database settings so backend modules can be imported
+# without requiring local PostgreSQL credentials.
 os.environ.setdefault("DATABASE_HOST", "localhost")
 os.environ.setdefault("DATABASE_PORT", "5432")
 os.environ.setdefault("DATABASE_NAME", "test_db")
@@ -29,8 +29,14 @@ class TestAuthValidation(unittest.TestCase):
             password="TestPassword123",
         )
 
-        self.assertEqual(str(user.email), "test@example.com")
-        self.assertEqual(user.username, "testuser")
+        self.assertEqual(
+            str(user.email),
+            "test@example.com",
+        )
+        self.assertEqual(
+            user.username,
+            "testuser",
+        )
 
     def test_invalid_email_rejected(self):
         with self.assertRaises(ValidationError):
@@ -48,15 +54,27 @@ class TestAuthValidation(unittest.TestCase):
                 password="123",
             )
 
+    def test_short_username_rejected(self):
+        with self.assertRaises(ValidationError):
+            UserRegister(
+                email="test@example.com",
+                username="ab",
+                password="TestPassword123",
+            )
+
     def test_password_hashing(self):
         password = b"TestPassword123"
+
         password_hash = bcrypt.hashpw(
             password,
             bcrypt.gensalt(),
         )
 
         self.assertTrue(
-            bcrypt.checkpw(password, password_hash)
+            bcrypt.checkpw(
+                password,
+                password_hash,
+            )
         )
 
         self.assertNotEqual(
@@ -71,7 +89,9 @@ class TestRegistrationEndpoint(unittest.TestCase):
         db = MagicMock()
 
         existing_result = MagicMock()
-        existing_result.first.return_value = SimpleNamespace(id=1)
+        existing_result.first.return_value = SimpleNamespace(
+            id=1
+        )
 
         db.execute.return_value = existing_result
 
@@ -81,7 +101,10 @@ class TestRegistrationEndpoint(unittest.TestCase):
         )
 
         with self.assertRaises(HTTPException) as context:
-            register_user(user, db)
+            register_user(
+                user,
+                db,
+            )
 
         self.assertEqual(
             context.exception.status_code,
@@ -117,7 +140,10 @@ class TestRegistrationEndpoint(unittest.TestCase):
             password="TestPassword123",
         )
 
-        response = register_user(user, db)
+        response = register_user(
+            user,
+            db,
+        )
 
         self.assertEqual(
             str(response.email),
@@ -129,7 +155,9 @@ class TestRegistrationEndpoint(unittest.TestCase):
             "New User",
         )
 
-        self.assertTrue(response.is_active)
+        self.assertTrue(
+            response.is_active
+        )
 
         db.commit.assert_called_once()
 
@@ -137,7 +165,9 @@ class TestRegistrationEndpoint(unittest.TestCase):
             db.execute.call_args_list[1].args[1]
         )
 
-        stored_hash = insert_parameters["password_hash"]
+        stored_hash = insert_parameters[
+            "password_hash"
+        ]
 
         self.assertNotEqual(
             stored_hash,

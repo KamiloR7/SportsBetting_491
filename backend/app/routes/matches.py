@@ -1,6 +1,6 @@
 from typing import List, Literal, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
@@ -37,7 +37,7 @@ def _match_from_row(row) -> MatchOut:
 
 @router.get("", response_model=List[MatchOut])
 def list_matches(
-    league_id: Optional[int] = None,
+    league_id: Optional[int] = Query(default=None, ge=1),
     status: Optional[MatchStatus] = None,
     db: Session = Depends(get_db),
 ):
@@ -77,7 +77,7 @@ def list_matches(
 
 @router.get("/history", response_model=List[MatchOut])
 def match_history(
-    league_id: Optional[int] = None,
+    league_id: Optional[int] = Query(default=None, ge=1),
     limit: int = Query(default=100, ge=1, le=500),
     db: Session = Depends(get_db),
 ):
@@ -118,7 +118,7 @@ def match_history(
 
 @router.get("/{match_id}", response_model=MatchOut)
 def get_match(
-    match_id: int,
+    match_id: int = Path(..., ge=1),
     db: Session = Depends(get_db),
 ):
     row = db.execute(
