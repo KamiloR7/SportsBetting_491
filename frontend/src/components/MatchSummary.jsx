@@ -1,7 +1,9 @@
 function MatchSummary({ match }) {
-  const startTime = new Date(match.start_time);
-  const dateTime = Number.isNaN(startTime.getTime())
-    ? "Date and time unavailable"
+  const hasStartTime = match.start_time != null &&
+    !(typeof match.start_time === "string" && match.start_time.trim() === "");
+  const startTime = hasStartTime ? new Date(match.start_time) : null;
+  const dateTime = !startTime || Number.isNaN(startTime.getTime())
+    ? "Date/time unavailable"
     : startTime.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
   const status = match.status
     ? match.status.replaceAll("_", " ")

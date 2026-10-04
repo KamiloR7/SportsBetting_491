@@ -24,8 +24,15 @@ function MatchData({ id }) {
 
   return (
     <>
-      <MatchSummary match={result.match} />
-      <p>Predictions and betting odds are currently unavailable.</p>
+      <div className="match-details-summary">
+        <MatchSummary match={result.match} />
+      </div>
+      <section className="match-details-context" aria-labelledby="match-context-heading">
+        <h2 id="match-context-heading">Match context</h2>
+        <p>Neutral site: {result.match.neutral_site === true
+          ? "Yes"
+          : result.match.neutral_site === false ? "No" : "Unavailable"}</p>
+      </section>
     </>
   );
 }
