@@ -1,21 +1,16 @@
-import testMatches
-  from "../data/testMatches";
+import { apiRequest } from "./api";
 
-export async function getMatches() {
-  return testMatches;
+export function getLeagues(options = {}) {
+  return apiRequest("/leagues", options);
 }
 
-export async function getMatchById(id) {
-  const match = testMatches.find(
-    (match) =>
-      match.id === Number(id)
-  );
+export function getMatches(leagueId, options = {}) {
+  return apiRequest(`/matches?league_id=${encodeURIComponent(leagueId)}`, options);
+}
 
-  if (!match) {
-    throw new Error(
-      "Match not found"
-    );
+export async function getMatchById(id, options = {}) {
+  if (!/^[1-9]\d*$/.test(String(id))) {
+    throw new Error("This match ID is invalid.");
   }
-
-  return match;
+  return apiRequest(`/matches/${encodeURIComponent(id)}`, options);
 }
