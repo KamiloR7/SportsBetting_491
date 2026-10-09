@@ -43,7 +43,7 @@ jobs:
       - name: Install test dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -c backend/requirements-sprint2-tested.txt pytest
+          pip install -c backend/requirements-sprint2-tested.txt pytest pytest-cov
           pip install -e .
           pip install -c backend/requirements-sprint2-tested.txt -r backend/requirements.txt
 
@@ -56,14 +56,21 @@ jobs:
       - name: Run automated tests
         env:
           PYTHONPATH: backend
-        run: python -m pytest -v --junitxml=build/test-results.xml
+        run: |
+          python -m pytest -v \
+            --junitxml=build/test-results.xml \
+            --cov=backend/app/ml \
+            --cov-report=term-missing \
+            --cov-report=xml:build/coverage.xml
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: tests-${{ env.BUILD_ID }}
-          path: build/test-results.xml
+          path: |
+            build/test-results.xml
+            build/coverage.xml
 
       - name: Upload build metadata
         uses: actions/upload-artifact@v4
