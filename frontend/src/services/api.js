@@ -11,6 +11,7 @@ export async function apiRequest(endpoint, options = {}) {
 
   if (!response.ok) {
     if (response.status === 404) throw new Error("The requested item was not found.");
+    if (response.status === 503) throw new Error("This service is unavailable right now. Please try again later.");
     throw new Error("The server could not load this data. Please try again later.");
   }
 

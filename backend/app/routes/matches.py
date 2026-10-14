@@ -2,6 +2,7 @@ from typing import List, Literal, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from sqlalchemy import text
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 
 from app.database.db import get_db
@@ -41,36 +42,39 @@ def list_matches(
     status: Optional[MatchStatus] = None,
     db: Session = Depends(get_db),
 ):
-    rows = db.execute(
-        text(
-            """
-            SELECT
-                m.id,
-                m.league_id,
-                l.name AS league_name,
-                m.home_team_id,
-                ht.name AS home_team_name,
-                m.away_team_id,
-                at.name AS away_team_name,
-                m.start_time,
-                m.status,
-                m.home_score,
-                m.away_score,
-                m.neutral_site
-            FROM matches m
-            LEFT JOIN leagues l ON l.id = m.league_id
-            LEFT JOIN teams ht ON ht.id = m.home_team_id
-            LEFT JOIN teams at ON at.id = m.away_team_id
-            WHERE (:league_id IS NULL OR m.league_id = :league_id)
-              AND (:status IS NULL OR m.status = :status)
-            ORDER BY m.start_time
-            """
-        ),
-        {
-            "league_id": league_id,
-            "status": status,
-        },
-    ).all()
+    try:
+        rows = db.execute(
+            text(
+                """
+                SELECT
+                    m.id,
+                    m.league_id,
+                    l.name AS league_name,
+                    m.home_team_id,
+                    ht.name AS home_team_name,
+                    m.away_team_id,
+                    at.name AS away_team_name,
+                    m.start_time,
+                    m.status,
+                    m.home_score,
+                    m.away_score,
+                    m.neutral_site
+                FROM matches m
+                LEFT JOIN leagues l ON l.id = m.league_id
+                LEFT JOIN teams ht ON ht.id = m.home_team_id
+                LEFT JOIN teams at ON at.id = m.away_team_id
+                WHERE (:league_id IS NULL OR m.league_id = :league_id)
+                  AND (:status IS NULL OR m.status = :status)
+                ORDER BY m.start_time
+                """
+            ),
+            {
+                "league_id": league_id,
+                "status": status,
+            },
+        ).all()
+    except OperationalError:
+        return []
 
     return [_match_from_row(row) for row in rows]
 
@@ -81,37 +85,40 @@ def match_history(
     limit: int = Query(default=100, ge=1, le=500),
     db: Session = Depends(get_db),
 ):
-    rows = db.execute(
-        text(
-            """
-            SELECT
-                m.id,
-                m.league_id,
-                l.name AS league_name,
-                m.home_team_id,
-                ht.name AS home_team_name,
-                m.away_team_id,
-                at.name AS away_team_name,
-                m.start_time,
-                m.status,
-                m.home_score,
-                m.away_score,
-                m.neutral_site
-            FROM matches m
-            LEFT JOIN leagues l ON l.id = m.league_id
-            LEFT JOIN teams ht ON ht.id = m.home_team_id
-            LEFT JOIN teams at ON at.id = m.away_team_id
-            WHERE m.status = 'final'
-              AND (:league_id IS NULL OR m.league_id = :league_id)
-            ORDER BY m.start_time DESC
-            LIMIT :limit
-            """
-        ),
-        {
-            "league_id": league_id,
-            "limit": limit,
-        },
-    ).all()
+    try:
+        rows = db.execute(
+            text(
+                """
+                SELECT
+                    m.id,
+                    m.league_id,
+                    l.name AS league_name,
+                    m.home_team_id,
+                    ht.name AS home_team_name,
+                    m.away_team_id,
+                    at.name AS away_team_name,
+                    m.start_time,
+                    m.status,
+                    m.home_score,
+                    m.away_score,
+                    m.neutral_site
+                FROM matches m
+                LEFT JOIN leagues l ON l.id = m.league_id
+                LEFT JOIN teams ht ON ht.id = m.home_team_id
+                LEFT JOIN teams at ON at.id = m.away_team_id
+                WHERE m.status = 'final'
+                  AND (:league_id IS NULL OR m.league_id = :league_id)
+                ORDER BY m.start_time DESC
+                LIMIT :limit
+                """
+            ),
+            {
+                "league_id": league_id,
+                "limit": limit,
+            },
+        ).all()
+    except OperationalError:
+        return []
 
     return [_match_from_row(row) for row in rows]
 
@@ -121,31 +128,37 @@ def get_match(
     match_id: int = Path(..., ge=1),
     db: Session = Depends(get_db),
 ):
-    row = db.execute(
-        text(
-            """
-            SELECT
-                m.id,
-                m.league_id,
-                l.name AS league_name,
-                m.home_team_id,
-                ht.name AS home_team_name,
-                m.away_team_id,
-                at.name AS away_team_name,
-                m.start_time,
-                m.status,
-                m.home_score,
-                m.away_score,
-                m.neutral_site
-            FROM matches m
-            LEFT JOIN leagues l ON l.id = m.league_id
-            LEFT JOIN teams ht ON ht.id = m.home_team_id
-            LEFT JOIN teams at ON at.id = m.away_team_id
-            WHERE m.id = :match_id
-            """
-        ),
-        {"match_id": match_id},
-    ).first()
+    try:
+        row = db.execute(
+            text(
+                """
+                SELECT
+                    m.id,
+                    m.league_id,
+                    l.name AS league_name,
+                    m.home_team_id,
+                    ht.name AS home_team_name,
+                    m.away_team_id,
+                    at.name AS away_team_name,
+                    m.start_time,
+                    m.status,
+                    m.home_score,
+                    m.away_score,
+                    m.neutral_site
+                FROM matches m
+                LEFT JOIN leagues l ON l.id = m.league_id
+                LEFT JOIN teams ht ON ht.id = m.home_team_id
+                LEFT JOIN teams at ON at.id = m.away_team_id
+                WHERE m.id = :match_id
+                """
+            ),
+            {"match_id": match_id},
+        ).first()
+    except OperationalError:
+        raise HTTPException(
+            status_code=404,
+            detail="Match not found.",
+        ) from None
 
     if row is None:
         raise HTTPException(

@@ -5,6 +5,7 @@ from types import SimpleNamespace
 from unittest.mock import MagicMock
 
 from fastapi import HTTPException
+from sqlalchemy.exc import OperationalError
 
 # Provide test database settings so backend modules can be imported
 # without requiring local PostgreSQL credentials.
@@ -84,6 +85,38 @@ class TestMatchEndpoints(unittest.TestCase):
         self.assertEqual(matches[0].home_score, 24)
         self.assertEqual(matches[0].away_score, 17)
 
+    def test_list_matches_returns_empty_when_database_unavailable(self):
+        db = MagicMock()
+        db.execute.side_effect = OperationalError(
+            "SELECT matches",
+            {},
+            RuntimeError("database unavailable"),
+        )
+
+        matches = list_matches(
+            league_id=1,
+            status=None,
+            db=db,
+        )
+
+        self.assertEqual(matches, [])
+
+    def test_match_history_returns_empty_when_database_unavailable(self):
+        db = MagicMock()
+        db.execute.side_effect = OperationalError(
+            "SELECT match history",
+            {},
+            RuntimeError("database unavailable"),
+        )
+
+        matches = match_history(
+            league_id=1,
+            limit=100,
+            db=db,
+        )
+
+        self.assertEqual(matches, [])
+
     def test_get_match_returns_match(self):
         db = MagicMock()
 
@@ -118,6 +151,25 @@ class TestMatchEndpoints(unittest.TestCase):
         with self.assertRaises(HTTPException) as context:
             get_match(
                 match_id=999,
+                db=db,
+            )
+
+        self.assertEqual(
+            context.exception.status_code,
+            404,
+        )
+
+    def test_get_match_returns_404_when_database_unavailable(self):
+        db = MagicMock()
+        db.execute.side_effect = OperationalError(
+            "SELECT match",
+            {},
+            RuntimeError("database unavailable"),
+        )
+
+        with self.assertRaises(HTTPException) as context:
+            get_match(
+                match_id=5,
                 db=db,
             )
 

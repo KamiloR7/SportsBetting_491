@@ -173,10 +173,18 @@ It also inserts a small Sprint 1 development set of teams for each sport.
 
 The seed script is designed to avoid creating duplicate records when run more than once.
 
+For Sprint 3 local UI testing, seed a small set of scheduled and historical
+NFL, MLB, and EPL matches after the base reference data:
+
+```bash
+python -m app.database.seed_dev_matches
+```
+
 Seed implementation:
 
 ```text
 backend/app/database/seed_data.py
+backend/app/database/seed_dev_matches.py
 ```
 
 ---
