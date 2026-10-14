@@ -25,25 +25,73 @@ jobs:
           python-version: "3.12"
 
       - name: Generate build metadata
-        run: |-
-          SHORT_SHA="${GITHUB_SHA::7}"
-          BUILD_ID="build-${GITHUB_RUN_NUMBER}-${GITHUB_RUN_ATTEMPT}-${SHORT_SHA}"
-
-          echo "BUILD_ID=$BUILD_ID" >> "$GITHUB_ENV"
+        id: metadata
+        shell: bash
+        env:
+          SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          SOURCE_BRANCH: ${{ github.head_ref || github.ref_name }}
+        run: |
+          set -euo pipefail
+          SHORT_SHA="${SOURCE_SHA:0:7}"
+          BUILD_ID="build-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${SHORT_SHA}"
+          RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          BUILT_AT="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
 
           mkdir -p build
-          echo "build_id=$BUILD_ID" > build/build-info.txt
-          echo "run_number=$GITHUB_RUN_NUMBER" >> build/build-info.txt
-          echo "run_attempt=$GITHUB_RUN_ATTEMPT" >> build/build-info.txt
-          echo "commit=$GITHUB_SHA" >> build/build-info.txt
-          echo "branch=$GITHUB_REF_NAME" >> build/build-info.txt
+          {
+            echo "build_id=$BUILD_ID"
+            echo "run_id=$GITHUB_RUN_ID"
+            echo "run_attempt=$GITHUB_RUN_ATTEMPT"
+            echo "run_number=$GITHUB_RUN_NUMBER"
+            echo "commit=$SOURCE_SHA"
+            echo "short_commit=$SHORT_SHA"
+            echo "branch=$SOURCE_BRANCH"
+            echo "event=$GITHUB_EVENT_NAME"
+            echo "repository=$GITHUB_REPOSITORY"
+            echo "run_url=$RUN_URL"
+            echo "created_utc=$BUILT_AT"
+          } > build/build-info.txt
+
+          echo "BUILD_ID=$BUILD_ID" >> "$GITHUB_ENV"
+          echo "SOURCE_SHA=$SOURCE_SHA" >> "$GITHUB_ENV"
+          echo "SOURCE_BRANCH=$SOURCE_BRANCH" >> "$GITHUB_ENV"
+          echo "build_id=$BUILD_ID" >> "$GITHUB_OUTPUT"
 
           echo "Build ID: $BUILD_ID"
+          echo "Source commit: $SOURCE_SHA"
+          echo "Source branch: $SOURCE_BRANCH"
+          echo "Run: $RUN_URL"
+          echo "::notice title=Build ID::$BUILD_ID"
+
+          {
+            echo "### Build traceability"
+            echo ""
+            echo "| Field | Value |"
+            echo "| --- | --- |"
+            echo "| Build ID | \`$BUILD_ID\` |"
+            echo "| Source commit | \`$SOURCE_SHA\` |"
+            echo "| Source branch | \`$SOURCE_BRANCH\` |"
+            echo "| Run attempt | \`$GITHUB_RUN_ATTEMPT\` |"
+            echo "| Created (UTC) | $BUILT_AT |"
+            echo "| Run | $RUN_URL |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Verify build metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s build/build-info.txt
+          grep -Fx "build_id=$BUILD_ID" build/build-info.txt
+          grep -Fx "commit=$SOURCE_SHA" build/build-info.txt
+          grep -Fx "branch=$SOURCE_BRANCH" build/build-info.txt
+          grep -Fx "run_id=$GITHUB_RUN_ID" build/build-info.txt
+          grep -Fx "run_attempt=$GITHUB_RUN_ATTEMPT" build/build-info.txt
+          echo "Build metadata validation passed."
 
       - name: Install test dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -c backend/requirements-sprint2-tested.txt pytest pytest-cov
+          pip install -c backend/requirements-sprint2-tested.txt pytest
           pip install -e .
           pip install -c backend/requirements-sprint2-tested.txt -r backend/requirements.txt
 
@@ -56,26 +104,20 @@ jobs:
       - name: Run automated tests
         env:
           PYTHONPATH: backend
-        run: |
-          python -m pytest -v \
-            --junitxml=build/test-results.xml \
-            --cov=backend/app/ml \
-            --cov-report=term-missing \
-            --cov-report=xml:build/coverage.xml
+        run: python -m pytest -v --junitxml=build/test-results.xml
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: tests-${{ env.BUILD_ID }}
-          path: |
-            build/test-results.xml
-            build/coverage.xml
+          name: tests-${{ steps.metadata.outputs.build_id }}
+          path: build/test-results.xml
 
       - name: Upload build metadata
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.BUILD_ID }}
+          name: ${{ steps.metadata.outputs.build_id }}
           path: |
             build/build-info.txt
             build/dist/*.whl
