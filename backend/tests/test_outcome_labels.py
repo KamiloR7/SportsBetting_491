@@ -104,3 +104,20 @@ def test_rejects_unsupported_sport():
             3,
             "FINAL",
         )
+
+def test_label_conversion_is_deterministic():
+    # =====================================
+    #Identical match inputs must always produc the same outcome label.
+    # =====================================
+
+    results = [
+        label_match_outcome(
+            "UEFA",
+            1,
+            1,
+            "FINAL",
+        )
+        for _ in range(10)
+    ]
+
+    assert results == ["draw"] * 10
