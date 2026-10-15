@@ -15,7 +15,14 @@ Completes the Member 1 Sprint 3 Backend and Database workflow for NFL, MLB, and 
 
 ## Jira
 
-- Add the actual Jira issue links for model loading, prediction service, history lookup, validation, testing, frontend integration, and documentation.
+- [SCRUM-261](https://cpsc-491-group5.atlassian.net/browse/SCRUM-261) model loading
+- [SCRUM-266](https://cpsc-491-group5.atlassian.net/browse/SCRUM-266) prediction service and endpoint
+- [SCRUM-262](https://cpsc-491-group5.atlassian.net/browse/SCRUM-262) team and history lookup
+- [SCRUM-263](https://cpsc-491-group5.atlassian.net/browse/SCRUM-263) validation and error handling
+- [SCRUM-268](https://cpsc-491-group5.atlassian.net/browse/SCRUM-268) response and probability contract
+- [SCRUM-267](https://cpsc-491-group5.atlassian.net/browse/SCRUM-267) backend integration tests and CI
+- [SCRUM-264](https://cpsc-491-group5.atlassian.net/browse/SCRUM-264) API documentation and frontend integration
+- [SCRUM-265](https://cpsc-491-group5.atlassian.net/browse/SCRUM-265) submission artifacts and evidence
 
 ## Changes
 
@@ -52,8 +59,8 @@ Please verify the model deployment safeguards, prior-game history query, respons
 Before opening the pull request:
 
 1. Push all local commits on the feature branch.
-2. Replace the Jira placeholder with the real issue links.
-3. Open the pull request against `main`.
-4. Request a teammate review.
-5. Confirm both CI jobs pass.
+2. Open the pull request against `main`.
+3. Request a teammate review.
+4. Confirm both CI jobs pass.
+5. Add the PR and CI links to the Jira issues and submission evidence.
 6. Merge only after approval.

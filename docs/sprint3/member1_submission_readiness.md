@@ -16,7 +16,7 @@ Assessment date: 2026-10-15
 - CI configuration for Python tests frontend lint and frontend build
 - Final test plan document prepared for Google Docs import
 - Manual-test and work-evidence workbook prepared for Google Sheets import
-- Jira alignment criteria prepared for the live board
+- Eight live Jira issues created, assigned, added to Sprint 3, and moved to In Review
 
 Local verification on 2026-10-15:
 
@@ -40,7 +40,7 @@ The new backend work is in commits `3d392ce` and `3a47b96` on branch `aymoon13/s
 4. Merge only after approval and successful CI.
 5. Complete the eight manual cases in the evidence workbook with actual results and links or screenshots.
 6. Import the test plan to Google Docs and the evidence workbook to Google Sheets, then add shareable links.
-7. Match or create the Jira issues listed in the Jira alignment file and attach the PR and tests.
+7. Attach the combined PR, hosted CI result, and final evidence links to Jira issues SCRUM-261 through SCRUM-268.
 8. Add the final repository, PR, CI, Jira, test plan, evidence, and Sprint 3 ChatGPT links to the submission document.
 9. Continue real Sprint 3 work on at least three additional dates if the goal is the rubric's five-day evidence tier. Do not backdate commits or invent activity.
 
