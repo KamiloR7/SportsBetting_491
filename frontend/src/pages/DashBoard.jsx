@@ -1,6 +1,7 @@
 
 import { useEffect, useState } from "react";
 import MatchCard from "../components/MatchCard";
+import DemoNotice from "../components/DemoNotice";
 import { getLeagues, getMatches } from "../services/matches";
 
 const SPORT_OPTIONS = [
@@ -133,6 +134,7 @@ function Dashboard() {
 
   return (
     <div className="dashboard">
+      <DemoNotice />
       <header className="dashboard-header">
         <h1>Matches</h1>
         <p>Select a sport to browse upcoming matches.</p>

@@ -62,4 +62,5 @@ def demo_db():
 
 prepare_demo()
 app.title = "Sports Match Prediction API (Synthetic Demo)"
+app.state.data_mode = "synthetic_demo"
 app.dependency_overrides[get_db] = demo_db

@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import MatchSummary from "../components/MatchSummary";
+import DemoNotice from "../components/DemoNotice";
 import { getMatchById, getMatchHistory, runMatchPrediction } from "../services/matches";
 
 function teamPlayedMatch(match, teamId) {
@@ -270,6 +271,7 @@ function MatchDetails() {
   const { id } = useParams();
   return (
     <div className="match-details">
+      <DemoNotice />
       <Link to="/dashboard">Back to matches</Link>
       <h1>Match details</h1>
       <MatchData key={id} id={id} />

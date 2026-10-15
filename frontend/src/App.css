@@ -1,3 +1,12 @@
+.demo-notice {
+  margin: 0 0 16px;
+  padding: 9px 12px;
+  border-left: 3px solid #67c6a5;
+  color: #ccefe1;
+  background: #19332c;
+  font-size: 14px;
+}
+
 .dashboard {
   box-sizing: border-box;
   width: 100%;

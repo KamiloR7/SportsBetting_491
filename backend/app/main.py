@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 
 from app.routes.auth import router as auth_router
 from app.routes.matches import router as matches_router
@@ -18,5 +18,5 @@ app.include_router(predictions_router)
 
 
 @app.get("/health")
-def health_check():
-    return {"status": "ok"}
+def health_check(request: Request):
+    return {"status": "ok", "data_mode": getattr(request.app.state, "data_mode", "database")}
