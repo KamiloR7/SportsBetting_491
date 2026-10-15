@@ -1,0 +1,91 @@
+[
+  {
+    "match_id": "NBA-TEST-001",
+    "sport": "NBA",
+    "game_date": "2026-01-10",
+    "home_score": 115,
+    "away_score": 108,
+    "status": "FINAL",
+    "expected_label": "home_win"
+  },
+  {
+    "match_id": "NBA-TEST-002",
+    "sport": "NBA",
+    "game_date": "2026-01-11",
+    "home_score": 98,
+    "away_score": 112,
+    "status": "FINAL",
+    "expected_label": "away_win"
+  },
+  {
+    "match_id": "NFL-TEST-001",
+    "sport": "NFL",
+    "game_date": "2026-01-12",
+    "home_score": 28,
+    "away_score": 21,
+    "status": "FINAL",
+    "expected_label": "home_win"
+  },
+  {
+    "match_id": "NFL-TEST-002",
+    "sport": "NFL",
+    "game_date": "2026-01-13",
+    "home_score": 17,
+    "away_score": 24,
+    "status": "FINAL",
+    "expected_label": "away_win"
+  },
+  {
+    "match_id": "UEFA-TEST-001",
+    "sport": "UEFA",
+    "game_date": "2026-01-14",
+    "home_score": 2,
+    "away_score": 0,
+    "status": "FINAL",
+    "expected_label": "home_win"
+  },
+  {
+    "match_id": "UEFA-TEST-002",
+    "sport": "UEFA",
+    "game_date": "2026-01-15",
+    "home_score": 1,
+    "away_score": 1,
+    "status": "FINAL",
+    "expected_label": "draw"
+  },
+  {
+    "match_id": "UEFA-TEST-003",
+    "sport": "UEFA",
+    "game_date": "2026-01-16",
+    "home_score": 0,
+    "away_score": 3,
+    "status": "FINAL",
+    "expected_label": "away_win"
+  },
+  {
+    "match_id": "NBA-TEST-003",
+    "sport": "NBA",
+    "game_date": "2026-01-17",
+    "home_score": null,
+    "away_score": null,
+    "status": "SCHEDULED",
+    "expected_label": null
+  },
+  {
+    "match_id": "NFL-TEST-003",
+    "sport": "NFL",
+    "game_date": "2026-01-18",
+    "home_score": 21,
+    "away_score": 21,
+    "status": "FINAL",
+    "expected_label": null
+  },
+  {
+    "match_id": "UEFA-TEST-004",
+    "sport": "UEFA",
+    "game_date": "2026-01-19",
+    "home_score": 2,
+    "status": "FINAL",
+    "expected_error": "missing away_score"
+  }
+]
