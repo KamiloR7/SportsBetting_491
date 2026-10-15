@@ -69,3 +69,37 @@ Result on 2026-10-15:
 ```
 
 Status: implemented and locally verified; PR review, CI, approval, and merge remain required before this item is complete evidence.
+
+## Items 2–10: prediction workflow
+
+Implemented the backend and frontend path for a selected match:
+
+- `POST /predictions` validates a positive `match_id` and rejects extra fields.
+- The database lookup identifies NFL, MLB, or EPL from the stored league.
+- Only final games before the selected match are used to build team-history features.
+- Cold-start teams receive zero-valued features and explicit zero history counts.
+- The prediction service selects the sport's verified model and returns one response schema.
+- Home-win and not-home-win probabilities sum to one; confidence is the larger value.
+- Missing matches, unsupported sports, and unavailable models have controlled HTTP errors.
+- The match-details page can request and render the prediction and history counts.
+- CI now runs frontend lint/build in addition to the full Python test suite.
+- The backend README documents setup, request/response fields, errors, and the EPL binary-model limitation.
+
+### Automated evidence
+
+Backend result on 2026-10-15:
+
+```text
+136 passed in 3.34s
+```
+
+Frontend results on 2026-10-15:
+
+```text
+eslint .
+vite build
+35 modules transformed
+build completed successfully
+```
+
+Status: locally verified; PR CI, teammate review, approval, and merge remain pending by design so the combined Sprint 3 PR can be opened during class.

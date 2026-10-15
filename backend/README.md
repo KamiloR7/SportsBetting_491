@@ -13,7 +13,8 @@ The Sprint 1 backend currently includes:
 * FastAPI Swagger/OpenAPI documentation
 * Health-check endpoint
 
-Prediction functionality, authentication, write endpoints, and production deployment are planned for future sprints.
+Sprint 3 adds a prediction endpoint that connects stored matchup history to the
+trusted NFL, MLB, and EPL baseline artifacts produced by the Sprint 2 pipeline.
 
 ---
 
@@ -109,6 +110,7 @@ DATABASE_PORT=5432
 DATABASE_NAME=sports_betting
 DATABASE_USER=postgres
 DATABASE_PASSWORD=your_local_password
+MODEL_DIRECTORY=build/sprint2-models
 ```
 
 Important:
@@ -118,6 +120,8 @@ Important:
 * `.env` is excluded through `.gitignore`.
 * Database credentials must never be hard-coded into Python files.
 * Each teammate may have different PostgreSQL credentials.
+* `MODEL_DIRECTORY` points to the directory containing one immutable artifact
+  version for each of NFL, MLB, and EPL.
 
 Configuration is loaded through:
 
@@ -218,7 +222,71 @@ Health Check: http://127.0.0.1:8000/health
 Sports:       http://127.0.0.1:8000/sports
 Leagues:      http://127.0.0.1:8000/leagues
 Teams:        http://127.0.0.1:8000/teams
+Predictions:  http://127.0.0.1:8000/predictions
 ```
+
+---
+
+## Sprint 3 Prediction API
+
+### Generate a prediction
+
+`POST /predictions`
+
+Request:
+
+```json
+{
+  "match_id": 42
+}
+```
+
+The selected match must exist in PostgreSQL and its league abbreviation must be
+`NFL`, `MLB`, or `EPL`. The service uses only final games scheduled before the
+selected matchup to calculate each team's win rate, average score, and average
+score allowed. A team with no prior results receives zero-valued cold-start
+features, and the response reports the number of historical games used.
+
+Successful response:
+
+```json
+{
+  "match_id": 42,
+  "sport": "NFL",
+  "home_team_id": 10,
+  "home_team_name": "Kansas City Chiefs",
+  "away_team_id": 20,
+  "away_team_name": "Philadelphia Eagles",
+  "predicted_outcome": "HOME_WIN",
+  "predicted_team_id": 10,
+  "predicted_team_name": "Kansas City Chiefs",
+  "probabilities": {
+    "home_win": 0.73,
+    "not_home_win": 0.27
+  },
+  "confidence": 0.73,
+  "model_version": "2a69b54f54ff6b319c6d",
+  "history": {
+    "home_games": 12,
+    "away_games": 11
+  }
+}
+```
+
+The current Sprint 2 artifacts use a binary target for all three sports:
+`HOME_WIN` versus `NOT_HOME_WIN`. For EPL, the latter includes both an away win
+and a draw; the API does not claim to distinguish those outcomes.
+
+### Controlled errors
+
+| Status | Condition |
+| --- | --- |
+| `404` | The selected match does not exist. |
+| `422` | The request is malformed, `match_id` is invalid, or the league is unsupported. |
+| `503` | A configured model is missing, ambiguous, damaged, or incompatible. |
+
+Detailed checksum or filesystem failures are not returned to clients. The API
+uses a generic 503 message to avoid exposing internal deployment paths.
 
 There is currently no route defined for:
 

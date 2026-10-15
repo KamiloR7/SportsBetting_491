@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import MatchSummary from "../components/MatchSummary";
+import PredictionPanel from "../components/PredictionPanel";
 import { getMatchById } from "../services/matches";
 
 function MatchData({ id }) {
@@ -33,6 +34,7 @@ function MatchData({ id }) {
           ? "Yes"
           : result.match.neutral_site === false ? "No" : "Unavailable"}</p>
       </section>
+      <PredictionPanel matchId={result.match.id} />
     </>
   );
 }
