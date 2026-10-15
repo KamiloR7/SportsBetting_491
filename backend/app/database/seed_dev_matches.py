@@ -118,22 +118,36 @@ def _insert_match(
     )
 
 
-def run_seed() -> None:
-    now = datetime.now(timezone.utc).replace(microsecond=0)
+def run_seed(db_engine=engine) -> None:
+    now = datetime.now(timezone.utc).replace(hour=12, minute=0, second=0, microsecond=0)
 
-    with engine.begin() as conn:
+    with db_engine.begin() as conn:
         nfl = _league_id(conn, "NFL")
         mlb = _league_id(conn, "MLB")
         epl = _league_id(conn, "EPL")
 
+        # Sample development results only; these are not current league schedules.
+        sport_samples = [
+            (nfl, "american-football", ["KC", "PHI", "DAL", "SF", "BUF", "GB"],
+             [(28, 17), (17, 24), (14, 31), (35, 20), (24, 27), (30, 21)]),
+            (mlb, "baseball", ["NYY", "LAD", "BOS", "CHC", "HOU", "ATL"],
+             [(6, 3), (2, 5), (3, 4), (7, 2), (1, 5), (5, 4)]),
+            (epl, "soccer", ["MCI", "ARS", "LIV", "CHE", "MUN", "TOT"],
+             [(2, 1), (0, 2), (1, 1), (3, 0), (0, 0), (1, 2)]),
+        ]
         match_specs = [
             (nfl, "american-football", "KC", "PHI", now + timedelta(days=3), "scheduled", None, None),
-            (nfl, "american-football", "DAL", "SF", now - timedelta(days=12), "final", 21, 28),
             (mlb, "baseball", "NYY", "LAD", now + timedelta(days=4), "scheduled", None, None),
-            (mlb, "baseball", "BOS", "CHC", now - timedelta(days=10), "final", 5, 3),
             (epl, "soccer", "MCI", "ARS", now + timedelta(days=5), "scheduled", None, None),
-            (epl, "soccer", "LIV", "CHE", now - timedelta(days=9), "final", 2, 1),
         ]
+        for league_id, sport_slug, teams, scores in sport_samples:
+            for index in range(18):
+                home_score, away_score = scores[index % len(scores)]
+                match_specs.append((
+                    league_id, sport_slug, teams[index % len(teams)],
+                    teams[(index + 3) % len(teams)],
+                    now - timedelta(days=30 - index), "final", home_score, away_score,
+                ))
 
         for league_id, sport_slug, home, away, start_time, status, home_score, away_score in match_specs:
             _insert_match(

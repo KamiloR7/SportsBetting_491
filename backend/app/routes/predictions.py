@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from fastapi import APIRouter, Depends, HTTPException, Path
 from sqlalchemy import text
 from sqlalchemy.exc import OperationalError
@@ -5,23 +7,9 @@ from sqlalchemy.orm import Session
 
 from app.database.db import get_db
 from app.schemas.predictions import PredictionOut
+from app.services.match_prediction import predict_probabilities
 
 router = APIRouter(prefix="/predictions", tags=["predictions"])
-
-
-def _prediction_from_row(row) -> PredictionOut:
-    return PredictionOut(
-        match_id=row.match_id,
-        model_version_id=row.model_version_id,
-        model_name=row.model_name,
-        model_version=row.model_version,
-        predicted_winner_id=row.predicted_winner_id,
-        predicted_winner_name=row.predicted_winner_name,
-        home_win_probability=row.home_win_probability,
-        away_win_probability=row.away_win_probability,
-        confidence=row.confidence,
-        generated_at=row.generated_at,
-    )
 
 
 @router.post("/matches/{match_id}", response_model=PredictionOut)
@@ -30,40 +18,77 @@ def run_match_prediction(
     db: Session = Depends(get_db),
 ):
     try:
-        row = db.execute(
+        match = db.execute(
             text(
                 """
-                SELECT
-                    mp.match_id,
-                    mp.model_version_id,
-                    mv.name AS model_name,
-                    mv.version AS model_version,
-                    mp.predicted_winner_id,
-                    t.name AS predicted_winner_name,
-                    mp.home_win_probability,
-                    mp.away_win_probability,
-                    mp.confidence,
-                    mp.generated_at
-                FROM match_predictions mp
-                LEFT JOIN model_versions mv ON mv.id = mp.model_version_id
-                LEFT JOIN teams t ON t.id = mp.predicted_winner_id
-                WHERE mp.match_id = :match_id
-                ORDER BY mp.generated_at DESC
-                LIMIT 1
+                SELECT m.id, m.league_id, l.abbreviation AS sport,
+                       m.home_team_id, ht.name AS home_team_name,
+                       m.away_team_id, at.name AS away_team_name,
+                       m.start_time, m.status
+                FROM matches m
+                JOIN leagues l ON l.id = m.league_id
+                JOIN teams ht ON ht.id = m.home_team_id
+                JOIN teams at ON at.id = m.away_team_id
+                WHERE m.id = :match_id
                 """
             ),
             {"match_id": match_id},
         ).first()
-    except OperationalError:
-        raise HTTPException(
-            status_code=503,
-            detail="Prediction service is unavailable until the local database is running.",
-        ) from None
+        if match is None:
+            raise HTTPException(status_code=404, detail="Match not found.")
+        if match.status != "scheduled":
+            raise HTTPException(status_code=422, detail="Only scheduled matches can be predicted.")
+        if match.sport not in {"NFL", "MLB", "EPL"}:
+            raise HTTPException(status_code=422, detail="This league has no prediction model.")
 
-    if row is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Prediction has not been generated for this match.",
+        start_time = match.start_time
+        if isinstance(start_time, str):
+            start_time = datetime.fromisoformat(start_time.replace("Z", "+00:00"))
+        if start_time.tzinfo is None:
+            start_time = start_time.replace(tzinfo=timezone.utc)
+        start_day = start_time.astimezone(timezone.utc).replace(
+            hour=0, minute=0, second=0, microsecond=0
         )
+        history = db.execute(
+            text(
+                """
+                SELECT home_team_id, away_team_id, home_score, away_score
+                FROM matches
+                WHERE league_id = :league_id
+                  AND status = 'final'
+                  AND start_time < :start_day
+                  AND home_score IS NOT NULL
+                  AND away_score IS NOT NULL
+                ORDER BY start_time
+                """
+            ),
+            {"league_id": match.league_id, "start_day": start_day},
+        ).all()
+    except OperationalError:
+        raise HTTPException(status_code=503, detail="Match data is unavailable.") from None
 
-    return _prediction_from_row(row)
+    try:
+        result = predict_probabilities(
+            match.sport, match.home_team_id, match.away_team_id, history
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+    winner_id = {
+        "home_win": match.home_team_id,
+        "away_win": match.away_team_id,
+    }.get(result["predicted_outcome"])
+    winner_name = {
+        "home_win": match.home_team_name,
+        "away_win": match.away_team_name,
+    }.get(result["predicted_outcome"])
+    return PredictionOut(
+        match_id=match_id,
+        model_name="multisport_baseline",
+        predicted_winner_id=winner_id,
+        predicted_winner_name=winner_name,
+        generated_at=datetime.now(timezone.utc),
+        **result,
+    )

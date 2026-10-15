@@ -74,7 +74,7 @@ def list_matches(
             },
         ).all()
     except OperationalError:
-        return []
+        raise HTTPException(status_code=503, detail="Match data is unavailable.") from None
 
     return [_match_from_row(row) for row in rows]
 
@@ -82,6 +82,7 @@ def list_matches(
 @router.get("/history", response_model=List[MatchOut])
 def match_history(
     league_id: Optional[int] = Query(default=None, ge=1),
+    team_id: Optional[int] = Query(default=None, ge=1),
     limit: int = Query(default=100, ge=1, le=500),
     db: Session = Depends(get_db),
 ):
@@ -108,17 +109,19 @@ def match_history(
                 LEFT JOIN teams at ON at.id = m.away_team_id
                 WHERE m.status = 'final'
                   AND (:league_id IS NULL OR m.league_id = :league_id)
+                  AND (:team_id IS NULL OR m.home_team_id = :team_id OR m.away_team_id = :team_id)
                 ORDER BY m.start_time DESC
                 LIMIT :limit
                 """
             ),
             {
                 "league_id": league_id,
+                "team_id": team_id,
                 "limit": limit,
             },
         ).all()
     except OperationalError:
-        return []
+        raise HTTPException(status_code=503, detail="Match history is unavailable.") from None
 
     return [_match_from_row(row) for row in rows]
 
@@ -156,8 +159,8 @@ def get_match(
         ).first()
     except OperationalError:
         raise HTTPException(
-            status_code=404,
-            detail="Match not found.",
+            status_code=503,
+            detail="Match data is unavailable.",
         ) from None
 
     if row is None:

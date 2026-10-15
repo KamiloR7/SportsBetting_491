@@ -23,6 +23,13 @@ function resultForTeam(match, teamId) {
   return teamScore > opponentScore ? "Win" : "Loss";
 }
 
+function scoreForTeam(match, teamId) {
+  const isHomeTeam = match.home_team_id === teamId;
+  const teamScore = isHomeTeam ? match.home_score : match.away_score;
+  const opponentScore = isHomeTeam ? match.away_score : match.home_score;
+  return `${teamScore ?? "-"}-${opponentScore ?? "-"}`;
+}
+
 function TeamHistory({ headingId, label, teamId, history }) {
   const recentMatches = history
     .filter((match) => teamPlayedMatch(match, teamId))
@@ -44,7 +51,7 @@ function TeamHistory({ headingId, label, teamId, history }) {
               <li key={`${label}-${match.id}`}>
                 <span>{resultForTeam(match, teamId)}</span>
                 <span>vs {opponentName || "Opponent unavailable"}</span>
-                <span>{match.home_score ?? "-"}-{match.away_score ?? "-"}</span>
+                <span aria-label="Team score to opponent score">{scoreForTeam(match, teamId)}</span>
               </li>
             );
           })}
@@ -56,24 +63,29 @@ function TeamHistory({ headingId, label, teamId, history }) {
 
 function HistoricalTeamContext({ match }) {
   const [result, setResult] = useState({
-    loading: Boolean(match.league_id),
-    history: [],
+    loading: Boolean(match.league_id && match.home_team_id && match.away_team_id),
+    homeHistory: [],
+    awayHistory: [],
     error: "",
   });
 
   useEffect(() => {
     let ignore = false;
 
-    if (!match.league_id) {
+    if (!match.league_id || !match.home_team_id || !match.away_team_id) {
       return undefined;
     }
 
-    getMatchHistory(match.league_id)
-      .then((history) => {
+    Promise.all([
+      getMatchHistory(match.league_id, match.home_team_id),
+      getMatchHistory(match.league_id, match.away_team_id),
+    ])
+      .then(([homeHistory, awayHistory]) => {
         if (!ignore) {
           setResult({
             loading: false,
-            history: history.filter((item) => item.id !== match.id),
+            homeHistory: homeHistory.filter((item) => item.id !== match.id),
+            awayHistory: awayHistory.filter((item) => item.id !== match.id),
             error: "",
           });
         }
@@ -82,7 +94,8 @@ function HistoricalTeamContext({ match }) {
         if (!ignore) {
           setResult({
             loading: false,
-            history: [],
+            homeHistory: [],
+            awayHistory: [],
             error: "History unavailable",
           });
         }
@@ -91,7 +104,7 @@ function HistoricalTeamContext({ match }) {
     return () => {
       ignore = true;
     };
-  }, [match.id, match.league_id]);
+  }, [match.id, match.league_id, match.home_team_id, match.away_team_id]);
 
   if (result.loading) {
     return <p role="status">Loading team history...</p>;
@@ -107,13 +120,13 @@ function HistoricalTeamContext({ match }) {
         headingId="home-team-history-heading"
         label={match.home_team_name || "Home team"}
         teamId={match.home_team_id}
-        history={result.history}
+        history={result.homeHistory}
       />
       <TeamHistory
         headingId="away-team-history-heading"
         label={match.away_team_name || "Away team"}
         teamId={match.away_team_id}
-        history={result.history}
+        history={result.awayHistory}
       />
     </div>
   );
@@ -123,6 +136,11 @@ function formatPercent(value) {
   return value == null
     ? "Unavailable"
     : `${Math.round(Number(value) * 100)}%`;
+}
+
+function predictionOutcome(prediction) {
+  if (prediction.predicted_outcome === "draw") return "Draw";
+  return prediction.predicted_winner_name || "Outcome unavailable";
 }
 
 function PredictionPanel({ match }) {
@@ -147,14 +165,10 @@ function PredictionPanel({ match }) {
         error: "",
       });
     } catch (error) {
-      const message = error.message === "The requested item was not found."
-        ? "Prediction has not been generated for this match yet."
-        : error.message;
-
       setResult({
         loading: false,
         prediction: null,
-        error: message,
+        error: error.message,
       });
     }
   }
@@ -180,7 +194,7 @@ function PredictionPanel({ match }) {
         <dl className="prediction-results">
           <div>
             <dt>Predicted outcome</dt>
-            <dd>{result.prediction.predicted_winner_name || "Outcome unavailable"}</dd>
+            <dd>{predictionOutcome(result.prediction)}</dd>
           </div>
           <div>
             <dt>Home win probability</dt>
@@ -190,6 +204,12 @@ function PredictionPanel({ match }) {
             <dt>Away win probability</dt>
             <dd>{formatPercent(result.prediction.away_win_probability)}</dd>
           </div>
+          {result.prediction.draw_probability != null && (
+            <div>
+              <dt>Estimated draw probability</dt>
+              <dd>{formatPercent(result.prediction.draw_probability)}</dd>
+            </div>
+          )}
           <div>
             <dt>Confidence</dt>
             <dd>{formatPercent(result.prediction.confidence)}</dd>

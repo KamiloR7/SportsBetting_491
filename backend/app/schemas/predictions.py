@@ -6,6 +6,7 @@ from pydantic import BaseModel
 
 class PredictionOut(BaseModel):
     match_id: int
+    predicted_outcome: str
     model_version_id: Optional[int] = None
     model_name: Optional[str] = None
     model_version: Optional[str] = None
@@ -13,5 +14,6 @@ class PredictionOut(BaseModel):
     predicted_winner_name: Optional[str] = None
     home_win_probability: Optional[float] = None
     away_win_probability: Optional[float] = None
+    draw_probability: Optional[float] = None
     confidence: Optional[float] = None
     generated_at: Optional[datetime] = None

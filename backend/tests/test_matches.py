@@ -76,6 +76,7 @@ class TestMatchEndpoints(unittest.TestCase):
 
         matches = match_history(
             league_id=None,
+            team_id=10,
             limit=100,
             db=db,
         )
@@ -84,8 +85,9 @@ class TestMatchEndpoints(unittest.TestCase):
         self.assertEqual(matches[0].status, "final")
         self.assertEqual(matches[0].home_score, 24)
         self.assertEqual(matches[0].away_score, 17)
+        self.assertEqual(db.execute.call_args.args[1]["team_id"], 10)
 
-    def test_list_matches_returns_empty_when_database_unavailable(self):
+    def test_list_matches_returns_503_when_database_unavailable(self):
         db = MagicMock()
         db.execute.side_effect = OperationalError(
             "SELECT matches",
@@ -93,15 +95,12 @@ class TestMatchEndpoints(unittest.TestCase):
             RuntimeError("database unavailable"),
         )
 
-        matches = list_matches(
-            league_id=1,
-            status=None,
-            db=db,
-        )
+        with self.assertRaises(HTTPException) as context:
+            list_matches(league_id=1, status=None, db=db)
 
-        self.assertEqual(matches, [])
+        self.assertEqual(context.exception.status_code, 503)
 
-    def test_match_history_returns_empty_when_database_unavailable(self):
+    def test_match_history_returns_503_when_database_unavailable(self):
         db = MagicMock()
         db.execute.side_effect = OperationalError(
             "SELECT match history",
@@ -109,13 +108,10 @@ class TestMatchEndpoints(unittest.TestCase):
             RuntimeError("database unavailable"),
         )
 
-        matches = match_history(
-            league_id=1,
-            limit=100,
-            db=db,
-        )
+        with self.assertRaises(HTTPException) as context:
+            match_history(league_id=1, team_id=10, limit=100, db=db)
 
-        self.assertEqual(matches, [])
+        self.assertEqual(context.exception.status_code, 503)
 
     def test_get_match_returns_match(self):
         db = MagicMock()
@@ -159,7 +155,7 @@ class TestMatchEndpoints(unittest.TestCase):
             404,
         )
 
-    def test_get_match_returns_404_when_database_unavailable(self):
+    def test_get_match_returns_503_when_database_unavailable(self):
         db = MagicMock()
         db.execute.side_effect = OperationalError(
             "SELECT match",
@@ -175,7 +171,7 @@ class TestMatchEndpoints(unittest.TestCase):
 
         self.assertEqual(
             context.exception.status_code,
-            404,
+            503,
         )
 
 

@@ -1,164 +1,66 @@
-# Sprint 2 frontend
+# Sprint 3 match UI
 
-React + Vite + JavaScript + React Router. The current frontend browses NFL,
-MLB, and EPL matches through the backend API; the active match screens do not
-use mock match data.
+React, Vite, and React Router provide the NFL, MLB, and EPL match-prediction
+workflow. The routed match screens use the backend API; legacy mock betting data
+is not used.
 
-## Setup
+## Run locally
 
-Use Node.js and npm compatible with the installed Vite version. From the
-repository root:
+Start the backend on `http://127.0.0.1:8000`, then from `frontend/`:
 
 ```sh
-cd frontend
 npm ci
 npm run dev
 ```
 
-Open the URL Vite prints (usually `http://localhost:5173/`), or go directly to
-`/dashboard`. Stop Vite with Control + C.
+Open `/dashboard` on the URL printed by Vite. The default `/api` base path is
+proxied to the backend in development. `VITE_API_URL` can override the base URL;
+direct cross-origin requests require backend CORS support. Production hosting
+must proxy `/api` and provide SPA fallback for direct route loads.
 
-The expected backend is `http://127.0.0.1:8000`. By default, `services/api.js`
-uses `/api`; the Vite development proxy strips that prefix and forwards requests
-to the backend. For example, `/api/leagues` becomes backend `/leagues`.
+For a full walkthrough without PostgreSQL, start the synthetic demo backend
+from `backend/` with `python -m uvicorn app.database.demo:app --port 8000`.
+Its matches and trained model are local examples, not live sports data.
 
-`VITE_API_URL` overrides the request base URL; a trailing slash is removed.
-Set it before starting Vite, for example:
+## User flow
 
-```sh
-VITE_API_URL=http://127.0.0.1:8000 npm run dev
-```
+1. Select Football/NFL, Baseball/MLB, or Soccer/EPL on `/dashboard`.
+2. Choose a scheduled match to open `/matches/:id`.
+3. Review the match summary and each team's three most recent completed matches.
+4. Select **Run Prediction** to generate an outcome and probabilities.
 
-A direct cross-origin URL requires backend CORS support. Restart Vite after
-changing environment settings. Production builds use the value supplied at
-build time. Without an override, production hosting must proxy `/api`.
-`npm run preview` does not use the development API proxy; production hosts also
-need SPA fallback for direct route loads.
+The selected sport is retained in `sessionStorage` for the browser session.
+Loading, empty, and error states are shown for the list, details, history, and
+prediction request. An unavailable backend is an error; an empty list means the
+backend returned no scheduled matches.
 
-## Screens, components, and navigation
+The `/login` page remains a prototype navigation screen and does not authenticate
+with the backend. It currently logs entered values to the console; do not enter
+real credentials there.
 
-Routes live in `src/App.jsx`, using `BrowserRouter`:
+## API contract
 
-| Route | Component | Current behavior |
-| --- | --- | --- |
-| `/` | `SplashScreen` | Branding screen; redirects to `/login` after 2.5 seconds. |
-| `/login` | `Login` | Prototype form; submission navigates to `/dashboard`. It does not authenticate with the backend and currently logs entered values to the console. |
-| `/dashboard` | `Dashboard` in `pages/DashBoard.jsx` | Football/NFL, Baseball/MLB, and Soccer/EPL selection, API loading, empty/error states, and match cards. |
-| `/matches/:id` | `MatchDetails` | Fetches one match, renders its summary and neutral-site context, and links back to `/dashboard`. |
-
-The flow is splash → login → dashboard → match card → details → Back to matches.
-There is no direct splash-to-dashboard link or register/account route.
-Dashboard selection is component state initialized to Football/NFL. The selected
-sport is stored in `sessionStorage` so returning from details keeps the same
-sport during the browser session. Sport buttons expose selection through
-`aria-pressed`.
-
-- `components/MatchCard.jsx`: reusable match article with a `View Match` link
-  to `/matches/${match.id}`.
-- `components/MatchSummary.jsx`: shared league, teams, local date/time, status,
-  and available scores for cards and details.
-- `pages/MatchDetails.jsx`: validates IDs through the service, handles loading,
-  missing/error results, and displays neutral-site context without inferring venue.
-- `services/api.js`: shared fetch wrapper and readable connection, HTTP, and
-  JSON errors; preserves abort errors.
-- `services/matches.js`: league/list/detail/history requests and positive
-  integer ID validation.
-- `App.css` and `index.css`: screen styles and shared typography/layout;
-  dashboard and details have scoped long-text wrapping.
-
-Legacy `services/odds.js`, `services/bets.js`, `data/testMatches.js`, and
-`components/BettingOptions.jsx` are not used by the current routed match screens.
-They are not the Sprint 2 match API contract.
-
-## Consumed API contract
-
-| Request | Current use |
+| Request | Use |
 | --- | --- |
-| `GET /leagues` | Resolve the selected sport's NFL/MLB/EPL abbreviation to its backend ID. |
-| `GET /matches?league_id=<id>` | Load matches for that resolved ID. |
-| `GET /matches/{match_id}` | Load one match for the details route. |
-| `GET /matches/history?league_id=<id>` | Load completed matches for historical team context on details. |
-| `POST /predictions/matches/{match_id}` | Run or retrieve the selected match prediction result. |
+| `GET /leagues` | Resolve NFL, MLB, or EPL to its current league ID. |
+| `GET /matches?league_id=<id>&status=scheduled` | List upcoming matches. |
+| `GET /matches/{id}` | Load one match. |
+| `GET /matches/history?league_id=<id>&team_id=<id>&limit=3` | Load recent completed results for each team. |
+| `POST /predictions/matches/{id}` | Run the trained local baseline on pre-match history. |
 
-League selection consumes only each league's `id` and `abbreviation`.
-Match fields consumed by the UI are:
+Prediction responses contain `predicted_outcome`, `home_win_probability`,
+`away_win_probability`, optional `draw_probability` for EPL, `confidence`, and
+the predicted winner's name when the outcome is not a draw. A missing model,
+unavailable database, or insufficient team history produces an explicit error.
 
-| Field | Use |
-| --- | --- |
-| `id` | Card key and details link. |
-| `league_name` | League/competition text; missing value shows `League unavailable`. |
-| `home_team_name`, `away_team_name` | Team headings with unavailable fallbacks. |
-| `start_time` | Browser-local medium date and short time; null, undefined, blank, whitespace-only, or invalid values show `Date/time unavailable`. |
-| `status` | Text with underscores replaced by spaces; missing value shows `Unavailable`. |
-| `home_score`, `away_score` | Home–away scores when either is present; zero is preserved, a missing side shows `—`. |
-| `neutral_site` | Details only: true → Yes, false → No, null/undefined → Unavailable. |
+## Verification and limits
 
-Do not assume league IDs are fixed or add sport-specific periods, statistics, or
-score labels to the shared components.
+From `frontend/`, run `npm run lint` and `npm run build`. Backend tests include an
+isolated NFL/MLB/EPL API flow with matches, history, and generated predictions.
+For the live browser path, configure PostgreSQL, load the schema, seed matches,
+and train local artifacts as described in `backend/README.md`.
 
-## Backend/Data dependencies and current limitations
-
-The local matches table has no rows in the reviewed environment. NFL, MLB, and
-EPL list requests returned empty arrays, and match ID `1` returned 404. Successful
-populated list → details testing is therefore a Backend/Data dependency, not a
-frontend bug. Do not fabricate records to mark that check complete.
-
-The prediction endpoint reads stored `match_predictions` rows when model output
-exists. If the local database is unavailable or a selected match has no generated
-prediction yet, the UI shows a clear unavailable state instead of inventing a
-model result. The current match response does not include odds, venue/location,
-or sport metadata. Neutral-site status does not identify a venue. League names
-come from the response; no unavailable context is inferred.
-
-The prototype login and dashboard selection reset described above remain current
-usability limitations. Populated layouts and actual browser viewport behavior
-still need verification.
-
-## Testing status and remaining checks
-
-Evidence from the Sprint 2 frontend review:
-
-- Live API checks: NFL/MLB/EPL league IDs resolved; all three lists returned
-  `200` with `[]`; `/matches/1` returned 404.
-- Isolated component rendering: all three empty states show
-  `No [league] matches are available.` without cards/placeholders or crashes.
-- Runtime-only API failure simulation: connection failure, HTTP 404/500, and
-  invalid JSON produce readable dashboard/details alerts; abort errors are
-  preserved. Backend configuration was not changed and no match records were added.
-- Invalid ID service checks: `abc` and `0` are rejected before an API request.
-- Source review: loading/empty states retain `role="status"`, error states retain
-  `role="alert"`, request cleanup preserves abort handling, and back links remain
-  visible on details errors. Details loading and error markup were also rendered
-  in isolation.
-- Navigation source review confirmed splash/login/dashboard/card/details paths.
-  Vite returned the app entry HTML with `200` for direct `/dashboard` and
-  `/matches/1` requests; this does not prove browser rendering or refresh behavior.
-- Static responsive review confirmed fluid root sizing, smaller headings at narrow
-  widths, and `overflow-wrap: anywhere` on dashboard/details for long names.
-  Actual browser layout and Back/Forward interactions remain untested.
-- Build, lint, and whitespace checks passed after the frontend changes.
-  The isolated checks were temporary review scripts, not a committed test suite.
-
-Run from `frontend/`:
-
-```sh
-npm run build
-npm run lint
-git diff --check
-```
-
-Remaining browser checks: navigate through the prototype routes, use Back/Forward,
-refresh `/dashboard` and `/matches/1`, switch leagues quickly, and inspect dashboard
-empty states and details loading/error states at narrow widths. Once real backend
-matches exist, verify card → populated details → back, local dates, zero scores,
-long team/competition names, and neutral-site values across NFL/MLB/EPL.
-
-## Handoff
-
-Keep requests in `services/matches.js` and shared transport/error handling in
-`services/api.js`; routes belong in `App.jsx`. Reuse `MatchSummary` and `MatchCard`
-across sports. Extend details context only when the API actually supplies fields.
-When prediction data becomes available later, confirm its contract first, add the
-request in the service layer, and add a dedicated details component with its own
-loading/unavailable/error behavior. Do not treat legacy mock odds as real API data
-or assume sport-specific fields apply to NFL/EPL.
+The local development match seed is synthetic demo data, not a live schedule.
+The EPL draw probability is an early baseline estimate that splits the model's
+not-home-win probability using historical draw frequency. It is not a separately
+trained three-class model. Match responses do not include venue or odds data.

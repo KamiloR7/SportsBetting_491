@@ -34,10 +34,7 @@ function EmptyUpcomingMatches({ sportOption }) {
   return (
     <section className="empty-state" role="status">
       <h2>No upcoming {sportOption.leagueAbbreviation} matches</h2>
-      <p>
-        Scheduled matches will appear here after the local database is seeded
-        with current {sportOption.sportName.toLowerCase()} schedule data.
-      </p>
+      <p>Check back when the next schedule is available.</p>
     </section>
   );
 }

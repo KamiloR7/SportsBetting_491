@@ -16,9 +16,9 @@ export function getMatches(leagueId, filters = {}, options = {}) {
   return apiRequest(`/matches?${params.toString()}`, options);
 }
 
-export function getMatchHistory(leagueId, limit = 100, options = {}) {
+export function getMatchHistory(leagueId, teamId, limit = 3, options = {}) {
   return apiRequest(
-    `/matches/history?league_id=${encodeURIComponent(leagueId)}&limit=${encodeURIComponent(limit)}`,
+    `/matches/history?league_id=${encodeURIComponent(leagueId)}&team_id=${encodeURIComponent(teamId)}&limit=${encodeURIComponent(limit)}`,
     options,
   );
 }
