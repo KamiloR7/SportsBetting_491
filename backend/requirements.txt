@@ -10,3 +10,4 @@ bcrypt
 email-validator
 pytest
 pytest-cov
+httpx2>=2.13,<3
