@@ -91,7 +91,7 @@ jobs:
       - name: Install test dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -c backend/requirements-sprint2-tested.txt pytest
+          pip install -c backend/requirements-sprint2-tested.txt pytest "pytest-cov>=7,<8"
           pip install -e .
           pip install -c backend/requirements-sprint2-tested.txt -r backend/requirements.txt
 
@@ -102,9 +102,33 @@ jobs:
         run: python -m pip wheel --no-deps . --wheel-dir build/dist
 
       - name: Run automated tests
+        id: tests
         env:
           PYTHONPATH: backend
-        run: python -m pytest -v --junitxml=build/test-results.xml
+        run: |
+          python -m pytest -v --junitxml=build/test-results.xml \
+            --cov --cov-config=.coveragerc \
+            --cov-report=term-missing --cov-report=xml --cov-report=html
+
+      - name: Publish coverage summary
+        if: ${{ always() && (steps.tests.outcome == 'success' || steps.tests.outcome == 'failure') }}
+        run: |
+          echo "### Python line and branch coverage" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          python -m coverage report --format=markdown >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Coverage includes backend/app and src/sportsbetting. Download the coverage-$BUILD_ID artifact for HTML and XML reports." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload coverage reports
+        if: ${{ always() && (steps.tests.outcome == 'success' || steps.tests.outcome == 'failure') }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ steps.metadata.outputs.build_id }}
+          path: |
+            build/coverage.xml
+            build/coverage-html/
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Run Sprint 3 ML training smoke test
         env:

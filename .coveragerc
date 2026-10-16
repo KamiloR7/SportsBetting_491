@@ -1,0 +1,16 @@
+[run]
+branch = True
+source =
+    backend/app
+    src/sportsbetting
+
+[report]
+include_namespace_packages = True
+show_missing = True
+precision = 2
+
+[xml]
+output = build/coverage.xml
+
+[html]
+directory = build/coverage-html
