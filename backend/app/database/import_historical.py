@@ -109,6 +109,11 @@ def main(argv=None):
                         record = normalize_match_row(row)
                     if record["league"] != args.sport:
                         raise NormalizationError("Record league conflicts with selected sport")
+                    # Keep caller metadata visible to DATA-24 even when an
+                    # adapter (notably NFL) clears its canonical outcome.
+                    # This applies to every input format and both run modes.
+                    if "outcome" in row:
+                        record["outcome"] = row["outcome"]
                     normalized.append(record)
                     locations.append({"file": str(path), "row": index})
                 except (NormalizationError, ValueError, TypeError, KeyError) as exc:

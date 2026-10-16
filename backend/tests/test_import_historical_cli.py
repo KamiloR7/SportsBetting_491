@@ -172,3 +172,57 @@ def test_malformed_csv_width(tmp_path):
     path = tmp_path / "bad.csv"
     path.write_text("game_id,source\n1,test,extra\n")
     assert cli.main(["--input", str(path), "--sport", "NFL", "--format", "csv", "--dry-run"]) == 2
+
+
+@pytest.mark.parametrize("input_format", ["json", "csv"])
+@pytest.mark.parametrize("dry_run", [True, False])
+@pytest.mark.parametrize("home,away,outcome,accepted", [
+    (3, 1, "AWAY_WIN", False),  # Original bypass: home-winning scores.
+    (3, 1, "HOME_WIN", True),
+    (1, 3, "AWAY_WIN", True),
+    (1, 1, "TIE", True),
+    (1, 1, "AWAY_WIN", False),
+    (3, 1, None, True),
+])
+def test_nfl_supplied_outcome_uses_data24_in_both_modes(
+    tmp_path, monkeypatch, capsys, input_format, dry_run, home, away, outcome, accepted
+):
+    import csv
+    from src.normalizers.match_validation import validate_historical_matches
+
+    row = record(home_score=home, away_score=away, outcome=outcome)
+    if outcome is None:
+        row.pop("outcome")
+    assert bool(validate_historical_matches([row]).accepted) == accepted
+    path = tmp_path / f"nfl.{input_format}"
+    if input_format == "json":
+        path.write_text(json.dumps([row]))
+    else:
+        with path.open("w", newline="") as handle:
+            writer = csv.DictWriter(handle, fieldnames=list(row))
+            writer.writeheader()
+            writer.writerow(row)
+    engine = FakeEngine()
+    engine.dispose = lambda: None
+    monkeypatch.setattr(cli, "configured_engine", lambda _: engine)
+    args = ["--input", str(path), "--sport", "NFL", "--format", input_format]
+    if dry_run:
+        args.append("--dry-run")
+    assert cli.main(args) == (0 if accepted else 1)
+    report = json.loads(capsys.readouterr().out)
+    assert report["records_rejected"] == (0 if accepted else 1)
+    assert report["records_accepted"] == (1 if accepted else 0)
+    if not accepted:
+        assert "outcome" in report["rejected"][0]["reasons"][0]
+    assert engine.transactions == (1 if accepted and not dry_run else 0)
+
+
+@pytest.mark.parametrize("sport,home,away,outcome,accepted", [
+    ("EPL", 1, 1, "DRAW", True), ("EPL", 1, 1, "AWAY_WIN", False),
+    ("MLB", 3, 1, "HOME_WIN", True), ("MLB", 3, 1, "AWAY_WIN", False),
+    ("MLB", 1, 1, "DRAW", False),
+])
+def test_other_sport_outcome_regression(tmp_path, capsys, sport, home, away, outcome, accepted):
+    args = arguments(tmp_path, [record(sport, home_score=home, away_score=away, outcome=outcome)], sport)
+    assert cli.main(args + ["--dry-run"]) == (0 if accepted else 1)
+    assert json.loads(capsys.readouterr().out)["records_rejected"] == (0 if accepted else 1)
