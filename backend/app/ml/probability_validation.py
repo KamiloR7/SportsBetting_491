@@ -3,9 +3,9 @@ import math
 
 # Expected prediction classes for each sport
 EXPECTED_CLASSES = {
-    "NBA": {"home_win", "away_win"},
     "NFL": {"home_win", "away_win"},
-    "UEFA": {"home_win", "draw", "away_win"},
+    "MLB": {"home_win", "away_win"},
+    "EPL": {"home_win", "draw", "away_win"},
 }
 
 

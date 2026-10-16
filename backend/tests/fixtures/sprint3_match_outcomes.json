@@ -1,19 +1,19 @@
 [
   {
-    "match_id": "NBA-TEST-001",
-    "sport": "NBA",
+    "match_id": "MLB-TEST-001",
+    "sport": "MLB",
     "game_date": "2026-01-10",
-    "home_score": 115,
-    "away_score": 108,
+    "home_score": 5,
+    "away_score": 3,
     "status": "FINAL",
     "expected_label": "home_win"
   },
   {
-    "match_id": "NBA-TEST-002",
-    "sport": "NBA",
+    "match_id": "MLB-TEST-002",
+    "sport": "MLB",
     "game_date": "2026-01-11",
-    "home_score": 98,
-    "away_score": 112,
+    "home_score": 2,
+    "away_score": 6,
     "status": "FINAL",
     "expected_label": "away_win"
   },
@@ -36,8 +36,8 @@
     "expected_label": "away_win"
   },
   {
-    "match_id": "UEFA-TEST-001",
-    "sport": "UEFA",
+    "match_id": "EPL-TEST-001",
+    "sport": "EPL",
     "game_date": "2026-01-14",
     "home_score": 2,
     "away_score": 0,
@@ -45,8 +45,8 @@
     "expected_label": "home_win"
   },
   {
-    "match_id": "UEFA-TEST-002",
-    "sport": "UEFA",
+    "match_id": "EPL-TEST-002",
+    "sport": "EPL",
     "game_date": "2026-01-15",
     "home_score": 1,
     "away_score": 1,
@@ -54,8 +54,8 @@
     "expected_label": "draw"
   },
   {
-    "match_id": "UEFA-TEST-003",
-    "sport": "UEFA",
+    "match_id": "EPL-TEST-003",
+    "sport": "EPL",
     "game_date": "2026-01-16",
     "home_score": 0,
     "away_score": 3,
@@ -63,8 +63,8 @@
     "expected_label": "away_win"
   },
   {
-    "match_id": "NBA-TEST-003",
-    "sport": "NBA",
+    "match_id": "MLB-TEST-003",
+    "sport": "MLB",
     "game_date": "2026-01-17",
     "home_score": null,
     "away_score": null,
@@ -81,8 +81,8 @@
     "expected_label": null
   },
   {
-    "match_id": "UEFA-TEST-004",
-    "sport": "UEFA",
+    "match_id": "EPL-TEST-004",
+    "sport": "EPL",
     "game_date": "2026-01-19",
     "home_score": 2,
     "status": "FINAL",
