@@ -116,7 +116,7 @@ def test_normalize_uefa_team_keeps_shared_shape():
 
 def test_normalize_nfl_team_standardizes_sport_and_types():
     team = normalize_team_row(nfl_team())
-    assert team["sport"] == "FOOTBALL"
+    assert team["sport"] == "American Football"
     assert team["founded"] == 1959
     assert team["conference"] == "AFC"
 
@@ -138,7 +138,7 @@ def test_common_aliases_are_accepted_for_future_collectors():
 
 
 def test_status_and_sport_aliases():
-    assert canonical_sport("NFL") == "FOOTBALL"
+    assert canonical_sport("NFL") == "American Football"
     assert canonical_sport("EPL") == "SOCCER"
     assert canonical_sport("MLB") == "BASEBALL"
     assert canonical_status("FINAL") == "completed"
@@ -149,7 +149,7 @@ def test_status_and_sport_aliases():
 def test_completed_match_derives_winner_and_converts_numeric_fields():
     match = normalize_match_row(nfl_match())
     assert tuple(match.keys()) == MATCH_FIELDS
-    assert match["sport"] == "FOOTBALL"
+    assert match["sport"] == "American Football"
     assert match["season"] == 2026
     assert match["week"] == 1
     assert match["home_score"] == 27

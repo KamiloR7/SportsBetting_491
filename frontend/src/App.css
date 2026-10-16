@@ -1,5 +1,104 @@
+.demo-notice {
+  margin: 0 0 16px;
+  padding: 9px 12px;
+  border-left: 3px solid #67c6a5;
+  color: #ccefe1;
+  background: #19332c;
+  font-size: 14px;
+}
+
 .dashboard {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: clamp(16px, 4vw, 40px);
   overflow-wrap: anywhere;
+}
+
+.dashboard-header {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.dashboard-header h1 {
+  margin-bottom: 0;
+}
+
+.sport-selector {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 auto 28px;
+}
+
+.sport-option {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  min-height: 82px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  background: var(--bg);
+  text-align: left;
+  cursor: pointer;
+}
+
+.sport-option:hover {
+  border-color: var(--accent-border);
+}
+
+.sport-option:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.sport-option[aria-pressed="true"] {
+  color: var(--text-h);
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+}
+
+.sport-option-name,
+.sport-option-league {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.sport-option-name {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.sport-option-league {
+  font-size: 14px;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.match-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  text-align: left;
+}
+
+.empty-state {
+  display: grid;
+  gap: 8px;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  text-align: left;
+}
+
+.empty-state h2 {
+  margin: 0;
 }
 
 .match-details {
@@ -69,6 +168,77 @@
   outline-offset: 3px;
 }
 
+.match-details .team-history-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.match-details .team-history {
+  min-width: 0;
+}
+
+.match-details .team-history h3 {
+  margin: 0 0 10px;
+  color: var(--text-h);
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+.match-details .team-history ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.match-details .team-history li {
+  display: grid;
+  grid-template-columns: minmax(52px, max-content) minmax(0, 1fr) max-content;
+  gap: 10px;
+  align-items: baseline;
+  padding-block: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.match-details .team-history li span:first-child {
+  color: var(--text-h);
+  font-weight: 600;
+}
+
+.match-details .prediction-panel-header {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.match-details .prediction-panel-header h2 {
+  margin-bottom: 0;
+}
+
+.match-details .prediction-panel button {
+  min-height: 42px;
+  padding: 8px 14px;
+  border: 1px solid var(--accent-border);
+  border-radius: 8px;
+  color: var(--text-h);
+  background: var(--accent-bg);
+  cursor: pointer;
+}
+
+.match-details .prediction-panel button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.match-details .prediction-panel button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
 .prediction-result {
   display: grid;
   gap: 8px;
@@ -81,6 +251,28 @@
   font-size: 0.9rem;
 }
 
+.match-details .prediction-results {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0;
+}
+
+.match-details .prediction-results div {
+  min-width: 0;
+}
+
+.match-details .prediction-results dt {
+  margin-bottom: 2px;
+  font-size: 14px;
+}
+
+.match-details .prediction-results dd {
+  margin: 0;
+  color: var(--text-h);
+  font-weight: 600;
+}
+
 .match-details a {
   display: inline-block;
   color: var(--text-h);
@@ -91,6 +283,40 @@
   outline: 2px solid var(--accent);
   outline-offset: 4px;
   border-radius: 2px;
+}
+
+@media (max-width: 720px) {
+  .sport-selector {
+    grid-template-columns: 1fr;
+  }
+
+  .match-details .team-history-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .match-details .team-history li {
+    grid-template-columns: minmax(0, 1fr) max-content;
+    gap: 2px 10px;
+  }
+
+  .match-details .team-history li span:nth-child(2) {
+    grid-column: 1;
+  }
+
+  .match-details .team-history li span:last-child {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    align-self: center;
+  }
+
+  .match-details .prediction-panel-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .match-details .prediction-results {
+    grid-template-columns: 1fr;
+  }
 }
 
 .counter {

@@ -25,6 +25,7 @@ class TestBackendIntegration(unittest.TestCase):
             "/matches/history",
             "/matches/{match_id}",
             "/predictions",
+            "/predictions/matches/{match_id}",
         }
 
         for route in expected_routes:
