@@ -1,9 +1,11 @@
 [run]
+branch = True
 source =
     backend/app
     src/sportsbetting
 
 [report]
+include_namespace_packages = True
 show_missing = True
 precision = 2
 
