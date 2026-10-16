@@ -1,0 +1,60 @@
+{
+  "historical_datasets": {
+    "NFL": {
+      "expected_file": "data/raw/nfl_games.csv",
+      "exists": false,
+      "record_count": null,
+      "missing_required_fields": null,
+      "duplicate_identifiers": null,
+      "seasons": null
+    },
+    "MLB": {
+      "expected_file": "data/raw/mlb_games.csv",
+      "exists": false,
+      "record_count": null,
+      "missing_required_fields": null,
+      "duplicate_identifiers": null,
+      "seasons": null
+    },
+    "EPL": {
+      "expected_file": "data/raw/epl_games.csv",
+      "exists": false,
+      "record_count": null,
+      "missing_required_fields": null,
+      "duplicate_identifiers": null,
+      "seasons": null
+    }
+  },
+  "synthetic_outcome_fixture": {
+    "path": "backend/tests/fixtures/sprint3_match_outcomes.json",
+    "sports": {
+      "NFL": {
+        "rows": 3,
+        "duplicate_match_ids": 0,
+        "missing_or_null_home_score": 0,
+        "missing_or_null_away_score": 0,
+        "final_records_missing_scores": 0,
+        "available_seasons": [],
+        "rows_missing_each_of_source_season_home_team_id_away_team_id": 3
+      },
+      "MLB": {
+        "rows": 3,
+        "duplicate_match_ids": 0,
+        "missing_or_null_home_score": 1,
+        "missing_or_null_away_score": 1,
+        "final_records_missing_scores": 0,
+        "available_seasons": [],
+        "rows_missing_each_of_source_season_home_team_id_away_team_id": 3
+      },
+      "EPL": {
+        "rows": 4,
+        "duplicate_match_ids": 0,
+        "missing_or_null_home_score": 0,
+        "missing_or_null_away_score": 1,
+        "final_records_missing_scores": 1,
+        "available_seasons": [],
+        "rows_missing_each_of_source_season_home_team_id_away_team_id": 4
+      }
+    }
+  }
+}
