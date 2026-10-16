@@ -10,7 +10,11 @@ export async function apiRequest(endpoint, options = {}) {
   }
 
   if (!response.ok) {
+    const payload = await response.json().catch(() => null);
+    const detail = typeof payload?.detail === "string" ? payload.detail : null;
     if (response.status === 404) throw new Error("The requested item was not found.");
+    if (response.status === 422) throw new Error(detail || "This request is not valid.");
+    if (response.status === 503) throw new Error(detail || "This service is unavailable right now. Please try again later.");
     throw new Error("The server could not load this data. Please try again later.");
   }
 

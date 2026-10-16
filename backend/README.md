@@ -13,7 +13,8 @@ The Sprint 1 backend currently includes:
 * FastAPI Swagger/OpenAPI documentation
 * Health-check endpoint
 
-Prediction functionality, authentication, write endpoints, and production deployment are planned for future sprints.
+Sprint 3 adds match browsing, per-team history, and an on-demand prediction
+endpoint backed by locally trained baseline artifacts.
 
 ---
 
@@ -173,10 +174,48 @@ It also inserts a small Sprint 1 development set of teams for each sport.
 
 The seed script is designed to avoid creating duplicate records when run more than once.
 
+For Sprint 3 local UI testing, seed synthetic scheduled and historical NFL,
+MLB, and EPL matches after the base reference data, then train local artifacts:
+
+```bash
+python -m app.database.seed_dev_matches
+python -m app.ml.train_local_match_models
+```
+
+The generated model files are ignored under `build/sprint2-models`. Set
+`PREDICTION_MODEL_DIR` to another artifact directory when needed. These
+development matches are sample records, not a live sports feed. The seed uses
+stable times within a day so rerunning it that day does not duplicate records.
+
+For a full UI walkthrough without PostgreSQL, start the isolated synthetic demo
+API instead of the standard backend:
+
+```bash
+cd backend
+python -m uvicorn app.database.demo:app --port 8000
+```
+
+The demo creates an in-memory SQLite database, seeds sample matches, and trains
+ignored local artifacts under `build/sprint3-demo-models`. It does not modify a
+PostgreSQL database. Do not use its sample outcomes as live predictions.
+
+`POST /predictions/matches/{id}` runs the verified local baseline on completed
+league matches before the selected match date. It requires at least one result
+for each team. NFL and MLB return home/away win probabilities. The current EPL
+baseline is binary (home win versus not home win); the endpoint splits the
+not-home-win portion into draw and away win using a smoothed historical league
+draw frequency. A separately trained three-class EPL model remains future work.
+
+Match list, details, and history requests return 503 when the database is
+unavailable, so a connection failure is not mistaken for an empty schedule.
+Prediction requests return 503 when the model artifact is unavailable and 422
+when there is insufficient history or the match is not scheduled.
+
 Seed implementation:
 
 ```text
 backend/app/database/seed_data.py
+backend/app/database/seed_dev_matches.py
 ```
 
 ---
