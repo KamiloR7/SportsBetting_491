@@ -1,20 +1,21 @@
-"""Sport-specific match outcome labels."""
+"""Sport-specific match outcome labels for NFL, MLB, and EPL."""
 
 
 def label_match_outcome(sport, home_score, away_score, status):
     """
     Return the outcome label for a completed match.
 
-    NBA/NFL: home_win or away_win
-    UEFA: home_win, draw, or away_win
+    NFL/MLB: home_win or away_win
+    EPL: home_win, draw, or away_win
 
     Nonfinal matches return None.
+    Tied NFL/MLB games are excluded from binary winner training.
     """
 
     sport = sport.upper()
     status = status.upper()
 
-    if sport not in {"NBA", "NFL", "UEFA"}:
+    if sport not in {"NFL", "MLB", "EPL"}:
         raise ValueError(f"Unsupported sport: {sport}")
 
     # Exclude unfinished matches from training.
@@ -37,10 +38,9 @@ def label_match_outcome(sport, home_score, away_score, status):
     if home_score < away_score:
         return "away_win"
 
-    # UEFA soccer supports draws.
-    if sport == "UEFA":
+    # EPL supports draws as a separate prediction outcome.
+    if sport == "EPL":
         return "draw"
 
-    # A tied NBA/NFL score does not fit the binary winner model.
-    # Exclude it instead of incorrectly labeling a winner.
+    # Tied NFL/MLB games do not have a binary winner.
     return None
