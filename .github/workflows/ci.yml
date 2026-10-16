@@ -63,6 +63,19 @@ jobs:
             --cov-report=term-missing \
             --cov-report=xml:build/coverage.xml
 
+      - name: Run Sprint 3 ML training smoke test
+        env:
+          PYTHONPATH: backend
+        run: python -m app.ml.run_sport_aware_smoke
+
+      - name: Upload Sprint 3 ML smoke report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ml-smoke-${{ env.BUILD_ID }}
+          path: build/sprint3-ml-smoke/report.json
+          if-no-files-found: warn
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
