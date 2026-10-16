@@ -1,3 +1,8 @@
+"""PostgreSQL match writes. Call inside a caller-owned transaction.
+
+Historical importers must use historical_import.load_historical_matches(),
+which serializes cooperating importers and runs DATA-24 validation first.
+"""
 from __future__ import annotations
 
 import logging
@@ -7,270 +12,155 @@ from typing import Any, Mapping
 from sqlalchemy import text
 
 logger = logging.getLogger(__name__)
+STATUS_MAP = {"scheduled": "scheduled", "in_progress": "in_progress",
+              "completed": "final", "postponed": "postponed", "cancelled": "cancelled"}
 
 
-STATUS_MAP = {
-    "scheduled": "scheduled",
-    "in_progress": "in_progress",
-    "completed": "final",
-    "postponed": "postponed",
-    "cancelled": "cancelled",
-}
+class ReferenceResolutionError(ValueError):
+    """A required reference is missing, ambiguous or inconsistent."""
 
 
-def _resolve_league_id(conn, league_name: str) -> int:
-    row = conn.execute(
-        text(
-            """
-            SELECT id
-            FROM leagues
-            WHERE name = :name OR abbreviation = :name
-            LIMIT 1
-            """
-        ),
-        {"name": league_name},
-    ).first()
-
-    if row is None:
-        raise ValueError(f"League not found: {league_name}")
-
-    return row.id
+class MatchIdentityError(ValueError):
+    """A stored source mapping is dangling or changes match identity."""
 
 
-def _resolve_team_id(
-    conn,
-    *,
-    sport_name: str,
-    team_name: str | None,
-    team_abbr: str | None,
-) -> int:
-    row = conn.execute(
-        text(
-            """
-            SELECT t.id
-            FROM teams t
-            JOIN sports s ON s.id = t.sport_id
-            WHERE
-                (
-                    (:team_name IS NOT NULL AND t.name = :team_name)
-                    OR
-                    (:team_abbr IS NOT NULL AND t.abbreviation = :team_abbr)
-                )
-                AND (
-                    UPPER(s.name) = UPPER(:sport_name)
-                    OR UPPER(s.slug) = UPPER(:sport_name)
-                )
-            LIMIT 1
-            """
-        ),
-        {
-            "team_name": team_name,
-            "team_abbr": team_abbr,
-            "sport_name": sport_name,
-        },
-    ).first()
-
-    if row is None:
-        raise ValueError(
-            f"Team not found for sport={sport_name}, "
-            f"name={team_name}, abbr={team_abbr}"
-        )
-
-    return row.id
+def _one(result, description):
+    rows = result.all()
+    if len(rows) != 1:
+        raise ReferenceResolutionError(f"{description}: expected one reference, found {len(rows)}")
+    return rows[0]
 
 
-def _resolve_data_source_id(conn, source_name: str) -> int:
-    conn.execute(
-        text(
-            """
-            INSERT INTO data_sources (name, source_type)
-            VALUES (:name, 'api')
-            ON CONFLICT (name) DO NOTHING
-            """
-        ),
-        {"name": source_name},
-    )
-
-    row = conn.execute(
-        text("SELECT id FROM data_sources WHERE name = :name"),
-        {"name": source_name},
-    ).first()
-
-    if row is None:
-        raise ValueError(f"Data source could not be resolved: {source_name}")
-
-    return row.id
+def _existing_source_id(conn, source):
+    row = conn.execute(text("SELECT id FROM data_sources WHERE name = :name"), {"name": source}).first()
+    return row.id if row else None
 
 
-def _resolve_existing_match_id(
-    conn,
-    *,
-    data_source_id: int,
-    external_id: str,
-) -> int | None:
-    row = conn.execute(
-        text(
-            """
-            SELECT entity_id
-            FROM external_mappings
-            WHERE data_source_id = :data_source_id
-              AND entity_type = 'match'
-              AND external_id = :external_id
-            """
-        ),
-        {
-            "data_source_id": data_source_id,
-            "external_id": external_id,
-        },
-    ).first()
-
-    return row.entity_id if row else None
+def _resolve_team_id(conn, *, sport_id, sport_name, team_name, team_abbr, external_id, source_id):
+    if external_id is not None and source_id is not None:
+        mapped = conn.execute(text("""SELECT entity_id FROM external_mappings
+            WHERE data_source_id = :source_id AND entity_type = 'team'
+              AND external_id = :external_id"""),
+            {"source_id": source_id, "external_id": str(external_id)}).first()
+        if mapped:
+            return _one(conn.execute(text("""SELECT t.id FROM teams t
+                WHERE t.id = :team_id AND t.sport_id = :sport_id"""),
+                {"team_id": mapped.entity_id, "sport_id": sport_id}),
+                f"Mapped team {external_id} (missing target or wrong sport)").id
+    return _one(conn.execute(text("""SELECT t.id FROM teams t
+        WHERE t.sport_id = :sport_id AND
+        ((:team_name IS NOT NULL AND t.name = :team_name) OR
+         (:team_abbr IS NOT NULL AND t.abbreviation = :team_abbr))"""),
+        {"sport_id": sport_id, "sport_name": sport_name,
+         "team_name": team_name, "team_abbr": team_abbr}),
+        f"Team name={team_name}, abbreviation={team_abbr}; provide an external mapping if unresolved").id
 
 
-def upsert_match(conn, match: Mapping[str, Any]) -> int:
-    game_id = str(match["game_id"])
-    source_name = str(match.get("source") or "unknown")
+def resolve_match_references(conn, match: Mapping[str, Any], *, require_season=False):
+    """Resolve existing records only. Provider IDs never become internal IDs.
 
-    logger.info(
-    "Processing match %s from source %s",
-    game_id,
-    source_name,
-)
-
+    Explicit team mappings are authoritative over provider display names.
+    Fallback exact-name/abbreviation matches must be unique within the sport.
+    No missing sport, league, team, or season is created.
+    """
     sport_name = str(match["sport"])
-    league_name = str(match["league"])
+    sport = _one(conn.execute(text("""SELECT id FROM sports
+        WHERE UPPER(name) = UPPER(:name) OR UPPER(slug) = UPPER(:name)"""),
+        {"name": sport_name}), f"Sport {sport_name}")
+    league = _one(conn.execute(text("""SELECT id FROM leagues
+        WHERE sport_id = :sport_id AND (name = :name OR abbreviation = :name)"""),
+        {"sport_id": sport.id, "name": match["league"]}), f"League {match['league']}")
+    source_id = _existing_source_id(conn, match["source"])
+    teams = {}
+    for side in ("home", "away"):
+        teams[side] = _resolve_team_id(conn, sport_id=sport.id, sport_name=sport_name,
+            team_name=match.get(f"{side}_team_name"), team_abbr=match.get(f"{side}_team_abbr"),
+            external_id=match.get(f"{side}_team_id"), source_id=source_id)
+    if teams["home"] == teams["away"]:
+        raise ReferenceResolutionError("Home and away resolve to the same database team")
+    season_id = None
+    year = match.get("season")
+    if year is None and require_season:
+        raise ReferenceResolutionError("Missing season")
+    if year is not None:
+        year = int(year)
+        label = f"{year}-{str(year + 1)[-2:]}" if match["league"] == "EPL" else str(year)
+        season_id = _one(conn.execute(text("""SELECT id FROM seasons
+            WHERE league_id = :league_id AND name = :name"""),
+            {"league_id": league.id, "name": label}), f"Season {label} for league {league.id}").id
+    return {"league_id": league.id, "home_team_id": teams["home"],
+            "away_team_id": teams["away"], "season_id": season_id}
 
-    league_id = _resolve_league_id(conn, league_name)
 
-    home_team_id = _resolve_team_id(
-        conn,
-        sport_name=sport_name,
-        team_name=match.get("home_team_name"),
-        team_abbr=match.get("home_team_abbr"),
-    )
+def upsert_match(conn, match: Mapping[str, Any], *, references=None, return_action=False):
+    """Insert/update within the caller's transaction; default result is match ID.
 
-    away_team_id = _resolve_team_id(
-        conn,
-        sport_name=sport_name,
-        team_name=match.get("away_team_name"),
-        team_abbr=match.get("away_team_abbr"),
-    )
-
-    data_source_id = _resolve_data_source_id(conn, source_name)
-
-    db_status = STATUS_MAP.get(str(match["status"]))
-
-    if db_status is None:
-        logger.error(
-            "Unsupported match status %s for match %s",
-            match["status"],
-            game_id,
-        )
+    Optional references are the result of resolve_match_references on this
+    connection. return_action adds inserted/updated for batch accounting.
+    """
+    if not conn.in_transaction():
+        raise ValueError("upsert_match requires an active transaction")
+    game_id = str(match["game_id"])
+    source = match.get("source")
+    if not source:
+        raise ValueError("Match is missing source")
+    status = STATUS_MAP.get(str(match["status"]))
+    if status is None:
         raise ValueError(f"Unsupported match status: {match['status']}")
-
-    kickoff_utc = match.get("kickoff_utc")
-    if not kickoff_utc:
-        raise ValueError(f"Match {game_id} is missing kickoff_utc")
-
-    existing_match_id = _resolve_existing_match_id(
-        conn,
-        data_source_id=data_source_id,
-        external_id=game_id,
-    )
-
-    if existing_match_id is not None:
-        logger.info("Updating existing match %s", game_id)
-
-        conn.execute(
-            text(
-                """
-                UPDATE matches
-                SET
-                    league_id = :league_id,
-                    home_team_id = :home_team_id,
-                    away_team_id = :away_team_id,
-                    start_time = :start_time,
-                    status = :status,
-                    home_score = :home_score,
-                    away_score = :away_score,
-                    updated_at = NOW()
-                WHERE id = :match_id
-                """
-            ),
-            {
-                "match_id": existing_match_id,
-                "league_id": league_id,
-                "home_team_id": home_team_id,
-                "away_team_id": away_team_id,
-                "start_time": kickoff_utc,
-                "status": db_status,
-                "home_score": match.get("home_score"),
-                "away_score": match.get("away_score"),
-            },
-        )
-
-        return existing_match_id
-    logger.info("Inserting new match %s", game_id)
-
-    row = conn.execute(
-        text(
-            """
-            INSERT INTO matches (
-                league_id,
-                home_team_id,
-                away_team_id,
-                start_time,
-                status,
-                home_score,
-                away_score
-            )
-            VALUES (
-                :league_id,
-                :home_team_id,
-                :away_team_id,
-                :start_time,
-                :status,
-                :home_score,
-                :away_score
-            )
-            RETURNING id
-            """
-        ),
-        {
-            "league_id": league_id,
-            "home_team_id": home_team_id,
-            "away_team_id": away_team_id,
-            "start_time": kickoff_utc,
-            "status": db_status,
-            "home_score": match.get("home_score"),
-            "away_score": match.get("away_score"),
-        },
-    ).first()
-
-    match_id = row.id
-
-    conn.execute(
-        text(
-            """
-            INSERT INTO external_mappings (
-                data_source_id,
-                entity_type,
-                entity_id,
-                external_id
-            )
-            VALUES (
-                :data_source_id,
-                'match',
-                :entity_id,
-                :external_id
-            )
-            """
-        ),
-        {
-            "data_source_id": data_source_id,
-            "entity_id": match_id,
-            "external_id": game_id,
-        },
-    )
-
-    return match_id
+    kickoff = match.get("kickoff_utc")
+    try:
+        kickoff = datetime.fromisoformat(str(kickoff).replace("Z", "+00:00"))
+        if kickoff.tzinfo is None or kickoff.utcoffset() is None:
+            raise ValueError
+        kickoff = kickoff.astimezone(timezone.utc)
+    except (ValueError, OverflowError) as exc:
+        raise ValueError("Match requires valid timezone-aware kickoff_utc") from exc
+    refs = references if references is not None else resolve_match_references(conn, match)
+    conn.execute(text("""INSERT INTO data_sources (name, source_type) VALUES (:name, :source_type)
+        ON CONFLICT (name) DO NOTHING"""),
+        {"name": source, "source_type": "file" if source == "football-data.co.uk" else "api"})
+    source_id = _existing_source_id(conn, source)
+    if source_id is None:
+        raise MatchIdentityError("Data source could not be resolved")
+    mapped = conn.execute(text("""SELECT entity_id FROM external_mappings
+        WHERE data_source_id = :source_id AND entity_type = 'match'
+          AND external_id = :external_id FOR UPDATE"""),
+        {"source_id": source_id, "external_id": game_id}).first()
+    params = dict(refs, start_time=kickoff.isoformat().replace("+00:00", "Z"), status=status,
+                  home_score=match.get("home_score"), away_score=match.get("away_score"),
+                  neutral_site=match.get("neutral_site"))
+    if mapped:
+        stored = conn.execute(text("""SELECT id, league_id, home_team_id, away_team_id, season_id
+            FROM matches WHERE id = :match_id FOR UPDATE"""), {"match_id": mapped.entity_id}).first()
+        if stored is None:
+            raise MatchIdentityError(f"Dangling match mapping for {source}/{game_id}")
+        for field in ("league_id", "home_team_id", "away_team_id", "season_id"):
+            if field == "season_id" and (stored.season_id is None or refs[field] is None):
+                continue
+            if getattr(stored, field) != refs[field]:
+                raise MatchIdentityError(f"Incompatible {field} change for {source}/{game_id}")
+        params["match_id"] = stored.id
+        row = conn.execute(text("""UPDATE matches SET
+            season_id = COALESCE(:season_id, season_id), start_time = :start_time,
+            status = :status, home_score = :home_score, away_score = :away_score,
+            neutral_site = COALESCE(:neutral_site, neutral_site), updated_at = NOW()
+            WHERE id = :match_id RETURNING id"""), params).first()
+        if row is None:
+            raise MatchIdentityError("Mapped match disappeared during update")
+        action = "updated"
+    else:
+        row = conn.execute(text("""INSERT INTO matches
+            (league_id, season_id, home_team_id, away_team_id, start_time, status,
+             home_score, away_score, neutral_site)
+            VALUES (:league_id, :season_id, :home_team_id, :away_team_id, :start_time,
+                    :status, :home_score, :away_score, COALESCE(:neutral_site, FALSE))
+            RETURNING id"""), params).first()
+        if row is None:
+            raise MatchIdentityError("Match insert did not return an ID")
+        conn.execute(text("""INSERT INTO external_mappings
+            (data_source_id, entity_type, entity_id, external_id)
+            VALUES (:source_id, 'match', :entity_id, :external_id)"""),
+            {"source_id": source_id, "entity_id": row.id, "external_id": game_id})
+        action = "inserted"
+    logger.info("%s match %s from %s", action, game_id, source)
+    return (row.id, action) if return_action else row.id
