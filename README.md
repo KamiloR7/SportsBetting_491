@@ -5,11 +5,34 @@
 
 ### Run tests locally
 
-Create and activate a Python virtual environment, then install pytest:
+Create and activate a Python virtual environment, then install the project and test dependencies:
 
 ```bash
-python -m pip install pytest
+python -m pip install -e .
+python -m pip install -r backend/requirements.txt "pytest-cov>=7,<8"
+```
 
-### Then run tests through this command
+Set `PYTHONPATH=backend` in your shell, then run:
 
+```bash
 python -m pytest -v
+```
+
+### Coverage reporting (SCRUM-77)
+
+Run the same coverage command used by CI from the repository root:
+
+```bash
+python -m pytest -v --junitxml=build/test-results.xml --cov --cov-config=.coveragerc --cov-report=term-missing --cov-report=xml --cov-report=html
+```
+
+`.coveragerc` measures Python line coverage across `backend/app` and
+`src/sportsbetting`, including files that tests do not import. This percentage
+does not include the frontend or standalone collector scripts at the repo root.
+There is no minimum coverage gate yet; test failures still fail CI.
+
+Each pull request targeting `main` publishes a per-file coverage table and total
+percentage in the GitHub Actions **build** job summary and test log. Download the
+`coverage-<build-id>` artifact for `coverage.xml` and the browsable HTML report
+(`coverage-html/index.html`). Reports are uploaded even when tests fail, when
+pytest was able to generate them. Local reports are written under `build/`.

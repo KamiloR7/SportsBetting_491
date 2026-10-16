@@ -1,0 +1,14 @@
+[run]
+source =
+    backend/app
+    src/sportsbetting
+
+[report]
+show_missing = True
+precision = 2
+
+[xml]
+output = build/coverage.xml
+
+[html]
+directory = build/coverage-html
