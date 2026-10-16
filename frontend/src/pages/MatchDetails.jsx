@@ -1,8 +1,9 @@
 import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import MatchSummary from "../components/MatchSummary";
+import PredictionPanel from "../components/PredictionPanel";
 import DemoNotice from "../components/DemoNotice";
-import { getMatchById, getMatchHistory, runMatchPrediction } from "../services/matches";
+import { getMatchById, getMatchHistory } from "../services/matches";
 
 function teamPlayedMatch(match, teamId) {
   if (teamId == null) return false;
@@ -133,98 +134,6 @@ function HistoricalTeamContext({ match }) {
   );
 }
 
-function formatPercent(value) {
-  return value == null
-    ? "Unavailable"
-    : `${Math.round(Number(value) * 100)}%`;
-}
-
-function predictionOutcome(prediction) {
-  if (prediction.predicted_outcome === "draw") return "Draw";
-  return prediction.predicted_winner_name || "Outcome unavailable";
-}
-
-function PredictionPanel({ match }) {
-  const [result, setResult] = useState({
-    loading: false,
-    prediction: null,
-    error: "",
-  });
-
-  async function handleRunPrediction() {
-    setResult({
-      loading: true,
-      prediction: null,
-      error: "",
-    });
-
-    try {
-      const prediction = await runMatchPrediction(match.id);
-      setResult({
-        loading: false,
-        prediction,
-        error: "",
-      });
-    } catch (error) {
-      setResult({
-        loading: false,
-        prediction: null,
-        error: error.message,
-      });
-    }
-  }
-
-  return (
-    <section className="match-details-context prediction-panel" aria-labelledby="prediction-heading">
-      <div className="prediction-panel-header">
-        <h2 id="prediction-heading">Prediction</h2>
-        <button
-          type="button"
-          onClick={handleRunPrediction}
-          disabled={result.loading}
-        >
-          {result.loading ? "Running..." : "Run Prediction"}
-        </button>
-      </div>
-
-      {result.error && (
-        <p role="alert">{result.error}</p>
-      )}
-
-      {result.prediction && (
-        <dl className="prediction-results">
-          <div>
-            <dt>Predicted outcome</dt>
-            <dd>{predictionOutcome(result.prediction)}</dd>
-          </div>
-          <div>
-            <dt>Home win probability</dt>
-            <dd>{formatPercent(result.prediction.home_win_probability)}</dd>
-          </div>
-          <div>
-            <dt>Away win probability</dt>
-            <dd>{formatPercent(result.prediction.away_win_probability)}</dd>
-          </div>
-          {result.prediction.draw_probability != null && (
-            <div>
-              <dt>Estimated draw probability</dt>
-              <dd>{formatPercent(result.prediction.draw_probability)}</dd>
-            </div>
-          )}
-          <div>
-            <dt>Confidence</dt>
-            <dd>{formatPercent(result.prediction.confidence)}</dd>
-          </div>
-        </dl>
-      )}
-
-      {!result.error && !result.prediction && !result.loading && (
-        <p>Run the model to view the predicted outcome and confidence.</p>
-      )}
-    </section>
-  );
-}
-
 function MatchData({ id }) {
   const [result, setResult] = useState({ loading: true, match: null, error: "" });
 
@@ -262,7 +171,7 @@ function MatchData({ id }) {
         <h2 id="team-context-heading">Historical team context</h2>
         <HistoricalTeamContext key={result.match.id} match={result.match} />
       </section>
-      <PredictionPanel match={result.match} />
+      <PredictionPanel matchId={result.match.id} />
     </>
   );
 }

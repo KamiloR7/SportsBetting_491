@@ -24,6 +24,7 @@ class TestBackendIntegration(unittest.TestCase):
             "/matches",
             "/matches/history",
             "/matches/{match_id}",
+            "/predictions",
             "/predictions/matches/{match_id}",
         }
 

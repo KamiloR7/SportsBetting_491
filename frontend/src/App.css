@@ -139,6 +139,35 @@
   margin-bottom: 12px;
 }
 
+.prediction-panel {
+  display: grid;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.prediction-panel button {
+  width: fit-content;
+  padding: 10px 16px;
+  border: 1px solid var(--accent-border);
+  border-radius: 6px;
+  color: var(--text-h);
+  background: var(--accent-bg);
+  font: inherit;
+  cursor: pointer;
+}
+
+.prediction-panel button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.prediction-panel button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
 .match-details .team-history-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -208,6 +237,18 @@
 .match-details .prediction-panel button:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
+}
+
+.prediction-result {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.prediction-note {
+  font-size: 0.9rem;
 }
 
 .match-details .prediction-results {

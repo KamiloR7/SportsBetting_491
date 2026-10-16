@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -11,6 +13,7 @@ class Settings(BaseSettings):
     DATABASE_NAME: str
     DATABASE_USER: str
     DATABASE_PASSWORD: str
+    MODEL_DIRECTORY: Path = Path("build/sprint2-models")
 
     @property
     def DATABASE_URL(self) -> str:
