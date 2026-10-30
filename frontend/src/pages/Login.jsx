@@ -1,21 +1,14 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 function Login() {
-  const navigate = useNavigate();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
 
   function handleLogin(event) {
     event.preventDefault();
-
-    // Temporary Sprint 1 behavior
-    // Later this will call the real backend
-
-    console.log("Login:", email, password);
-
-    navigate("/dashboard");
+    setPassword("");
+    setMessage("Login is not available yet. This prototype does not verify credentials or protect access to the dashboard.");
   }
 
   return (
@@ -25,7 +18,9 @@ function Login() {
 
         <h1>Welcome Back</h1>
 
-        <p>Sign in to view today's matches</p>
+        <p>Login prototype</p>
+
+        <p role="status" aria-live="polite">{message}</p>
 
         <form onSubmit={handleLogin}>
 
@@ -47,9 +42,7 @@ function Login() {
             onChange={(event) => setPassword(event.target.value)}
           />
 
-          <button type="submit">
-            Login
-          </button>
+          <button type="submit">Continue</button>
 
         </form>
 
