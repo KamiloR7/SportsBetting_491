@@ -83,8 +83,11 @@ def test_valid_target_and_loader_invocation(tmp_path, monkeypatch, capsys):
     report = json.loads(capsys.readouterr().out)
     assert targets == ["sportsbetting_import_test"]
     assert report["matches_inserted"] == 2 and engine.transactions == 2
+    assert report["matches_unchanged"] == 0
     assert cli.main(args) == 0
-    assert json.loads(capsys.readouterr().out)["matches_updated"] == 2
+    replay = json.loads(capsys.readouterr().out)
+    assert replay["matches_updated"] == 0
+    assert replay["matches_unchanged"] == 2
 
 
 def test_transaction_failure_sanitized(tmp_path, monkeypatch, capsys, caplog):

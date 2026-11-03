@@ -60,7 +60,9 @@ class FakeConnection:
         if "SELECT id, league_id" in sql:
             stored = self.matches.get(params["match_id"])
             if stored is None and self.existing_match_id == params["match_id"]:
-                stored = dict(id=self.existing_match_id, league_id=1, home_team_id=10, away_team_id=20, season_id=None)
+                stored = dict(id=self.existing_match_id, league_id=1, home_team_id=10, away_team_id=20,
+                          season_id=None, start_time=None, status="scheduled", home_score=0,
+                          away_score=0, neutral_site=False)
             return FakeResult(SimpleNamespace(**stored)) if stored else FakeResult()
         if "INSERT INTO matches" in sql:
             match_id = 99 + len(self.matches)
