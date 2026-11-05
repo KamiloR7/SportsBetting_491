@@ -1,0 +1,146 @@
+[
+  {
+    "method": "GET",
+    "path": "/auth/assessment/records/{record_id}",
+    "access": "protected",
+    "rationale": "Assessment opt-in plus valid session and owner check."
+  },
+  {
+    "method": "PATCH",
+    "path": "/auth/assessment/records/{record_id}",
+    "access": "protected",
+    "rationale": "Assessment opt-in, session, bound CSRF and owner check before writes."
+  },
+  {
+    "method": "GET",
+    "path": "/auth/csrf",
+    "access": "public",
+    "rationale": "HTTPS-only same-origin bootstrap; session-bound CSRF after login."
+  },
+  {
+    "method": "POST",
+    "path": "/auth/login",
+    "access": "public",
+    "rationale": "HTTPS-only pre-login CSRF challenge plus credentials and database throttle."
+  },
+  {
+    "method": "POST",
+    "path": "/auth/logout",
+    "access": "protected",
+    "rationale": "Valid session and bound CSRF; revoke only the presented session."
+  },
+  {
+    "method": "GET",
+    "path": "/auth/me",
+    "access": "protected",
+    "rationale": "Valid active-user session; return only that user's public account fields."
+  },
+  {
+    "method": "POST",
+    "path": "/auth/register",
+    "access": "public",
+    "rationale": "HTTPS-only public account creation; bcrypt storage, validation and duplicate handling."
+  },
+  {
+    "method": "GET",
+    "path": "/docs",
+    "access": "public",
+    "rationale": "Public generated API documentation/schema; no runtime account records."
+  },
+  {
+    "method": "HEAD",
+    "path": "/docs",
+    "access": "public",
+    "rationale": "Public generated API documentation/schema; no runtime account records."
+  },
+  {
+    "method": "GET",
+    "path": "/docs/oauth2-redirect",
+    "access": "public",
+    "rationale": "Public generated API documentation/schema; no runtime account records."
+  },
+  {
+    "method": "HEAD",
+    "path": "/docs/oauth2-redirect",
+    "access": "public",
+    "rationale": "Public generated API documentation/schema; no runtime account records."
+  },
+  {
+    "method": "GET",
+    "path": "/health",
+    "access": "public",
+    "rationale": "Operational status and explicit data mode; no account data."
+  },
+  {
+    "method": "GET",
+    "path": "/leagues",
+    "access": "public",
+    "rationale": "Public league catalogue."
+  },
+  {
+    "method": "GET",
+    "path": "/matches",
+    "access": "public",
+    "rationale": "Public match browsing."
+  },
+  {
+    "method": "GET",
+    "path": "/matches/history",
+    "access": "public",
+    "rationale": "Public completed-match results, not private account history."
+  },
+  {
+    "method": "GET",
+    "path": "/matches/{match_id}",
+    "access": "public",
+    "rationale": "Public match details."
+  },
+  {
+    "method": "GET",
+    "path": "/openapi.json",
+    "access": "public",
+    "rationale": "Public generated API documentation/schema; no runtime account records."
+  },
+  {
+    "method": "HEAD",
+    "path": "/openapi.json",
+    "access": "public",
+    "rationale": "Public generated API documentation/schema; no runtime account records."
+  },
+  {
+    "method": "POST",
+    "path": "/predictions",
+    "access": "public",
+    "rationale": "Public inference request; no account/private history write."
+  },
+  {
+    "method": "POST",
+    "path": "/predictions/matches/{match_id}",
+    "access": "public",
+    "rationale": "Public inference request; no account/private history write."
+  },
+  {
+    "method": "GET",
+    "path": "/redoc",
+    "access": "public",
+    "rationale": "Public generated API documentation/schema; no runtime account records."
+  },
+  {
+    "method": "HEAD",
+    "path": "/redoc",
+    "access": "public",
+    "rationale": "Public generated API documentation/schema; no runtime account records."
+  },
+  {
+    "method": "GET",
+    "path": "/sports",
+    "access": "public",
+    "rationale": "Public sport catalogue."
+  },
+  {
+    "method": "GET",
+    "path": "/teams",
+    "access": "public",
+    "rationale": "Public team catalogue."
+  }
+]
