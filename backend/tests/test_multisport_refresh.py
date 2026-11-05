@@ -4,6 +4,7 @@ from pathlib import Path
 from datetime import date
 from urllib.error import URLError
 
+import pandas as pd
 import pytest
 
 from app.ml.features import download_multisport_data as refresh
@@ -50,6 +51,17 @@ def test_source_schedule_includes_current_and_recent_historical_seasons():
                        "EPL": [2023, 2024, 2025, 2026]}
     assert "season=2026" in sources["MLB"][-1]
     assert sources["EPL"][-1].endswith("/2627/E0.csv")
+
+
+def test_feed_freshness_reports_age_and_rejects_stale_data():
+    data = pd.DataFrame({"game_date": ["2026-09-27", "2026-11-02"]})
+    as_of = refresh.datetime(2026, 11, 5, tzinfo=refresh.timezone.utc)
+
+    assert refresh.check_feed_freshness("NFL", data, max_age_days=45, as_of=as_of) == {
+        "newest_match_date": "2026-11-02", "newest_match_age_days": 3,
+    }
+    with pytest.raises(ValueError, match="MLB feed is stale"):
+        refresh.check_feed_freshness("MLB", data.iloc[:1], max_age_days=30, as_of=as_of)
 
 
 def test_fetch_source_stops_after_configured_attempts():
