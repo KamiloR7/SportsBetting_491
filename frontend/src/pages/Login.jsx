@@ -13,7 +13,7 @@ function Login() {
     // Temporary Sprint 1 behavior
     // Later this will call the real backend
 
-    console.log("Login:", email, password);
+    // Keep credentials out of logs while the frontend remains a prototype.
 
     navigate("/dashboard");
   }

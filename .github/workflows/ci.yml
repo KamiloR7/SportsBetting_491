@@ -159,6 +159,49 @@ jobs:
             build/build-info.txt
             build/dist/*.whl
 
+  auth-security:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: sprint4_test
+          POSTGRES_PASSWORD: disposable_ci_only
+          POSTGRES_DB: sportsbetting_sprint4_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U sprint4_test -d sportsbetting_sprint4_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PYTHONPATH: backend
+      SPRINT4_TEST_DATABASE_URL: postgresql+psycopg2://sprint4_test:disposable_ci_only@127.0.0.1:5432/sportsbetting_sprint4_test
+      SPRINT4_ALLOW_DISPOSABLE_TEST: "1"
+      SPRINT4_REQUIRE_POSTGRES: "1"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install existing backend dependencies
+        run: python -m pip install -c backend/requirements-sprint2-tested.txt -r backend/requirements.txt
+      - name: Run U1.1-U1.4 against SQLite and disposable PostgreSQL
+        run: python -m pytest backend/tests/test_auth_security.py backend/tests/test_auth_policy.py -v --junitxml=build/sprint4/auth-results.xml
+      - name: Verify real HTTPS cookies and CSRF behavior
+        run: python -m app.security_tls_smoke
+      - name: Upload security evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sprint4-auth-${{ github.sha }}
+          path: build/sprint4/
+          if-no-files-found: error
+          retention-days: 30
+
   frontend:
     runs-on: ubuntu-latest
 
