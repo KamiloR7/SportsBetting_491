@@ -61,7 +61,9 @@ def test_postgres_reimport_correction_and_doubleheader(postgres):
     assert load_historical_matches(postgres, rows)["matches_inserted"] == 4
     with postgres.connect() as conn:
         ids = conn.execute(text("SELECT id FROM matches ORDER BY id")).scalars().all()
-    assert load_historical_matches(postgres, rows)["matches_updated"] == 4
+    replay = load_historical_matches(postgres, rows)
+    assert replay["matches_updated"] == 0
+    assert replay["matches_unchanged"] == 4
     result = load_historical_matches(postgres, [record("MLB", game_id="mlb1", home_score=7, kickoff_utc="2024-09-01T21:00:00Z")])
     assert result["matches_updated"] == 1
     with postgres.connect() as conn:

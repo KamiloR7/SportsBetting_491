@@ -155,6 +155,32 @@ def test_mlb_schedule_json(tmp_path, capsys):
     assert json.loads(capsys.readouterr().out)["records_accepted"] == 1
 
 
+def test_malformed_provider_game_is_rejected_while_valid_sibling_imports(tmp_path, monkeypatch, capsys):
+    path = tmp_path / "provider-schedule.json"
+    path.write_text(json.dumps({"dates": [{"games": [
+        {"gamePk": 900001, "officialDate": "2024-04-01", "gameDate": "2024-04-01T20:00:00Z",
+         "gameType": "R", "season": "2024", "status": {"detailedState": "Final"},
+         "teams": {"home": {"team": {"id": 1}, "score": 3}, "away": {"team": {"id": 1}, "score": 1}}},
+        {"gamePk": 900002, "officialDate": "2024-04-02", "gameDate": "2024-04-02T20:00:00Z",
+         "gameType": "R", "season": "2024", "status": {"detailedState": "Final"},
+         "teams": {"home": {"team": {"id": 1, "name": "Home Club", "abbreviation": "H"}, "score": 3},
+                   "away": {"team": {"id": 2, "name": "Away Club", "abbreviation": "A"}, "score": 1}}},
+    ]}]}))
+    engine = FakeEngine()
+    engine.dispose = lambda: None
+    monkeypatch.setattr(cli, "configured_engine", lambda _: engine)
+
+    result = cli.main(["--input", str(path), "--sport", "MLB", "--format", "mlb-schedule"])
+
+    report = json.loads(capsys.readouterr().out)
+    assert result == 1
+    assert report["records_read"] == 2
+    assert report["records_accepted"] == report["matches_inserted"] == 1
+    assert report["records_rejected"] == 1
+    assert "teams must differ" in report["rejected"][0]["reasons"][0]
+    assert len(engine.conn.matches) == len(engine.conn.mappings) == 1
+
+
 def test_normalized_csv(tmp_path, capsys):
     import csv
     path = tmp_path / "nfl.csv"

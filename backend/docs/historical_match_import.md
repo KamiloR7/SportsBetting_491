@@ -24,9 +24,10 @@ Reference failures defer individual records; SQL, identity, write and commit
 failures roll back the entire batch. `matches_inserted`/`matches_updated` count
 committed writes only, including zero after rollback. Updates preserve match ID,
 reject league/team/established-season changes, allow corrected scores/kickoffs,
-and retain existing neutral-site/season values when omitted. A repeated identical
-import counts as an update. There is no uniqueness assumption based on date and
-teams, so distinct MLB doubleheaders remain distinct.
+and retain existing neutral-site/season values when omitted. Identical replays
+are reported as `matches_unchanged`; they do not issue an `UPDATE`. No
+uniqueness constraint is based on date and teams, so distinct MLB
+doubleheaders remain distinct.
 
 The low-level `upsert_match` retains its match-ID return value, requires an active
 transaction, and does not perform DATA-24 validation or take the importer lock.
