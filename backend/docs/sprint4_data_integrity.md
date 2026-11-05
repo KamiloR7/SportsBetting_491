@@ -3,7 +3,7 @@
 This note maps the Andrew-owned Sprint 4 data tasks to the current code and
 repeatable evidence. Local fixtures are synthetic; they prove normalization and
 failure behavior, not provider coverage, source accuracy, or production readiness.
-No live provider refresh or PostgreSQL write was performed for this evidence.
+No PostgreSQL write was performed for this evidence.
 
 ## Source fields and checks (SCRUM-279, SCRUM-291)
 
@@ -33,14 +33,19 @@ use a new output directory so existing local datasets remain untouched:
 
 ```bash
 PYTHONPATH=backend:src python -m app.ml.features.download_multisport_data \
-  --output data/raw/sprint4-refresh-evidence --timeout 60 --retries 2 --backoff-seconds 1
+  --output data/raw/sprint4-refresh-evidence --timeout 60 --retries 2 \
+  --backoff-seconds 1 --max-feed-age-days 45
 ```
 
 The source season window advances by calendar date: NFL uses a four-year window,
 MLB the current and two preceding seasons, and EPL the current and three
 preceding seasons. The command retries transient HTTP and connection failures a
-bounded number of times, normalizes and validates every sport before promoting outputs, and keeps
-the prior files if retrieval or validation fails. Promotion stages replacements
+bounded number of times, normalizes and validates every sport before promoting
+outputs, and keeps the prior files if retrieval or validation fails. The optional
+`--max-feed-age-days` setting measures each sport's newest completed-match date
+against the UTC refresh date and rejects over-age data before promotion. The
+manifest records the newest date and age even when no limit is configured.
+Promotion stages replacements
 beside the output directory and restores prior named outputs if a file replace
 fails. Unrelated files in the output directory are left untouched. Errors report
 the failure class and attempt count without printing the full provider URL or
@@ -65,21 +70,22 @@ and raw provider files were not committed.
 The refresh manifest records full source and dataset checksums, counts and date
 bounds. It is local under that ignored output directory. NFL and EPL included
 matches through two days before the refresh; MLB's current-season feed ended
-2026-09-27. No per-match source-update timestamp is available, so these checks
-measure feed coverage at retrieval time and do not provide a continuing stale-
-data alert.
+2026-09-27. Their UTC ages at retrieval were 3, 39, and 3 days respectively;
+each passed the configured 45-day threshold. No per-match source-update
+timestamp is available, so this measures newest-match feed coverage at retrieval
+time and does not provide a continuing stale-data alert.
 
 Verification on 2026-11-04: the focused offline command below completed with
-144 passed. On this Windows host, pytest needed a repository-local `--basetemp`
+145 passed. On this Windows host, pytest needed a repository-local `--basetemp`
 because its default temporary directory was denied by filesystem permissions.
 
 ## Acceptance evidence and remaining limits
 
 | Jira task | Local evidence | Still requires an authorized environment |
 | --- | --- | --- |
-| SCRUM-279, source completeness and accuracy | Required fields, missing/malformed/duplicate/out-of-range checks and repeatable offline test coverage; fixture outcomes can be recorded as expected vs actual from the test run. | Real source sample and currentness checks. The repository's raw datasets are placeholders, and the reduced six-column data has no per-record `updated_at`; age of a match is not evidence that its provider record is stale. |
-| SCRUM-291, normalization | Nine expected canonical outputs and invalid fixture rejections; source IDs stay scoped and MLB doubleheaders remain separate. | Provider-specific alias coverage beyond these fixtures and a real dataset assessment. |
-| SCRUM-294, reliable refresh | Bounded retries, clear sanitized failure, validation before promotion, and repeatable invocation with checksum manifest. | A real refresh should be run by an authorized operator with network access; no provider request was made for this assessment. |
+| SCRUM-279, source completeness and accuracy | Real three-sport sample validated for required fields, malformed values, duplicate IDs, score ranges, and feed freshness; expected/actual counts and checksums are recorded above. Synthetic tests cover failure cases. | No per-match source-update timestamp or continuing stale-feed monitor exists; the optional age threshold is evaluated when the refresh runs. |
+| SCRUM-291, normalization | Nine expected canonical outputs and invalid fixture rejections; source IDs stay scoped and MLB doubleheaders remain separate. A current/recent-season source snapshot was also validated. | Provider-specific aliases beyond the available fixtures. |
+| SCRUM-294, reliable refresh | Bounded retries, sanitized failure, validation before promotion, optional feed-age check, repeatable invocation, and a successful live three-sport refresh with checksum manifest. | An OS scheduler is not installed; refresh is repeatable by command. |
 | SCRUM-149 PI1.3 | PR #36 contains the replay, normalization, CLI rejection, and import evidence work. Offline fake-engine tests cover rollback; PostgreSQL test is opt-in. | Disposable local PostgreSQL setup for actual transaction rollback/reconciliation. Do not substitute demo/shared data. |
 
 For a deterministic local run of the relevant offline coverage:
