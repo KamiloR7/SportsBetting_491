@@ -9,9 +9,9 @@ No live provider refresh or PostgreSQL write was performed for this evidence.
 
 | Feed | Source identity and fields | Current checks and known limits |
 | --- | --- | --- |
-| NFL | nflverse games CSV: game ID, season, game type, game day, teams, scores | Keep configured regular seasons, exclude missing final scores, then validate canonical ID/date/team/score fields. The six-column ML file does not retain provider ID lineage or update timestamps. |
-| MLB | Stats API schedule: `gamePk`, official date, game date, game type, status, teams and scores | Keep completed regular-season games, reject missing scores, filter resumed games, collapse identical game IDs, reject conflicting duplicates. Game IDs preserve same-day doubleheaders. |
-| EPL | football-data.co.uk E0 CSV: date, teams, full-time scores and season URL | Parse day-first dates as UTC, keep E0 completed rows, and validate canonical identity/team/score fields. This source lacks a stable match ID and actual kickoff time in the current adapter; generated IDs use season/date/teams and date-only records must not be treated as kickoff timestamps. |
+| NFL | nflverse games CSV: game ID, season, game type, game day, teams, scores | Keep regular seasons in a rolling four-year window through the current season, exclude missing final scores, then validate canonical ID/date/team/score fields. The six-column ML file does not retain provider ID lineage or update timestamps. |
+| MLB | Stats API schedule: `gamePk`, official date, game date, game type, status, teams and scores | Refresh the current season and two preceding seasons. Keep completed regular-season games, reject missing scores, filter resumed games, collapse identical game IDs, reject conflicting duplicates. Game IDs preserve same-day doubleheaders. |
+| EPL | football-data.co.uk E0 CSV: date, teams, full-time scores and season URL | Refresh the current season and three preceding seasons. Parse day-first dates as UTC, keep E0 completed rows, and validate canonical identity/team/score fields. This source lacks a stable match ID and actual kickoff time in the current adapter; generated IDs use season/date/teams and date-only records must not be treated as kickoff timestamps. |
 
 Shared ML validation in `app.ml.features.prepare_multisport_data.validate_games`
 requires nonempty unique IDs, parseable dates, distinct named teams, and finite,
@@ -28,15 +28,18 @@ and doubleheader identity. See `test_sprint4_pi13_normalization.py`,
 
 ## Refresh behavior (SCRUM-294, SCRUM-295–298)
 
-Run the repeatable refresh from the repository root:
+Run the repeatable refresh from the repository root. For an initial evidence run,
+use a new output directory so existing local datasets remain untouched:
 
 ```bash
 PYTHONPATH=backend:src python -m app.ml.features.download_multisport_data \
-  --output data/raw --timeout 60 --retries 2 --backoff-seconds 1
+  --output data/raw/sprint4-refresh-evidence --timeout 60 --retries 2 --backoff-seconds 1
 ```
 
-The command retries transient HTTP and connection failures a bounded number of
-times, normalizes and validates every sport before promoting outputs, and keeps
+The source season window advances by calendar date: NFL uses a four-year window,
+MLB the current and two preceding seasons, and EPL the current and three
+preceding seasons. The command retries transient HTTP and connection failures a
+bounded number of times, normalizes and validates every sport before promoting outputs, and keeps
 the prior files if retrieval or validation fails. Promotion stages replacements
 beside the output directory and restores prior named outputs if a file replace
 fails. Unrelated files in the output directory are left untouched. Errors report
@@ -47,11 +50,27 @@ OS scheduler is installed or claimed.
 
 Refresh unit evidence is in `test_multisport_refresh.py`: bounded retries and
 backoff, sanitized terminal failure, failed validation preserving prior files,
-and replacement preserving unrelated files. Tests use injected local responses;
-they do not call public providers.
+and replacement preserving unrelated files. These tests use injected local
+responses. Separately, a network-enabled refresh completed on
+2026-11-05 04:17 UTC (2026-11-04 20:17 Pacific) into the ignored local directory
+`data/raw/sprint4-refresh-20261104`; it did not replace the existing NFL dataset
+and raw provider files were not committed.
+
+| Sport | Validated rows | Match-date coverage | Dataset SHA-256 prefix |
+| --- | ---: | --- | --- |
+| NFL | 937 | 2023-09-07 through 2026-11-02 | `477d4ae5928c3f3d` |
+| MLB | 7,280 | 2024-03-20 through 2026-09-27 | `47e644ab814da555` |
+| EPL | 1,230 | 2023-08-11 through 2026-11-02 | `cd75992809140a32` |
+
+The refresh manifest records full source and dataset checksums, counts and date
+bounds. It is local under that ignored output directory. NFL and EPL included
+matches through two days before the refresh; MLB's current-season feed ended
+2026-09-27. No per-match source-update timestamp is available, so these checks
+measure feed coverage at retrieval time and do not provide a continuing stale-
+data alert.
 
 Verification on 2026-11-04: the focused offline command below completed with
-143 passed. On this Windows host, pytest needed a repository-local `--basetemp`
+144 passed. On this Windows host, pytest needed a repository-local `--basetemp`
 because its default temporary directory was denied by filesystem permissions.
 
 ## Acceptance evidence and remaining limits

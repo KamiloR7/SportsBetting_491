@@ -10,7 +10,7 @@ import os
 import tempfile
 import time
 from collections import Counter
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -20,14 +20,33 @@ import pandas as pd
 from app.ml.features.prepare_multisport_data import validate_games
 
 COLUMNS = ["game_id", "game_date", "home_team", "away_team", "home_score", "away_score"]
-SOURCES = {
-    "NFL": ["https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv"],
-    "MLB": ["https://statsapi.mlb.com/api/v1/schedule?sportId=1&season=2024&gameType=R"],
-    "EPL": [
-        "https://www.football-data.co.uk/mmz4281/2324/E0.csv",
-        "https://www.football-data.co.uk/mmz4281/2425/E0.csv",
-    ],
-}
+def source_seasons(as_of: date | None = None) -> dict[str, list[int]]:
+    """Return rolling recent seasons, including the current season for each sport."""
+    as_of = as_of or date.today()
+    nfl_mlb_years = list(range(as_of.year - 3, as_of.year + 1))
+    current_epl_start = as_of.year if as_of.month >= 7 else as_of.year - 1
+    epl_starts = list(range(current_epl_start - 3, current_epl_start + 1))
+    return {"NFL": nfl_mlb_years, "MLB": list(range(as_of.year - 2, as_of.year + 1)),
+            "EPL": epl_starts}
+
+
+def _season_code(start_year: int) -> str:
+    return f"{start_year % 100:02d}{(start_year + 1) % 100:02d}"
+
+
+def build_sources(as_of: date | None = None) -> dict[str, list[str]]:
+    """Build feed URLs for a rolling historical window and the current season."""
+    seasons = source_seasons(as_of)
+    return {
+        "NFL": ["https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv"],
+        "MLB": [f"https://statsapi.mlb.com/api/v1/schedule?sportId=1&season={year}&gameType=R"
+                for year in seasons["MLB"]],
+        "EPL": [f"https://www.football-data.co.uk/mmz4281/{_season_code(year)}/E0.csv"
+                for year in seasons["EPL"]],
+    }
+
+
+SOURCES = build_sources()
 logger = logging.getLogger(__name__)
 TRANSIENT_HTTP_CODES = {408, 425, 429, 500, 502, 503, 504}
 
@@ -94,9 +113,10 @@ def _replace_snapshot(output: Path, files: dict[str, bytes]) -> None:
         staged.rmdir()
 
 
-def normalize_nfl(payload: bytes):
+def normalize_nfl(payload: bytes, seasons: list[int] | None = None):
     source = pd.read_csv(io.BytesIO(payload))
-    selected = source[source["season"].isin([2023, 2024]) & source["game_type"].eq("REG")]
+    seasons = seasons if seasons is not None else source_seasons()["NFL"]
+    selected = source[source["season"].isin(seasons) & source["game_type"].eq("REG")]
     completed = selected.dropna(subset=["home_score", "away_score"])
     data = completed.rename(columns={"gameday": "game_date"})[COLUMNS]
     return data, {"source_rows": len(source), "selected_rows": len(selected),

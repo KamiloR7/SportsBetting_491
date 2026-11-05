@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from datetime import date
 from urllib.error import URLError
 
 import pytest
@@ -38,6 +39,17 @@ def test_fetch_source_retries_transient_failures_with_a_bound():
     assert len(calls) == 3
     assert [delay for delay in delays] == [0.25, 0.5]
     assert all(timeout == 7 for _, timeout in calls)
+
+
+def test_source_schedule_includes_current_and_recent_historical_seasons():
+    seasons = refresh.source_seasons(date(2026, 11, 4))
+    sources = refresh.build_sources(date(2026, 11, 4))
+
+    assert seasons == {"NFL": [2023, 2024, 2025, 2026],
+                       "MLB": [2024, 2025, 2026],
+                       "EPL": [2023, 2024, 2025, 2026]}
+    assert "season=2026" in sources["MLB"][-1]
+    assert sources["EPL"][-1].endswith("/2627/E0.csv")
 
 
 def test_fetch_source_stops_after_configured_attempts():
