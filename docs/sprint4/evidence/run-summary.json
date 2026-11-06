@@ -1,0 +1,44 @@
+{
+  "source_commit": "2a4223e3243aa97944bf3dfdfc0c86cab9b03c9c",
+  "baseline_commit": "25cc7cf1ebc4dab95873adfe403216d174198349",
+  "captured_utc": "2026-11-05T20:30:21.824666+00:00",
+  "data": "synthetic accounts and records only",
+  "python": "3.12.14",
+  "os": "Darwin",
+  "sqlite": "3.53.1",
+  "postgresql_major": "17",
+  "regression": {
+    "tests": 559,
+    "passed": 555,
+    "skipped": 4,
+    "failures": 0,
+    "errors": 0
+  },
+  "security_subset": {
+    "tests": 65,
+    "passed": 65,
+    "skipped": 0,
+    "provenance": "Extracted without changing outcomes from regression.xml; CI runs these same test modules directly."
+  },
+  "baseline": {
+    "passed": 490,
+    "skipped": 4
+  },
+  "tls_smoke": "passed over real loopback HTTPS, verified generated certificate; separate ephemeral SQLite demo",
+  "packages": {
+    "fastapi": "0.142.2",
+    "starlette": "1.7.0",
+    "SQLAlchemy": "2.1.1",
+    "bcrypt": "5.0.0",
+    "pytest": "9.1.1",
+    "httpx2": "2.16.0",
+    "psycopg2-binary": "2.9.13"
+  },
+  "remaining": [
+    "Ayman peer review/approval and policy agreement",
+    "Merged-main CI after reviewed merge",
+    "Frontend login/logout/CSRF integration and monitoring coordination",
+    "Individual Google Doc update/version history and submission",
+    "Four legacy historical-import PostgreSQL tests not configured in this local run"
+  ]
+}

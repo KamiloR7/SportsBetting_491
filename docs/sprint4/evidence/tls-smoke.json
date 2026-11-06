@@ -1,0 +1,17 @@
+{
+  "result": "pass",
+  "transport": "real loopback HTTPS; generated test certificate explicitly verified",
+  "database": "ephemeral SQLite",
+  "data": "synthetic only",
+  "checks": [
+    "anonymous denial",
+    "login",
+    "Secure/HttpOnly/SameSite cookie",
+    "authorized read",
+    "cross-account denial",
+    "CSRF denial",
+    "authorized write",
+    "logout revocation"
+  ],
+  "source_commit": "2a4223e3243aa97944bf3dfdfc0c86cab9b03c9c"
+}

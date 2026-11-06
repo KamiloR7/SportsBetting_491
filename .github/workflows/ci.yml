@@ -159,6 +159,49 @@ jobs:
             build/build-info.txt
             build/dist/*.whl
 
+  auth-security:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: sprint4_test
+          POSTGRES_PASSWORD: disposable_ci_only
+          POSTGRES_DB: sportsbetting_sprint4_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U sprint4_test -d sportsbetting_sprint4_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PYTHONPATH: backend
+      SPRINT4_TEST_DATABASE_URL: postgresql+psycopg2://sprint4_test:disposable_ci_only@127.0.0.1:5432/sportsbetting_sprint4_test
+      SPRINT4_ALLOW_DISPOSABLE_TEST: "1"
+      SPRINT4_REQUIRE_POSTGRES: "1"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install existing backend dependencies
+        run: python -m pip install -c backend/requirements-sprint2-tested.txt -r backend/requirements.txt
+      - name: Run U1.1-U1.4 against SQLite and disposable PostgreSQL
+        run: python -m pytest backend/tests/test_auth_security.py backend/tests/test_auth_policy.py -v --junitxml=build/sprint4/auth-results.xml
+      - name: Verify real HTTPS cookies and CSRF behavior
+        run: python -m app.security_tls_smoke
+      - name: Upload security evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sprint4-auth-${{ github.sha }}
+          path: build/sprint4/
+          if-no-files-found: error
+          retention-days: 30
+
   frontend:
     runs-on: ubuntu-latest
 
@@ -184,3 +227,100 @@ jobs:
       - name: Build frontend
         working-directory: frontend
         run: npm run build
+
+  security-postgres:
+    name: Sprint 4 Security + PostgreSQL
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: vigor_security_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres_test_only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d vigor_security_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_HOST: localhost
+      DATABASE_PORT: "5432"
+      DATABASE_NAME: vigor_security_test
+      DATABASE_USER: postgres
+      DATABASE_PASSWORD: postgres_test_only
+      PGPASSWORD: postgres_test_only
+      PYTHONPATH: backend
+      SECURITY_POSTGRES_TESTS: "1"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -c backend/requirements-sprint2-tested.txt pytest "pytest-cov>=7,<8"
+          python -m pip install -e .
+          python -m pip install -c backend/requirements-sprint2-tested.txt -r backend/requirements.txt
+
+      - name: Initialize isolated PostgreSQL schema
+        run: |
+          psql -h localhost -U postgres -d vigor_security_test \
+            -v ON_ERROR_STOP=1 \
+            -f backend/app/database/sports_prediction_schema.sql
+
+      - name: Verify security database tables
+        shell: bash
+        run: |
+          set -euo pipefail
+          TABLE_COUNT=$(psql -h localhost -U postgres \
+            -d vigor_security_test -tAc "
+            SELECT COUNT(*)
+            FROM information_schema.tables
+            WHERE table_schema = 'public'
+              AND table_name IN (
+                'users',
+                'user_predictions',
+                'matches',
+                'teams'
+              );
+          ")
+          test "$TABLE_COUNT" -eq 4
+          echo "All four required security tables exist."
+
+      - name: Run Sprint 4 security tests
+        run: |
+          mkdir -p build
+          python -m pytest -v \
+            backend/tests/test_auth.py \
+            backend/tests/test_password_security.py \
+            backend/tests/test_session_security.py \
+            backend/tests/test_sprint4_auth_api.py \
+            backend/tests/test_login_throttle.py \
+            backend/tests/test_ownership_assessment.py \
+            backend/tests/test_security_postgres.py \
+            --junitxml=build/sprint4-security-results.xml
+
+      - name: Upload Sprint 4 security results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sprint4-security-results
+          path: build/sprint4-security-results.xml
+          if-no-files-found: warn
+          retention-days: 30
