@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import MatchSummary from "../components/MatchSummary";
 import PredictionPanel from "../components/PredictionPanel";
@@ -178,10 +178,14 @@ function MatchData({ id }) {
 
 function MatchDetails() {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const returnToMatches = searchParams.size
+    ? `/dashboard?${searchParams.toString()}`
+    : "/dashboard";
   return (
     <div className="match-details">
       <DemoNotice />
-      <Link to="/dashboard">Back to matches</Link>
+      <Link to={returnToMatches}>Back to matches</Link>
       <h1>Match details</h1>
       <MatchData key={id} id={id} />
     </div>
