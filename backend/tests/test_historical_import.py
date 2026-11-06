@@ -41,12 +41,27 @@ class FakeEngine:
             raise
 
 
-def test_insert_reimport_correction_and_kickoff_update():
+def test_insert_replay_is_counted_unchanged_without_database_update():
+    engine = FakeEngine()
+    first = load_historical_matches(engine, [record()])
+    assert first["matches_inserted"] == 1
+    update_count = sum("UPDATE matches SET" in sql for sql, _ in engine.conn.calls)
+
+    replay = load_historical_matches(engine, [record(kickoff_utc="2024-09-01T13:00:00-07:00")])
+
+    assert replay["matches_inserted"] == 0
+    assert replay["matches_updated"] == 0
+    assert replay["matches_unchanged"] == 1
+    assert sum("UPDATE matches SET" in sql for sql, _ in engine.conn.calls) == update_count
+    assert len(engine.conn.matches) == len(engine.conn.mappings) == 1
+
+
+def test_insert_reimport_correction_updates_one_match():
     engine = FakeEngine()
     first = load_historical_matches(engine, [record(), record()])
     assert first["matches_inserted"] == 1 and first["duplicates_collapsed"] == 1
     second = load_historical_matches(engine, [record(home_score=4, kickoff_utc="2024-09-01T21:00:00Z")])
-    assert second["matches_updated"] == 1
+    assert second["matches_updated"] == 1 and second["matches_unchanged"] == 0
     assert len(engine.conn.matches) == len(engine.conn.mappings) == 1
     stored = next(iter(engine.conn.matches.values()))
     assert stored["season_id"] == 7 and stored["neutral_site"] is True
@@ -162,7 +177,8 @@ def test_omitted_neutral_site_preserves_existing_value():
     engine = FakeEngine()
     load_historical_matches(engine, [record()])
     result = load_historical_matches(engine, [record(neutral_site=None)])
-    assert result["matches_updated"] == 1
+    assert result["matches_unchanged"] == 1
+    assert result["matches_updated"] == 0
     assert next(iter(engine.conn.matches.values()))["neutral_site"] is True
 
 
