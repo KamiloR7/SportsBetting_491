@@ -21,6 +21,9 @@ from app.ml.training.historical_match_model import (
     load_historical_model,
 )
 from app.schemas.prepared_predictions import PreparedPredictionRequest, PreparedPredictionResponse
+from app.services.prediction_input_integrity import canonical_prediction_input_hash
+
+UPCOMING_SOURCE_AGE_LIMIT = timedelta(hours=24)
 
 
 class PredictionInterfaceError(RuntimeError):
@@ -134,10 +137,15 @@ class PreparedPredictionService:
         if observed is not None:
             if observed > request.feature_as_of or any(result.result_available_at > observed for result in request.source_results):
                 raise PredictionInterfaceError("invalid_source_timestamp", "Source observation must include historical results and precede the feature cutoff.")
-        if self.max_source_age is not None:
+        age_limit = self.max_source_age
+        upcoming = request.start_time > generated_at
+        age_reference = generated_at if upcoming else request.feature_as_of
+        if upcoming:
+            age_limit = min(age_limit, UPCOMING_SOURCE_AGE_LIMIT) if age_limit else UPCOMING_SOURCE_AGE_LIMIT
+        if age_limit is not None:
             if observed is None:
                 raise PredictionInterfaceError("freshness_unavailable", "The configured freshness policy requires a reliable source observation timestamp.")
-            if request.feature_as_of - observed > self.max_source_age:
+            if age_reference - observed > age_limit:
                 raise PredictionInterfaceError("stale_source", "Source data exceeds the configured age at the prediction cutoff.")
             freshness = "within_configured_age"
         model = self.registry.get(request.sport, request.model_version)
@@ -145,6 +153,7 @@ class PreparedPredictionService:
             model_cutoff_guard(model.metadata).predict(frame, METHODS[0], schema_version=request.feature_schema_version)
         except (ValueError, TypeError) as exc:
             raise PredictionInterfaceError("training_cutoff_violation", "The fitted model uses labels unavailable at this prediction cutoff.") from exc
+        input_sha256 = canonical_prediction_input_hash(request)
         try:
             result = model.predict(frame, schema_version=request.feature_schema_version)[0]
             if result["model_version"] != request.model_version or result["match_id"] != request.match_id or result["sport"] != request.sport:
@@ -152,6 +161,10 @@ class PreparedPredictionService:
             return PreparedPredictionResponse(
                 **result, generated_at=generated_at, prediction_cutoff=request.feature_as_of,
                 freshness_status=freshness,
+                source_freshness_limit_seconds=int(age_limit.total_seconds()) if age_limit else None,
+                source_freshness_reference=("prediction_time" if upcoming else "feature_cutoff") if age_limit else None,
+                input_sha256=input_sha256,
+                probability_method="direct_multiclass" if request.sport == "EPL" else "direct_binary",
             )
         except (ValueError, TypeError, KeyError, IndexError, RuntimeError) as exc:
             raise PredictionInterfaceError("prediction_failed", "The configured model could not produce a valid prediction.", 502) from exc

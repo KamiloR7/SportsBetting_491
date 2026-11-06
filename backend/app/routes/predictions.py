@@ -116,6 +116,7 @@ def run_match_prediction(
     }.get(result["predicted_outcome"])
     return PredictionOut(
         match_id=match_id,
+        sport=match.sport,
         model_name="multisport_baseline",
         predicted_winner_id=winner_id,
         predicted_winner_name=winner_name,

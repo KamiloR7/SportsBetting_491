@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createPrediction } from "../services/predictions";
+import { predictionDisplay } from "../services/predictionTransparency";
 
 function percent(value) {
   return `${Math.round(value * 100)}%`;
@@ -18,7 +19,7 @@ function PredictionPanel({ matchId }) {
     setState({ loading: true, result: null, error: "" });
     createPrediction(matchId, { signal: controller.signal })
       .then((result) => {
-        if (!controller.signal.aborted) setState({ loading: false, result, error: "" });
+        if (!controller.signal.aborted) setState({ loading: false, result: { ...result, display: predictionDisplay(result) }, error: "" });
       })
       .catch((error) => {
         if (!controller.signal.aborted) {
@@ -38,14 +39,14 @@ function PredictionPanel({ matchId }) {
       {state.error && <p role="alert">{state.error}</p>}
       {state.result && (
         <div className="prediction-result" aria-live="polite">
-          <p><strong>{state.result.predicted_outcome === "HOME_WIN"
-            ? `${state.result.home_team_name} predicted to win`
-            : `${state.result.home_team_name} predicted not to win`}</strong></p>
-          <p>Confidence: {percent(state.result.confidence)}</p>
-          <p>Home win: {percent(state.result.probabilities.home_win)}</p>
-          <p>Not home win: {percent(state.result.probabilities.not_home_win)}</p>
-          <p>History used: {state.result.history.home_games} home-team games and {state.result.history.away_games} away-team games</p>
-          <p className="prediction-note">NFL, MLB, and EPL currently use a binary home-win versus not-home-win model.</p>
+          <p><strong>{state.result.display.headline}</strong></p>
+          <p>Confidence: {percent(state.result.display.confidence)}</p>
+          {state.result.display.probabilities.map(({ key, label, value }) => (
+            <p key={key}>{label}: {percent(value)}</p>
+          ))}
+          {state.result.history && <p>History used: {state.result.history.home_games} home-team games and {state.result.history.away_games} away-team games</p>}
+          <p className="prediction-note">{state.result.display.message}</p>
+          <p className="prediction-note">{state.result.display.calibrationNote}</p>
         </div>
       )}
     </section>

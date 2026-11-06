@@ -1,0 +1,275 @@
+{
+  "backend_regression": {
+    "failed": 0,
+    "passed": 744,
+    "skipped": 4
+  },
+  "consistency": [
+    {
+      "all_probabilities_valid": true,
+      "execution_count": 10,
+      "input_sha256": "9fba10dcde05d7f7ee379140c3968d041b26329588b8b483e47e85edd7c2b622",
+      "model_executions": 10,
+      "model_version": "historical-logreg-aabc5b588f908959a7ef",
+      "ordered_schema_sha256": "ab235aeb851b6c591dd1fbe2692af9f58248828c119e90f60e5748196fc366db",
+      "probability_sum_tolerance": 1e-06,
+      "reference_probabilities": {
+        "away_win": 0.08927019400381797,
+        "home_win": 0.910729805996182
+      },
+      "sport": "NFL",
+      "unique_feature_orders": 1,
+      "unique_input_hashes": 1,
+      "unique_model_versions": 1,
+      "unique_probability_vectors": 1
+    },
+    {
+      "all_probabilities_valid": true,
+      "execution_count": 10,
+      "input_sha256": "65ac7a28fde7293c1ade2c7d93e191a2cd138d75748e673eef4c86bfc0040c8c",
+      "model_executions": 10,
+      "model_version": "historical-logreg-10cd9f145a6c9f24e8b7",
+      "ordered_schema_sha256": "8b159664d13a3eba410324270cbf8cefee1a9af088b1b3d6d3fd376107291ec9",
+      "probability_sum_tolerance": 1e-06,
+      "reference_probabilities": {
+        "away_win": 0.045622253421472525,
+        "home_win": 0.9543777465785275
+      },
+      "sport": "MLB",
+      "unique_feature_orders": 1,
+      "unique_input_hashes": 1,
+      "unique_model_versions": 1,
+      "unique_probability_vectors": 1
+    },
+    {
+      "all_probabilities_valid": true,
+      "execution_count": 10,
+      "input_sha256": "9c787336d162f6a595ed422f9f28ee198f845525afc23befee9232ce9368c689",
+      "model_executions": 10,
+      "model_version": "historical-logreg-80daa36d79d6243d197c",
+      "ordered_schema_sha256": "e087ce634d1970b1ac45e5d85b21d4279535af683b563ace9a19b4a949049248",
+      "probability_sum_tolerance": 1e-06,
+      "reference_probabilities": {
+        "away_win": 0.02376194367005935,
+        "draw": 0.06954008159283759,
+        "home_win": 0.9066979747371031
+      },
+      "sport": "EPL",
+      "unique_feature_orders": 1,
+      "unique_input_hashes": 1,
+      "unique_model_versions": 1,
+      "unique_probability_vectors": 1
+    }
+  ],
+  "evidence_version": 1,
+  "freshness": [
+    {
+      "actual_status": 422,
+      "case": "missing",
+      "expected_status": 422,
+      "result": "freshness_unavailable"
+    },
+    {
+      "actual_status": 200,
+      "case": "1 day, 0:00:00",
+      "expected_status": 200,
+      "result": "within_configured_age"
+    },
+    {
+      "actual_status": 422,
+      "case": "1 day, 0:00:00.000001",
+      "expected_status": 422,
+      "result": "stale_source"
+    },
+    {
+      "actual_status": 200,
+      "case": "23:59:00",
+      "expected_status": 200,
+      "result": "within_configured_age"
+    }
+  ],
+  "invalid_scenarios": [
+    {
+      "actual_code": "invalid_request",
+      "actual_status": 422,
+      "expected_code": "invalid_request",
+      "expected_status": 422,
+      "id": "P1.1-01",
+      "inference_calls": 0,
+      "model_executions": 0,
+      "prediction_generated": false,
+      "scenario": "unsupported sport"
+    },
+    {
+      "actual_code": "invalid_features",
+      "actual_status": 422,
+      "expected_code": "invalid_features",
+      "expected_status": 422,
+      "id": "P1.1-02",
+      "inference_calls": 0,
+      "model_executions": 0,
+      "prediction_generated": false,
+      "scenario": "missing required feature"
+    },
+    {
+      "actual_code": "invalid_request",
+      "actual_status": 422,
+      "expected_code": "invalid_request",
+      "expected_status": 422,
+      "id": "P1.1-03",
+      "inference_calls": 0,
+      "model_executions": 0,
+      "prediction_generated": false,
+      "scenario": "incorrect numeric type"
+    },
+    {
+      "actual_code": "invalid_features_or_cutoff",
+      "actual_status": 422,
+      "expected_code": "invalid_features_or_cutoff",
+      "expected_status": 422,
+      "id": "P1.1-04",
+      "inference_calls": 0,
+      "model_executions": 0,
+      "prediction_generated": false,
+      "scenario": "infinite scoring value"
+    },
+    {
+      "actual_code": "feature_schema_mismatch",
+      "actual_status": 409,
+      "expected_code": "feature_schema_mismatch",
+      "expected_status": 409,
+      "id": "P1.1-05",
+      "inference_calls": 0,
+      "model_executions": 0,
+      "prediction_generated": false,
+      "scenario": "incorrect feature ordering"
+    },
+    {
+      "actual_code": "feature_schema_mismatch",
+      "actual_status": 409,
+      "expected_code": "feature_schema_mismatch",
+      "expected_status": 409,
+      "id": "P1.1-06",
+      "inference_calls": 0,
+      "model_executions": 0,
+      "prediction_generated": false,
+      "scenario": "feature schema mismatch"
+    },
+    {
+      "actual_code": "model_version_mismatch",
+      "actual_status": 409,
+      "expected_code": "model_version_mismatch",
+      "expected_status": 409,
+      "id": "P1.1-07",
+      "inference_calls": 0,
+      "model_executions": 0,
+      "prediction_generated": false,
+      "scenario": "model version mismatch"
+    },
+    {
+      "actual_code": "invalid_features_or_cutoff",
+      "actual_status": 422,
+      "expected_code": "invalid_features_or_cutoff",
+      "expected_status": 422,
+      "id": "P1.1-08",
+      "inference_calls": 0,
+      "model_executions": 0,
+      "prediction_generated": false,
+      "scenario": "cutoff at kickoff"
+    },
+    {
+      "actual_code": "historical_cutoff_violation",
+      "actual_status": 422,
+      "expected_code": "historical_cutoff_violation",
+      "expected_status": 422,
+      "id": "P1.1-09",
+      "inference_calls": 0,
+      "model_executions": 0,
+      "prediction_generated": false,
+      "scenario": "future historical result"
+    },
+    {
+      "actual_code": "stale_source",
+      "actual_status": 422,
+      "expected_code": "stale_source",
+      "expected_status": 422,
+      "id": "P1.1-10",
+      "inference_calls": 0,
+      "model_executions": 0,
+      "prediction_generated": false,
+      "scenario": "stale upcoming source"
+    },
+    {
+      "actual_code": "invalid_request",
+      "actual_status": 422,
+      "expected_code": "invalid_request",
+      "expected_status": 422,
+      "id": "P1.1-11",
+      "inference_calls": 0,
+      "model_executions": 0,
+      "prediction_generated": false,
+      "scenario": "blank match identity"
+    },
+    {
+      "actual_code": "invalid_request",
+      "actual_status": 422,
+      "expected_code": "invalid_request",
+      "expected_status": 422,
+      "id": "P1.1-12",
+      "inference_calls": 0,
+      "model_executions": 0,
+      "prediction_generated": false,
+      "scenario": "unsupported prediction configuration"
+    }
+  ],
+  "leakage": [
+    {
+      "actual_code": "historical_cutoff_violation",
+      "case": "same_day",
+      "model_executions": 0,
+      "rejected": true
+    },
+    {
+      "actual_code": "historical_cutoff_violation",
+      "case": "future_record",
+      "model_executions": 0,
+      "rejected": true
+    },
+    {
+      "actual_code": "invalid_provenance",
+      "case": "target_record",
+      "model_executions": 0,
+      "rejected": true
+    },
+    {
+      "actual_code": "historical_cutoff_violation",
+      "case": "unavailable_result",
+      "model_executions": 0,
+      "rejected": true
+    },
+    {
+      "case": "future_score_and_rolling_history",
+      "invariant": true,
+      "unavailable_prior_result_rejected": true
+    }
+  ],
+  "proposal_source": "Exact P1 acceptance criteria supplied by Kamilo Ramirez in conversation",
+  "synthetic_fixtures_only": true,
+  "transparency": [
+    {
+      "calibration": "uncalibrated",
+      "estimated_outcomes": [],
+      "method": "direct_multiclass",
+      "path": "prepared"
+    },
+    {
+      "calibration": "uncalibrated",
+      "estimated_outcomes": [
+        "draw",
+        "away_win"
+      ],
+      "method": "estimated_epl_split",
+      "path": "legacy_estimated"
+    }
+  ]
+}

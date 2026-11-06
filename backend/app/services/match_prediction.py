@@ -8,6 +8,7 @@ from pathlib import Path
 import pandas as pd
 
 from app.ml.predict_multisport import load_trusted_baseline, predict_outcomes
+from app.ml.probability_validation import validate_sport_probabilities
 
 DEFAULT_MODEL_DIR = Path(__file__).resolve().parents[3] / "build" / "sprint2-models"
 
@@ -43,6 +44,8 @@ def team_features(team_id: int, history: list) -> tuple[float, float, float, int
 
 
 def predict_probabilities(sport: str, home_team_id: int, away_team_id: int, history: list) -> dict:
+    if sport not in {"NFL", "MLB", "EPL"}:
+        raise ValueError("Unsupported prediction configuration")
     home_rate, home_score, home_allowed, home_games = team_features(home_team_id, history)
     away_rate, away_score, away_allowed, away_games = team_features(away_team_id, history)
     if not home_games or not away_games:
@@ -85,6 +88,7 @@ def predict_probabilities(sport: str, home_team_id: int, away_team_id: int, hist
     }
     if draw_probability is not None:
         probabilities["draw"] = draw_probability
+    validate_sport_probabilities(sport, probabilities)
     outcome = max(probabilities, key=probabilities.get)
 
     return {
@@ -94,4 +98,7 @@ def predict_probabilities(sport: str, home_team_id: int, away_team_id: int, hist
         "draw_probability": draw_probability,
         "confidence": probabilities[outcome],
         "model_version": metadata.get("artifact_version"),
+        "probability_method": "estimated_epl_split" if sport == "EPL" else "direct_binary",
+        "estimated_outcomes": ["draw", "away_win"] if sport == "EPL" else [],
+        "probability_calibration": "uncalibrated",
     }

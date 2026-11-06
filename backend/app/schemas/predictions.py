@@ -35,10 +35,14 @@ class PredictionResponse(BaseModel):
     confidence: float = Field(ge=0, le=1)
     model_version: str
     history: PredictionHistory
+    probability_method: Literal["direct_binary"] = "direct_binary"
+    estimated_outcomes: list[str] = Field(default_factory=list)
+    probability_calibration: Literal["uncalibrated"] = "uncalibrated"
 
 
 class PredictionOut(BaseModel):
     match_id: int
+    sport: Literal["NFL", "MLB", "EPL"] | None = None
     predicted_outcome: str
     model_version_id: Optional[int] = None
     model_name: Optional[str] = None
@@ -50,3 +54,6 @@ class PredictionOut(BaseModel):
     draw_probability: Optional[float] = None
     confidence: Optional[float] = None
     generated_at: Optional[datetime] = None
+    probability_method: Literal["direct_binary", "estimated_epl_split"] | None = None
+    estimated_outcomes: list[str] = Field(default_factory=list)
+    probability_calibration: Literal["uncalibrated"] = "uncalibrated"

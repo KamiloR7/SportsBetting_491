@@ -1,0 +1,12 @@
+{"error_code": "invalid_request", "event": "invalid_input_rejected", "inference_calls": 0, "model_executions": 0, "prediction_generated": false, "scenario_id": "P1.1-01", "status": 422}
+{"error_code": "invalid_features", "event": "invalid_input_rejected", "inference_calls": 0, "model_executions": 0, "prediction_generated": false, "scenario_id": "P1.1-02", "status": 422}
+{"error_code": "invalid_request", "event": "invalid_input_rejected", "inference_calls": 0, "model_executions": 0, "prediction_generated": false, "scenario_id": "P1.1-03", "status": 422}
+{"error_code": "invalid_features_or_cutoff", "event": "invalid_input_rejected", "inference_calls": 0, "model_executions": 0, "prediction_generated": false, "scenario_id": "P1.1-04", "status": 422}
+{"error_code": "feature_schema_mismatch", "event": "invalid_input_rejected", "inference_calls": 0, "model_executions": 0, "prediction_generated": false, "scenario_id": "P1.1-05", "status": 409}
+{"error_code": "feature_schema_mismatch", "event": "invalid_input_rejected", "inference_calls": 0, "model_executions": 0, "prediction_generated": false, "scenario_id": "P1.1-06", "status": 409}
+{"error_code": "model_version_mismatch", "event": "invalid_input_rejected", "inference_calls": 0, "model_executions": 0, "prediction_generated": false, "scenario_id": "P1.1-07", "status": 409}
+{"error_code": "invalid_features_or_cutoff", "event": "invalid_input_rejected", "inference_calls": 0, "model_executions": 0, "prediction_generated": false, "scenario_id": "P1.1-08", "status": 422}
+{"error_code": "historical_cutoff_violation", "event": "invalid_input_rejected", "inference_calls": 0, "model_executions": 0, "prediction_generated": false, "scenario_id": "P1.1-09", "status": 422}
+{"error_code": "stale_source", "event": "invalid_input_rejected", "inference_calls": 0, "model_executions": 0, "prediction_generated": false, "scenario_id": "P1.1-10", "status": 422}
+{"error_code": "invalid_request", "event": "invalid_input_rejected", "inference_calls": 0, "model_executions": 0, "prediction_generated": false, "scenario_id": "P1.1-11", "status": 422}
+{"error_code": "invalid_request", "event": "invalid_input_rejected", "inference_calls": 0, "model_executions": 0, "prediction_generated": false, "scenario_id": "P1.1-12", "status": 422}
