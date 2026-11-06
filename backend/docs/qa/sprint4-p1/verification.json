@@ -1,0 +1,50 @@
+{
+  "backend": {
+    "failed": 0,
+    "new_p1_tests": 30,
+    "passed": 744,
+    "skipped": 4
+  },
+  "formal_soc2_compliance_claimed": false,
+  "frontend": {
+    "eslint_exit_code": 0,
+    "failed": 0,
+    "passed": 8,
+    "production_build_exit_code": 0,
+    "skipped": 0
+  },
+  "latest_origin_main_at_publication": "e8b92b0",
+  "new_main_authentication_integration_tested": false,
+  "overall_control_status": "Partially Verified",
+  "own_commit_and_pr": {
+    "scope": "At assessment capture; independent review remains pending",
+    "status": "Not Yet Tested"
+  },
+  "publication_base": {
+    "branch": "member3/sprint4-ml-training",
+    "commit": "a35866e2446cddf1842e636fd3b5788f364696cf",
+    "pr_47": "merged",
+    "source_tree_matches_tested_base": true
+  },
+  "python_compilation": "passed",
+  "real_data_accuracy_evaluated": false,
+  "screenshots": {
+    "reason": "Browser host unavailable; Safari access not approved",
+    "status": "Not Yet Tested"
+  },
+  "statuses": {
+    "P1.1": "Verified (selected prepared-endpoint scenarios only)",
+    "P1.2": "Partially Verified",
+    "P1.3": "Verified (controlled fixtures only)",
+    "P1.4": "Partially Verified",
+    "freshness": "Partially Verified"
+  },
+  "synthetic_fixtures_only": true,
+  "versions": {
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "python": "3.12.5",
+    "sklearn": "1.9.1"
+  },
+  "whitespace_check": "passed"
+}

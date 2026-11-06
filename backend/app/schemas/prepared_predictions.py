@@ -62,10 +62,19 @@ class PreparedPredictionResponse(BaseModel):
     prediction_method: Literal["historical_logistic_regression"] = "historical_logistic_regression"
     source: Literal["trusted_local_development_artifact"] = "trusted_local_development_artifact"
     freshness_status: Literal["not_evaluated", "within_configured_age"]
+    source_freshness_limit_seconds: StrictInt | None = None
+    source_freshness_reference: Literal["prediction_time", "feature_cutoff"] | None = None
+    input_sha256: StrictStr = Field(pattern=r"^[0-9a-f]{64}$")
+    probability_method: Literal["direct_binary", "direct_multiclass"] = "direct_binary"
+    estimated_outcomes: list[str] = Field(default_factory=list)
+    probability_calibration: Literal["uncalibrated"] = "uncalibrated"
 
     @model_validator(mode="after")
     def validate_contract(self):
         validate_sport_probabilities(self.sport, self.probabilities)
+        expected_method = "direct_multiclass" if self.sport == "EPL" else "direct_binary"
+        if self.probability_method != expected_method or self.estimated_outcomes:
+            raise ValueError("Direct-model outputs must not be labeled as heuristic estimates")
         if self.class_order != list(outcome_classes(self.sport)):
             raise ValueError("Invalid outcome class ordering")
         if self.predicted_outcome != max(self.probabilities, key=self.probabilities.get):

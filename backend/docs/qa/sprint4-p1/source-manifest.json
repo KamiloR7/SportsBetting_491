@@ -1,0 +1,27 @@
+{
+  "base_commit": "54d8501c17d83e4ddd528c3a7460c7622285b300",
+  "branch": "member3/sprint4-soc2-p1-integrity",
+  "files": {
+    "backend/app/routes/predictions.py": "794ba767a358d8f48bb9640f5ca598a88727753e7eb4cb68937359058d970576",
+    "backend/app/schemas/predictions.py": "f7761ba888b5d86478b4dfde87e1b93a5bc0d0d99dd7ebd516c9e86eae92ad8b",
+    "backend/app/schemas/prepared_predictions.py": "0353cb873c53790573219599c7a8cbba4e057f956d922441275e309a205ec274",
+    "backend/app/services/match_prediction.py": "4caf469aaade2ae8f1a421f1d0a680dae2ccc8526ee4e96c29a85fedb665810c",
+    "backend/app/services/prediction_input_integrity.py": "8cda5776739a27c0c93ef7d00091600d6b92be2fbbd902528a32b0807b04cc03",
+    "backend/app/services/prepared_prediction_service.py": "0d3613a0339a60765ca7e62514256d1772cfed8a2b405181c28425ae131cf992",
+    "backend/docs/Sprint4_P1_Assessment.md": "78ceeb30abdbdf56aaa76d186c8c6798b7596b89e1ade634d8ccfdd02ff1ab34",
+    "backend/docs/qa/sprint4-p1/assessment-results.json": "5d5b7465b65089bd65d604556f91058a3a87ee8a310d129ab892e24d4b48d90d",
+    "backend/docs/qa/sprint4-p1/backend-regression.xml": "7fbcd9e70262e4cf0d719f0369bc37e76428d995476ef20eea308d36811007b8",
+    "backend/docs/qa/sprint4-p1/frontend-tests.tap": "2a772e569374644c236854c9894344c8f77f16b4d22473832a4af885aa6dc377",
+    "backend/docs/qa/sprint4-p1/rejection-events.jsonl": "607e5b91d952a0da56b5edf5e8e1cb9618ae9760c64f49200fb54fbc66775785",
+    "backend/docs/qa/sprint4-p1/sanitize_evidence.py": "4c73133a2f5356eaeb41503f1101fc57a011af98dd2d66e914e17d4e2992f0f3",
+    "backend/docs/qa/sprint4-p1/verification.json": "56293491abd4ccc4296cc214790f9063ade72fa95fb9b4593b8025600f80e2c4",
+    "backend/tests/test_predictions_api.py": "ac74eada5f6a2c472ad0266c83a8eea78e54093a99d6f86b83762c39f9ade6a8",
+    "backend/tests/test_soc2_p1_integrity.py": "2fa4feef42d726c2c218c0796020d0675c979f3e633dac26b2567a9a3215ff34",
+    "frontend/package.json": "21de908f9d7311018ec79a9697c2b1f2d7d3780c7dbe89ae81cb6cbe715d0469",
+    "frontend/src/components/PredictionPanel.jsx": "9539b58ceadbccc2a9eb1cfc1a5176516db73169df2dc7f833004611bc4d4b63",
+    "frontend/src/services/predictionTransparency.js": "b44ec85b23540e6a53333601cec73567733c62e3658ad77e12c60ec5e64c4a8e",
+    "frontend/src/services/predictionTransparency.test.js": "c34c77d2b53e8180b9eee717826c334b7e04f7486652a9c96729882c74dfa38e"
+  },
+  "pr_base_branch": "member3/sprint4-ml-training",
+  "pr_base_commit": "a35866e2446cddf1842e636fd3b5788f364696cf"
+}

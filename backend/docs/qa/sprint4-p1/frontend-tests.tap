@@ -1,0 +1,58 @@
+TAP version 13
+# Subtest: estimated EPL draw and away probabilities are disclosed
+ok 1 - estimated EPL draw and away probabilities are disclosed
+  ---
+  duration_ms: 1.112625
+  type: 'test'
+  ...
+# Subtest: direct EPL outputs are not labeled heuristic estimates
+ok 2 - direct EPL outputs are not labeled heuristic estimates
+  ---
+  duration_ms: 0.5085
+  type: 'test'
+  ...
+# Subtest: binary EPL does not invent separate draw and away probabilities
+ok 3 - binary EPL does not invent separate draw and away probabilities
+  ---
+  duration_ms: 0.091417
+  type: 'test'
+  ...
+# Subtest: legacy flattened estimated output is disclosed
+ok 4 - legacy flattened estimated output is disclosed
+  ---
+  duration_ms: 0.106084
+  type: 'test'
+  ...
+# Subtest: binary NFL and MLB are supported
+ok 5 - binary NFL and MLB are supported
+  ---
+  duration_ms: 0.10375
+  type: 'test'
+  ...
+# Subtest: unsupported or inconsistent disclosures fail clearly
+ok 6 - unsupported or inconsistent disclosures fail clearly
+  ---
+  duration_ms: 0.26725
+  type: 'test'
+  ...
+# Subtest: invalid probability distributions are never displayed
+ok 7 - invalid probability distributions are never displayed
+  ---
+  duration_ms: 0.108166
+  type: 'test'
+  ...
+# Subtest: backend outcome is honored on probability ties and contradictions fail
+ok 8 - backend outcome is honored on probability ties and contradictions fail
+  ---
+  duration_ms: 0.109
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 68.808042

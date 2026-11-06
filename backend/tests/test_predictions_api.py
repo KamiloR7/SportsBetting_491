@@ -78,6 +78,9 @@ def test_prediction_endpoint_returns_standard_contract():
         "confidence": 0.75,
         "model_version": "nfl-v1",
         "history": {"home_games": 5, "away_games": 4},
+        "probability_method": "direct_binary",
+        "estimated_outcomes": [],
+        "probability_calibration": "uncalibrated",
     }
 
 
