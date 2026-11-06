@@ -26,7 +26,15 @@ def dependency_calls(dependant):
 def test_every_runtime_route_has_explicit_access_policy():
     inventory = route_inventory(app)
     assert {(row["method"], row["path"]) for row in inventory if row["access"] == "protected"} == set(PROTECTED)
-    covered = {(method, path.replace("/records/1", "/records/{record_id}")) for method, path, _ in TEST_CASES}
+    covered = {
+        (
+            method,
+            path.replace("/records/1", "/records/{record_id}")
+                .replace("/predictions/1", "/predictions/{prediction_id}"),
+        )
+        for method, path, _ in TEST_CASES
+    }
+
     assert covered == set(PROTECTED), "Every protected policy needs a denial/zero-write test"
     for route in iter_route_contexts(app.routes):
         if not isinstance(route.original_route, APIRoute):

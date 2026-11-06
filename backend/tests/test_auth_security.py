@@ -124,12 +124,20 @@ def snapshot_records(engine):
         return [tuple(row) for row in conn.execute(select(assessment_records).order_by(assessment_records.c.id))]
 
 
+
 PROTECTED = [
     ("GET", "/auth/me", None),
     ("POST", "/auth/logout", None),
     ("GET", "/auth/assessment/records/1", None),
     ("PATCH", "/auth/assessment/records/1", {"note": "changed"}),
+    ("GET", "/assessment/predictions/1", None),
+    (
+        "PATCH",
+        "/assessment/predictions/1",
+        {"predicted_winner_id": 1},
+    ),
 ]
+
 
 
 @pytest.mark.parametrize("method,path,body", PROTECTED)

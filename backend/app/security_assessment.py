@@ -26,6 +26,9 @@ PROTECTED = {
     ("POST", "/auth/logout"): "Valid session and bound CSRF; revoke only the presented session.",
     ("GET", "/auth/assessment/records/{record_id}"): "Assessment opt-in plus valid session and owner check.",
     ("PATCH", "/auth/assessment/records/{record_id}"): "Assessment opt-in, session, bound CSRF and owner check before writes.",
+    ("GET", "/assessment/predictions/{prediction_id}"): "Valid active-user session and prediction ownership required.",
+    ("PATCH", "/assessment/predictions/{prediction_id}"): "Valid session, bound CSRF token, and prediction ownership " "required before writes.",
+
 }
 DOCUMENTATION = {
     (method, path): "Public generated API documentation/schema; no runtime account records."

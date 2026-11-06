@@ -22,20 +22,31 @@ from sqlalchemy.orm import Session
 
 from app.main import app
 from app.database.db import engine, get_db
-from app.services.session_security import (
-    create_session,
-    create_csrf_token,
-    revoke_session,
+import secrets
+
+from sqlalchemy import insert
+
+from app.core.authentication import (
+    SESSION_COOKIE,
+    SESSION_SECONDS,
+    digest,
+    now_seconds,
+)
+from app.database.auth_tables import (
+    initialize_auth_tables,
+    sessions,
 )
 
 
 @pytest.fixture
 def postgres_security_client():
+    # Authentication tables are created in the disposable CI database.
+    initialize_auth_tables(engine)
+
     # Roll back all synthetic records after each test.
     with engine.connect() as connection:
         transaction = connection.begin()
         previous_override = app.dependency_overrides.get(get_db)
-        tokens = []
 
         try:
             user_a = connection.execute(
@@ -148,16 +159,30 @@ def postgres_security_client():
 
                 def authenticate(user_id):
                     client.cookies.clear()
-                    token = create_session(user_id)
-                    tokens.append(token)
-                    client.cookies.set("vigor_session", token)
-                    return token
+
+                    token = secrets.token_urlsafe(32)
+                    csrf_token = secrets.token_urlsafe(32)
+
+                    connection.execute(
+                        insert(sessions).values(
+                            token_digest=digest(token),
+                            user_id=user_id,
+                            csrf_token=csrf_token,
+                            expires_at=now_seconds() + SESSION_SECONDS,
+                        )
+                    )
+
+                    client.cookies.set(
+                        SESSION_COOKIE,
+                        token,
+                        path="/",
+                    )
+
+                    return csrf_token
 
                 yield client, connection, ids, authenticate
 
         finally:
-            for token in tokens:
-                revoke_session(token)
 
             if previous_override is None:
                 app.dependency_overrides.pop(get_db, None)
@@ -239,8 +264,7 @@ def test_postgres_owner_update_persists_within_transaction(
 ):
     client, connection, ids, authenticate = postgres_security_client
 
-    token = authenticate(ids["user_a"])
-    csrf_token = create_csrf_token(token)
+    csrf_token = authenticate(ids["user_b"])
 
     response = client.patch(
         f"/assessment/predictions/{ids['prediction_id']}",

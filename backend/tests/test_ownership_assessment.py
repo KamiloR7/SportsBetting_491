@@ -6,10 +6,12 @@ from fastapi.testclient import TestClient
 
 from app.main import app
 from app.database.db import get_db
-from app.services.session_security import (
-    create_session,
-    create_csrf_token,
-    revoke_session,
+from fastapi import HTTPException, Request
+
+from app.core.authentication import (
+    AuthenticatedSession,
+    current_session,
+    csrf_session,
 )
 
 
@@ -17,34 +19,57 @@ from app.services.session_security import (
 def ownership_client():
     db = MagicMock()
 
+    identity = {"user_id": None}
+    csrf_value = "synthetic-ownership-test-csrf"
+
     def override_get_db():
         yield db
 
-    previous = app.dependency_overrides.get(get_db)
+    def override_current_session():
+        if identity["user_id"] is None:
+            raise HTTPException(
+                status_code=401,
+                detail="Authentication required",
+            )
+
+        return AuthenticatedSession(
+            token_digest="synthetic-session-digest",
+            csrf_token=csrf_value,
+            user={"id": identity["user_id"]},
+        )
+
+    def override_csrf_session(request: Request):
+        session = override_current_session()
+
+        if request.headers.get("X-CSRF-Token") != csrf_value:
+            raise HTTPException(
+                status_code=403,
+                detail="Invalid CSRF token",
+            )
+
+        return session
+
+    previous_overrides = app.dependency_overrides.copy()
+
     app.dependency_overrides[get_db] = override_get_db
+    app.dependency_overrides[current_session] = override_current_session
+    app.dependency_overrides[csrf_session] = override_csrf_session
 
-    tokens = []
+    try:
+        with TestClient(
+            app,
+            base_url="https://testserver",
+        ) as client:
 
-    with TestClient(
-        app,
-        base_url="https://testserver",
-    ) as client:
-        def authenticate_as(user_id):
-            token = create_session(user_id)
-            tokens.append(token)
-            client.cookies.set("vigor_session", token)
-            return token
+            def authenticate_as(user_id):
+                identity["user_id"] = user_id
+                return csrf_value
 
-        yield client, db, authenticate_as
+            yield client, db, authenticate_as
 
-    for token in tokens:
-        revoke_session(token)
-
-    if previous is None:
-        app.dependency_overrides.pop(get_db, None)
-    else:
-        app.dependency_overrides[get_db] = previous
-
+    finally:
+        app.dependency_overrides.clear()
+        app.dependency_overrides.update(previous_overrides)
 
 def test_anonymous_prediction_read_rejected(ownership_client):
     client, db, _ = ownership_client
@@ -100,9 +125,7 @@ def test_other_user_prediction_read_rejected(ownership_client):
 
 def test_other_user_prediction_write_rejected(ownership_client):
     client, db, authenticate_as = ownership_client
-    token = authenticate_as(2)
-
-    csrf_token = create_csrf_token(token)
+    csrf_token = authenticate_as(2)
 
     # Simulate an UPDATE matching zero owned rows.
     db.execute.return_value.first.return_value = None
@@ -128,9 +151,7 @@ def test_other_user_prediction_write_rejected(ownership_client):
 
 def test_owner_can_update_prediction(ownership_client):
     client, db, authenticate_as = ownership_client
-    token = authenticate_as(1)
-
-    csrf_token = create_csrf_token(token)
+    csrf_token = authenticate_as(1)
 
     db.execute.return_value.first.return_value = SimpleNamespace(
         id=101,
@@ -169,8 +190,15 @@ def test_prediction_write_without_csrf_rejected(ownership_client):
 def test_revoked_session_cannot_read_prediction(ownership_client):
     client, db, authenticate_as = ownership_client
 
-    token = authenticate_as(1)
-    revoke_session(token)
+    authenticate_as(1)
+    app.dependency_overrides[current_session] = (
+        lambda: (_ for _ in ()).throw(
+            HTTPException(
+                status_code=401,
+                detail="Authentication required",
+            )
+        )
+    )
 
     response = client.get(
         "/assessment/predictions/101"
