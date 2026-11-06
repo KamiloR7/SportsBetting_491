@@ -3,6 +3,7 @@ from fastapi import FastAPI, Request
 from app.routes.auth import router as auth_router
 from app.routes.matches import router as matches_router
 from app.routes.predictions import router as predictions_router
+from app.routes.prepared_predictions import router as prepared_predictions_router
 from app.routes.sports import router as sports_router
 
 app = FastAPI(
@@ -15,6 +16,7 @@ app.include_router(sports_router)
 app.include_router(auth_router)
 app.include_router(matches_router)
 app.include_router(predictions_router)
+app.include_router(prepared_predictions_router)
 
 
 @app.get("/health")
