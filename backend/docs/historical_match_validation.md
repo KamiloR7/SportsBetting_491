@@ -25,6 +25,8 @@ checked against scores (`HOME_WIN`, `AWAY_WIN`, `TIE`). The NFL normalizer's
 existing output metadata policy is preserved.
 
 Acceptance means data-quality acceptance, not guaranteed PostgreSQL loading.
+Identical replays are reported as unchanged and skip the database UPDATE; equivalent
+kickoff timestamps compare in UTC. Changed records are reported as updates.
 Date-only records remain valid; the current loader requires kickoff timestamps.
 The loader also needs policy for `suspended`/`incomplete`, source/team reference
 mapping, season/metadata persistence, and a transaction around match/mapping

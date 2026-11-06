@@ -24,6 +24,24 @@ class MatchIdentityError(ValueError):
     """A stored source mapping is dangling or changes match identity."""
 
 
+def _utc_timestamp(value):
+    """Interpret persisted and incoming timestamps as timezone-aware UTC."""
+    if isinstance(value, datetime):
+        parsed = value
+    else:
+        parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise ValueError("Timestamp is not timezone-aware")
+    return parsed.astimezone(timezone.utc)
+
+
+def _timestamps_equal(left, right):
+    try:
+        return _utc_timestamp(left) == _utc_timestamp(right)
+    except (TypeError, ValueError, OverflowError):
+        return False
+
+
 def _one(result, description):
     rows = result.all()
     if len(rows) != 1:
@@ -130,7 +148,8 @@ def upsert_match(conn, match: Mapping[str, Any], *, references=None, return_acti
                   home_score=match.get("home_score"), away_score=match.get("away_score"),
                   neutral_site=match.get("neutral_site"))
     if mapped:
-        stored = conn.execute(text("""SELECT id, league_id, home_team_id, away_team_id, season_id
+        stored = conn.execute(text("""SELECT id, league_id, home_team_id, away_team_id, season_id,
+            start_time, status, home_score, away_score, neutral_site
             FROM matches WHERE id = :match_id FOR UPDATE"""), {"match_id": mapped.entity_id}).first()
         if stored is None:
             raise MatchIdentityError(f"Dangling match mapping for {source}/{game_id}")
@@ -139,15 +158,29 @@ def upsert_match(conn, match: Mapping[str, Any], *, references=None, return_acti
                 continue
             if getattr(stored, field) != refs[field]:
                 raise MatchIdentityError(f"Incompatible {field} change for {source}/{game_id}")
-        params["match_id"] = stored.id
-        row = conn.execute(text("""UPDATE matches SET
-            season_id = COALESCE(:season_id, season_id), start_time = :start_time,
-            status = :status, home_score = :home_score, away_score = :away_score,
-            neutral_site = COALESCE(:neutral_site, neutral_site), updated_at = NOW()
-            WHERE id = :match_id RETURNING id"""), params).first()
-        if row is None:
-            raise MatchIdentityError("Mapped match disappeared during update")
-        action = "updated"
+        effective_season_id = refs["season_id"] if refs["season_id"] is not None else stored.season_id
+        effective_neutral_site = (match.get("neutral_site") if match.get("neutral_site") is not None
+                                  else stored.neutral_site)
+        unchanged = (
+            stored.season_id == effective_season_id
+            and _timestamps_equal(stored.start_time, params["start_time"])
+            and stored.status == params["status"]
+            and stored.home_score == params["home_score"]
+            and stored.away_score == params["away_score"]
+            and stored.neutral_site == effective_neutral_site
+        )
+        if unchanged:
+            entity_id, action = stored.id, "unchanged"
+        else:
+            params["match_id"] = stored.id
+            row = conn.execute(text("""UPDATE matches SET
+                season_id = COALESCE(:season_id, season_id), start_time = :start_time,
+                status = :status, home_score = :home_score, away_score = :away_score,
+                neutral_site = COALESCE(:neutral_site, neutral_site), updated_at = NOW()
+                WHERE id = :match_id RETURNING id"""), params).first()
+            if row is None:
+                raise MatchIdentityError("Mapped match disappeared during update")
+            entity_id, action = row.id, "updated"
     else:
         row = conn.execute(text("""INSERT INTO matches
             (league_id, season_id, home_team_id, away_team_id, start_time, status,
@@ -161,6 +194,6 @@ def upsert_match(conn, match: Mapping[str, Any], *, references=None, return_acti
             (data_source_id, entity_type, entity_id, external_id)
             VALUES (:source_id, 'match', :entity_id, :external_id)"""),
             {"source_id": source_id, "entity_id": row.id, "external_id": game_id})
-        action = "inserted"
+        entity_id, action = row.id, "inserted"
     logger.info("%s match %s from %s", action, game_id, source)
-    return (row.id, action) if return_action else row.id
+    return (entity_id, action) if return_action else entity_id

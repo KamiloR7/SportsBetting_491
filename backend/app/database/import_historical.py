@@ -127,7 +127,7 @@ def main(argv=None):
     summary = {"records_read": read, "records_accepted": len(validation.accepted),
                "records_rejected": len(errors), "duplicates_collapsed": len(validation.duplicates),
                "records_deferred": 0, "matches_inserted": 0, "matches_updated": 0,
-               "dry_run": args.dry_run, "rejected": errors, "deferred": [],
+               "matches_unchanged": 0, "dry_run": args.dry_run, "rejected": errors, "deferred": [],
                "duplicates": [dict(locations[item["index"]], kept=locations[item["kept_index"]]) for item in validation.duplicates],
                "transaction_failures": []}
     engine = None
@@ -161,6 +161,7 @@ def main(argv=None):
                     break
                 summary["matches_inserted"] += batch["matches_inserted"]
                 summary["matches_updated"] += batch["matches_updated"]
+                summary["matches_unchanged"] += batch["matches_unchanged"]
     finally:
         if engine is not None:
             engine.dispose()

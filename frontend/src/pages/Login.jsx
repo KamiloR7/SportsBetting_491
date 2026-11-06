@@ -17,6 +17,8 @@ function Login() {
     setMessage(
       "Login is not available yet. This prototype does not verify credentials or protect access to the dashboard."
     );
+    setPassword("");
+    setMessage("Login is not available yet. This prototype does not verify credentials or protect access to the dashboard.");
   }
 
   return (
@@ -25,6 +27,10 @@ function Login() {
         <h1>Welcome Back</h1>
 
         <p>Login prototype</p>
+
+        <p role="status" aria-live="polite">{message}</p>
+
+        <form onSubmit={handleLogin}>
 
         <p role="status" aria-live="polite">
           {message}
@@ -52,6 +58,7 @@ function Login() {
           />
 
           <button type="submit">Continue</button>
+
         </form>
       </div>
     </div>

@@ -38,7 +38,8 @@ def load_historical_matches(engine, records):
     report = {"records_read": validation.records_read, "records_accepted": len(validation.accepted),
               "records_rejected": len(validation.rejected), "duplicates_collapsed": len(validation.duplicates),
               "validation": validation.to_dict(), "deferred": [], "matches_inserted": 0,
-              "matches_updated": 0, "transaction_failures": [], "committed": False}
+              "matches_updated": 0, "matches_unchanged": 0,
+              "transaction_failures": [], "committed": False}
     candidates = []
     for row in validation.accepted:
         reasons = historical_ineligibility_reasons(row)
@@ -50,7 +51,7 @@ def load_historical_matches(engine, records):
         report["records_deferred"] = len(report["deferred"])
         return report
     try:
-        inserted = updated = 0
+        inserted = updated = unchanged = 0
         with engine.begin() as conn:
             conn.execute(text("SELECT pg_advisory_xact_lock(:lock_id)"), {"lock_id": HISTORICAL_IMPORT_LOCK})
             eligible = []
@@ -65,7 +66,9 @@ def load_historical_matches(engine, records):
                 _, action = upsert_match(conn, row, references=refs, return_action=True)
                 inserted += action == "inserted"
                 updated += action == "updated"
-        report.update(matches_inserted=inserted, matches_updated=updated, committed=True)
+                unchanged += action == "unchanged"
+        report.update(matches_inserted=inserted, matches_updated=updated,
+                      matches_unchanged=unchanged, committed=True)
     except Exception as exc:
         # Includes commit failures. Never report attempted writes as committed.
         report["transaction_failures"].append({"type": type(exc).__name__, "reason": str(exc)})
