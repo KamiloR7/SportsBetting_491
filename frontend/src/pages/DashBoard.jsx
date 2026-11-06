@@ -114,11 +114,9 @@ function LeagueMatches({ sportOption }) {
 }
 
 function PredictionHistory() {
-  const [history, setHistory] = useState([]);
+  const [history] = useState(() => getPredictionHistory());
 
-  useEffect(() => {
-    setHistory(getPredictionHistory());
-  }, []);
+  
 
   return (
     <section className="prediction-history" aria-labelledby="prediction-history-heading">
