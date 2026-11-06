@@ -33,6 +33,8 @@ The access classifications are based on the current FastAPI implementation and t
 | GET | /matches/{match_id} | Public | No | Retrieve a specific match |
 | POST | /predictions | Public | No | Generate a machine-learning match prediction |
 | POST | /predictions/matches/{match_id} | Public | No | Calculate and return a match prediction |
+| GET | /assessment/predictions/{prediction_id} | Authenticated + ownership | YES | Only the record owner may retrieve it |
+| PATCH | /assessment/predictions/{prediction_id} | Authenticated + ownership + CSRF | YES | Only the owner may modify it |
 
 ## 3. Prediction API Access Review
 
@@ -76,15 +78,20 @@ The Sprint 4 authentication prototype includes:
 - CSRF validation for /auth/logout.
 - Generic invalid-credential error messages.
 
-### Current Limitations
+### Sprint 4 Security Implementation Limitations
 
-The session store is process-local and not suitable for production use across multiple workers or servers.
+The authentication prototype includes session-based access control, CSRF validation, bcrypt password verification, and login throttling.
 
-CSRF protection currently covers the implemented logout operation. Any additional cookie-authenticated state-changing endpoints will require appropriate protection.
+**Verified locally:** Authentication and security tests using synthetic users and mocked SQLAlchemy database access.
 
-Login throttling, final negative security testing, PostgreSQL integration, and CI verification are tracked in separate Sprint 4 tasks.
+**Known limitations:**
+- Session storage is process-local and is not shared between backend workers.
+- Login throttling uses process-local state and requires shared storage for multi-instance deployment.
+- Current CSRF enforcement is implemented for authenticated logout. Future cookie-authenticated write endpoints require equivalent protection.
+- PostgreSQL integration and CI security verification remain pending.
+- Production deployment requires HTTPS, appropriate CORS configuration, and a durable session-storage strategy.
 
-This matrix documents route access requirements; it is not a claim of complete SOC 2 compliance.
+These limitations do not prevent the Sprint 4 prototype from being tested, but they must not be represented as completed production-security controls.
 
 ## 5. Future Resource Ownership Requirements
 

@@ -8,6 +8,7 @@ from app.routes.auth_sessions import router as auth_sessions_router
 from app.routes.matches import router as matches_router
 from app.routes.predictions import router as predictions_router
 from app.routes.sports import router as sports_router
+from app.routes.ownership_assessment import router as ownership_router
 
 app = FastAPI(
     title="Sports Match Prediction API",
@@ -20,7 +21,7 @@ app.include_router(auth_router)
 app.include_router(auth_sessions_router)
 app.include_router(matches_router)
 app.include_router(predictions_router)
-
+app.include_router(ownership_router)
 
 @app.exception_handler(RequestValidationError)
 async def redact_auth_validation(request: Request, exc: RequestValidationError):
