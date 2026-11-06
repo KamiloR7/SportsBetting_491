@@ -113,6 +113,21 @@ def _replace_snapshot(output: Path, files: dict[str, bytes]) -> None:
         staged.rmdir()
 
 
+def check_feed_freshness(sport: str, data: pd.DataFrame, *, max_age_days: int | None = None,
+                         as_of: datetime | None = None) -> dict[str, int | str]:
+    """Measure newest-match age and optionally reject a stale refresh feed."""
+    if max_age_days is not None and max_age_days < 0:
+        raise ValueError("max_feed_age_days must be nonnegative")
+    as_of = as_of or datetime.now(timezone.utc)
+    newest = pd.to_datetime(data["game_date"], utc=True).max().date()
+    age_days = (as_of.date() - newest).days
+    if age_days < 0:
+        raise ValueError(f"{sport} feed contains a future match date")
+    if max_age_days is not None and age_days > max_age_days:
+        raise ValueError(f"{sport} feed is stale: newest match is {age_days} days old; limit is {max_age_days}")
+    return {"newest_match_date": newest.isoformat(), "newest_match_age_days": age_days}
+
+
 def normalize_nfl(payload: bytes, seasons: list[int] | None = None):
     source = pd.read_csv(io.BytesIO(payload))
     seasons = seasons if seasons is not None else source_seasons()["NFL"]
@@ -161,7 +176,8 @@ def normalize_mlb(payload: bytes):
 
 
 def download_datasets(directory: Path, *, retries: int = 2, timeout: int = 60,
-                      backoff_seconds: float = 1.0) -> dict:
+                      backoff_seconds: float = 1.0,
+                      max_feed_age_days: int | None = None) -> dict:
     """Repeatably refresh all supported datasets; failed refreshes keep old outputs."""
     directory = Path(directory)
     manifest = {"retrieved_at_utc": datetime.now(timezone.utc).isoformat(), "sports": {},
@@ -183,11 +199,13 @@ def download_datasets(directory: Path, *, retries: int = 2, timeout: int = 60,
             provenance.append({"url": url, "sha256": hashlib.sha256(payload).hexdigest(), **counts})
             outputs[f"{sport.lower()}_source_{index}.bin"] = payload
         clean = validate_games(sport, pd.concat(frames, ignore_index=True))
+        freshness = check_feed_freshness(sport, clean, max_age_days=max_feed_age_days)
         path = directory / f"{sport.lower()}_games.csv"
         outputs[path.name] = clean.to_csv(index=False).encode("utf-8")
         manifest["sports"][sport] = {"sources": provenance, "rows": len(clean),
                                     "date_min": clean["game_date"].min().isoformat(),
-                                    "date_max": clean["game_date"].max().isoformat()}
+                                    "date_max": clean["game_date"].max().isoformat(),
+                                    "freshness": freshness}
         manifest["sports"][sport]["dataset_sha256"] = hashlib.sha256(outputs[path.name]).hexdigest()
     outputs["provenance.json"] = (json.dumps(manifest, indent=2) + "\n").encode("utf-8")
     _replace_snapshot(directory, outputs)
@@ -200,11 +218,14 @@ if __name__ == "__main__":
     parser.add_argument("--timeout", type=int, default=60, help="Per-request timeout in seconds")
     parser.add_argument("--retries", type=int, default=2, help="Retries for transient source failures")
     parser.add_argument("--backoff-seconds", type=float, default=1.0, help="Linear retry backoff")
+    parser.add_argument("--max-feed-age-days", type=int,
+                        help="Optionally reject a sport whose newest completed match exceeds this age")
     arguments = parser.parse_args()
     try:
         report = download_datasets(arguments.output, retries=arguments.retries,
                                     timeout=arguments.timeout,
-                                    backoff_seconds=arguments.backoff_seconds)
+                                    backoff_seconds=arguments.backoff_seconds,
+                                    max_feed_age_days=arguments.max_feed_age_days)
     except Exception as exc:
         logger.error("Refresh failed (%s); existing output snapshot was preserved", type(exc).__name__)
         raise SystemExit(1) from None
