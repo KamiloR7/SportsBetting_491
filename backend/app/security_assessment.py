@@ -64,4 +64,7 @@ if __name__ == "__main__":
     result = route_inventory(app)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + "\n")
-    print(f"Classified {len(result)} method/route pairs; four protected pairs.")
+    print(
+        f"Classified {len(result)} method/route pairs; "
+        f"{len(PROTECTED)} protected pairs."
+    )
