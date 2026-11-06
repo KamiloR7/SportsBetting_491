@@ -225,8 +225,7 @@ def test_postgres_cross_account_write_changes_zero_rows(
 ):
     client, connection, ids, authenticate = postgres_security_client
 
-    token = authenticate(ids["user_b"])
-    csrf_token = create_csrf_token(token)
+    csrf_token = authenticate(ids["user_b"])
 
     before = connection.execute(
         text("""
@@ -264,7 +263,7 @@ def test_postgres_owner_update_persists_within_transaction(
 ):
     client, connection, ids, authenticate = postgres_security_client
 
-    csrf_token = authenticate(ids["user_b"])
+    csrf_token = authenticate(ids["user_a"])
 
     response = client.patch(
         f"/assessment/predictions/{ids['prediction_id']}",
