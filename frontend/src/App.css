@@ -62,6 +62,40 @@
   border-color: var(--accent-border);
 }
 
+.match-filter {
+  display: grid;
+  grid-template-columns: auto minmax(160px, 240px);
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 24px;
+}
+
+.match-filter label {
+  font-weight: 600;
+}
+
+.match-filter select {
+  min-height: 42px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  background: var(--bg);
+  font: inherit;
+}
+
+.match-filter select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@media (max-width: 520px) {
+  .match-filter {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}
+
 .sport-option-name,
 .sport-option-league {
   min-width: 0;

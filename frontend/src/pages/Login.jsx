@@ -1,60 +1,55 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 function Login() {
-  const navigate = useNavigate();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
 
   function handleLogin(event) {
     event.preventDefault();
 
-    // Temporary Sprint 1 behavior
-    // Later this will call the real backend
-
-    console.log("Login:", email, password);
-
-    navigate("/dashboard");
+    // No authenticated login endpoint is available yet. Do not log credentials
+    // or imply that this form established an authenticated session.
+    setEmail("");
+    setPassword("");
+    setMessage(
+      "Sign-in is unavailable. This prototype does not authenticate accounts. Your credentials were not sent or saved."
+    );
   }
 
   return (
     <div className="login-page">
-
       <div className="login-card">
-
         <h1>Welcome Back</h1>
-
-        <p>Sign in to view today's matches</p>
+        <p>Login prototype</p>
 
         <form onSubmit={handleLogin}>
-
-          <label>Email</label>
-
+          <label htmlFor="login-email">Email</label>
           <input
+            id="login-email"
             type="email"
             placeholder="Enter email"
+            autoComplete="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
+            required
           />
 
-          <label>Password</label>
-
+          <label htmlFor="login-password">Password</label>
           <input
+            id="login-password"
             type="password"
             placeholder="Enter password"
+            autoComplete="current-password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
+            required
           />
 
-          <button type="submit">
-            Login
-          </button>
-
+          <button type="submit">Continue</button>
+          <p role="status" aria-live="polite">{message}</p>
         </form>
-
       </div>
-
     </div>
   );
 }
