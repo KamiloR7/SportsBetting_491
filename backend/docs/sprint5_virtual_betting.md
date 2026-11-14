@@ -1,26 +1,14 @@
 # Sprint 5 virtual betting integration
 
-Current local setup and verified workflow results: [local setup results](sprint5_local_setup_results.md). The preparation-stage status below predates the approved schema application and final PostgreSQL verification.
+Start with [backend integration readiness](backend_integration_readiness.md) for clean-clone setup and team contracts. Historical local execution evidence is retained in [local setup results](sprint5_local_setup_results.md).
 
 Local university demo only. Points have no cash value. Frontend UI and ML code are unchanged.
 
-## Verification results
+## Current setup and evidence
 
-- Baseline before changes: 417 passed, 57 skipped.
-- Final full backend suite: 463 passed, 109 skipped.
-- Separate localhost HTTP flow: 1 passed, 1 PostgreSQL case skipped.
-- `git diff --check`: clean.
-- PostgreSQL table inventory inspected read-only; no database mutations performed.
-- PostgreSQL-specific concurrency tests are implemented but not run because a disposable test database is not configured. No live Uvicorn process restart/persistence test was performed.
+For a fresh database and the full team handoff, follow [backend integration readiness](backend_integration_readiness.md). Current clean-clone instructions are separate from the historical local execution report. PR #51's settlement fix is required for safely settling externally finalized/cancelled matches.
 
-| Phase | Files / behavior | Database effect in existing development DB |
-|---|---|---|
-| Auth | `core/authentication.py`, `core/config.py`, `routes/auth.py`, `routes/auth_sessions.py`: reuse sessions/passwords, optional loopback HTTP, atomic initial wallet | None; new auth tables await approval |
-| Wallet | `database/betting_tables.py`, `services/virtual_betting.py`, `routes/virtual_betting.py`: wallet, ledger, refill APIs | None; additive schema prepared |
-| Matches/odds | `database/virtual_demo_fixtures.py`: explicit synthetic fixtures; market API | None; seed command not run |
-| Bets | `services/virtual_betting.py`, `routes/virtual_betting.py`: transactional placement, retries, history, ownership | None; exercised only in disposable test fixtures |
-| Settlement | `database/virtual_betting_cli.py`: local completion/void procedure | None; exercised only in disposable test fixtures |
-| Verification | `tests/test_virtual_betting.py`, `tests/test_auth_policy.py`, `app/security_assessment.py`: workflow, rollback, access policies, optional PostgreSQL concurrency | None |
+Earlier local verification and test totals are historical evidence in [local setup results](sprint5_local_setup_results.md), not a claim that every later environment has been verified. Fresh readiness test results are supplied with the readiness review. No credentials or application records are included in the guides.
 
 ## Setup and current status
 
@@ -34,7 +22,7 @@ After approval, from `backend/`:
 
 The review-only SQL preview is `backend/docs/sprint5_virtual_betting_schema.sql`.
 
-This creates missing `auth_sessions`, `auth_csrf_challenges`, `auth_login_attempts`, `auth_assessment_records`, `virtual_wallets`, `virtual_wallet_transactions`, `demo_markets`, `demo_outcomes`, and `virtual_bets`. It does not drop tables or change the existing users/matches schema. It does not reconcile incompatible pre-existing tables. Base project schema and reference sports/leagues/teams must already exist.
+This creates missing `auth_sessions`, `auth_csrf_challenges`, `auth_login_attempts`, `auth_assessment_records`, `virtual_wallets`, `virtual_wallet_transactions`, `demo_markets`, `demo_outcomes`, and `virtual_bets`. It does not drop tables or change the existing users/matches schema. It validates base-schema and required users-column prerequisites before creating auth/betting tables in a single transaction; it does not reconcile arbitrary incompatible existing tables. Base project schema and reference sports/leagues/teams must already exist.
 
 An older Sprint 1 database may lack `users.password_hash`, even though current base SQL includes it. The setup command creates missing tables only; it does not add this column automatically. Inspect the existing users schema first. For the verified local upgrade, the users table was empty and the owner explicitly approved `ALTER TABLE users ADD COLUMN password_hash VARCHAR(255) NOT NULL` after backup. Do not run that alteration blindly against populated or differently structured accounts; review an appropriate migration separately.
 
@@ -139,7 +127,7 @@ There is deliberately no settlement HTTP endpoint. After reviewing the synthetic
 ./venv/bin/python -m app.database.virtual_betting_cli settle 42 --void
 ```
 
-Completion stores final scores/status, closes the market, settles pending bets and updates wallets/ledger in one transaction. Identical repeated settlement does nothing; a conflicting replacement result is rejected. EPL ties settle draw bets; ties in two-way NFL/MLB markets void/refund all bets. Cancellation refunds original stakes. Do not use this demo mechanism to overwrite real results.
+Completion stores final scores/status, closes the market, settles pending bets and updates wallets/ledger in one transaction. An already-final matching result or explicit cancelled/void request still processes pending bets. Repeated settlement returns zero only when none remain; a conflicting replacement result is rejected. EPL ties settle draw bets; ties in two-way NFL/MLB markets void/refund all bets. Cancellation refunds original stakes. Do not use this demo mechanism to overwrite real results.
 
 ## Errors and ML compatibility
 
@@ -149,11 +137,11 @@ ML endpoints remain `POST /predictions` (`{"match_id":42}`) and `POST /predictio
 
 ## Validation and limits
 
-Run `PYTHONPATH=backend backend/venv/bin/python -m pytest backend/tests -q` from the repository root. New workflow tests use an isolated file-based SQLite database; they exercise real routes, password hashing, sessions, committed balances, and persistence after reconnecting with a fresh API client. They do not prove PostgreSQL concurrent locking or a live process restart. PostgreSQL test coverage requires explicit disposable-database configuration; existing development data is never used for mutation tests.
+Run `PYTHONPATH=backend backend/venv/bin/python -m pytest backend/tests -q` from the repository root. Workflow tests use isolated SQLite fixtures and opt-in PostgreSQL schemas; they exercise real routes, password hashing, sessions, committed balances, and persistence after reconnecting with a fresh API client. PostgreSQL variants verify row-lock concurrency. Client/connection recreation is not a live process restart. PostgreSQL coverage requires explicit disposable-database configuration; existing development data is never used for mutation tests.
 
 The local setup report records successful live HTTP betting and backend restart persistence after approved setup. Teammates must enable the opt-in routes after reviewing and applying setup to their own databases. Frontend wiring for wallet/bet UI is teammate work. No parlays, real money, external odds feed, automated results ingestion, or public deployment is included.
 
-Optional PostgreSQL tests require a database owner to first provision an empty local database named `sportsbetting_sprint5_test`. Set `SPRINT5_TEST_DATABASE_URL` privately to its SQLAlchemy PostgreSQL URL and `SPRINT5_ALLOW_DISPOSABLE_TEST=1`, then run `backend/tests/test_virtual_betting.py`. The harness creates a unique schema for each test and removes only that test schema afterward. It refuses other database names and remote hosts. Do not point it at the development database. The optional tests include competing wallet deductions and simultaneous duplicate-request retries; they have not been run without this explicit setup.
+Optional PostgreSQL tests require a database owner to first provision an empty local database named `sportsbetting_sprint5_test`. Set `SPRINT5_TEST_DATABASE_URL` privately to its SQLAlchemy PostgreSQL URL and `SPRINT5_ALLOW_DISPOSABLE_TEST=1`, then run `backend/tests/test_virtual_betting.py`. The harness creates a unique schema for each test and removes only that test schema afterward. It refuses other database names and remote hosts. Do not point it at the development database. The optional tests include competing wallet deductions and simultaneous duplicate-request retries; these tests require this explicit setup.
 
 The localhost HTTP path can be checked independently with:
 

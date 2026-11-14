@@ -98,3 +98,20 @@ def test_prediction_endpoint_maps_controlled_errors():
         result = client_with(StubService(error=error)).post("/predictions", json={"match_id": 1})
         assert result.status_code == status
         assert detail in result.json()["detail"]
+
+
+def test_prediction_initialization_failure_returns_sanitized_503(monkeypatch):
+    from app.database.db import get_db
+    from app.routes import predictions
+    from app.services.model_registry import ModelNotFoundError
+
+    def unavailable(db):
+        raise ModelNotFoundError("private artifact path must not reach clients")
+
+    monkeypatch.setattr(predictions, "get_prediction_service", unavailable)
+    app.dependency_overrides[get_db] = lambda: None
+    client = TestClient(app)
+    assert "503" in client.get("/openapi.json").json()["paths"]["/predictions"]["post"]["responses"]
+    result = client.post("/predictions", json={"match_id": 42})
+    assert result.status_code == 503
+    assert result.json() == {"detail": "Prediction service is temporarily unavailable."}
