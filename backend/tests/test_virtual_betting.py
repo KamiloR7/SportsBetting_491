@@ -279,3 +279,194 @@ def test_betting_denies_invalid_sessions_without_point_changes(demo,method,path,
     before=snapshot()
     assert client.request(method,path,json=body).status_code==401
     assert snapshot()==before
+
+
+def settlement_snapshot(engine):
+    """Capture only disposable fixture records to prove rejection/rollback safety."""
+    from app.database.betting_tables import bets
+    with engine.connect() as connection:
+        return {
+            table.name: connection.execute(select(table).order_by(*table.primary_key.columns)).all()
+            for table in [wallets, transactions, bets, markets]
+        } | {'matches': connection.execute(text('SELECT * FROM matches ORDER BY id')).all()}
+
+
+def mark_external_result(engine, match_id, home=None, away=None, cancelled=False):
+    with engine.begin() as connection:
+        connection.execute(
+            text('UPDATE matches SET status=:status, home_score=:home, away_score=:away WHERE id=:id'),
+            {'status': 'cancelled' if cancelled else 'final', 'home': home, 'away': away, 'id': match_id},
+        )
+
+
+@pytest.mark.parametrize('match_id,selection,scores,expected,stake', [
+    (1, 'home', (3, 1), 'WON', 101),
+    (1, 'away', (3, 1), 'LOST', 100),
+    (1, 'draw', (2, 2), 'WON', 100),
+    (2, 'home', (1, 1), 'VOID', 100),
+    (3, 'away', (1, 1), 'VOID', 100),
+])
+def test_external_final_pending_settlement(demo, match_id, selection, scores, expected, stake):
+    client, engine = demo
+    headers = account(client)
+    outcome = next(row for row in client.get(f'/matches/{match_id}/markets').json()[0]['outcomes']
+                   if row['selection'] == selection)
+    placed = client.post('/bets', json=payload(match_id=match_id, outcome_id=outcome['id'], stake=stake), headers=headers)
+    assert placed.status_code == 201, placed.text
+    bet = placed.json()
+    # Future changes to market odds must not change the accepted payout snapshot.
+    with engine.begin() as connection:
+        connection.execute(outcomes.update().where(outcomes.c.id == outcome['id']).values(decimal_odds=Decimal('9.0')))
+    mark_external_result(engine, match_id, *scores)
+    with engine.connect() as connection:
+        original_result = connection.execute(text('SELECT * FROM matches WHERE id=:id'), {'id': match_id}).one()
+    with Session(engine) as db:
+        assert settle_match(db, match_id, *scores) == {'match_id': match_id, 'settled': 1}
+    expected_credit = bet['potential_payout'] if expected == 'WON' else (stake if expected == 'VOID' else 0)
+    assert client.get('/wallet').json()['balance'] == 1000 - stake + expected_credit
+    assert client.get(f"/bets/{bet['id']}").json()['status'] == expected
+    ledger = client.get('/wallet/transactions').json()
+    credits = [row for row in ledger if row['reference'] == f"bet:{bet['id']}:settlement"]
+    assert len(credits) == (1 if expected_credit else 0)
+    if credits:
+        assert credits[0]['amount'] == expected_credit
+        assert credits[0]['kind'] == ('PAYOUT' if expected == 'WON' else 'REFUND')
+    with engine.connect() as connection:
+        assert connection.execute(text('SELECT * FROM matches WHERE id=:id'), {'id': match_id}).one() == original_result
+        assert not connection.execute(select(markets.c.is_open).where(markets.c.match_id == match_id)).scalar_one()
+    completed = settlement_snapshot(engine)
+    with Session(engine) as db:
+        assert settle_match(db, match_id, *scores)['settled'] == 0
+    assert settlement_snapshot(engine) == completed
+
+
+def test_external_cancelled_pending_settlement(demo):
+    client, engine = demo
+    headers = account(client)
+    assert client.post('/bets', json=payload(), headers=headers).status_code == 201
+    # Preserve provider-supplied metadata even if cancellation includes partial scores.
+    mark_external_result(engine, 1, 1, 0, cancelled=True)
+    original = settlement_snapshot(engine)['matches']
+    with Session(engine) as db:
+        assert settle_match(db, 1, void=True)['settled'] == 1
+    assert client.get('/wallet').json()['balance'] == 1000
+    assert client.get('/bets').json()[0]['status'] == 'VOID'
+    assert settlement_snapshot(engine)['matches'] == original
+    completed = settlement_snapshot(engine)
+    with Session(engine) as db:
+        assert settle_match(db, 1, void=True)['settled'] == 0
+    assert settlement_snapshot(engine) == completed
+
+
+@pytest.mark.parametrize('stored,requested,void,cancelled', [
+    ((3, 1), (1, 3), False, False),  # Conflicting winner.
+    ((3, 1), (4, 1), False, False),  # Score correction, even with same winner.
+    ((3, 1), (None, None), False, False),
+    ((3, 1), (-1, 1), False, False),
+    ((3, 1), (True, 1), False, False),
+    ((None, None), (3, 1), False, False),  # Stored final result is incomplete.
+    ((3, 1), (None, None), True, False),  # Cannot turn final into cancellation.
+    ((None, None), (3, 1), False, True),  # Cancellation requires explicit void.
+])
+def test_external_result_rejection_is_unchanged(demo, stored, requested, void, cancelled):
+    client, engine = demo
+    headers = account(client)
+    assert client.post('/bets', json=payload(), headers=headers).status_code == 201
+    mark_external_result(engine, 1, *stored, cancelled=cancelled)
+    before = settlement_snapshot(engine)
+    with pytest.raises(ValueError), Session(engine) as db:
+        settle_match(db, 1, *requested, void=void)
+    assert settlement_snapshot(engine) == before
+
+
+def test_external_final_preserves_already_settled_bet(demo):
+    from app.database.betting_tables import bets
+    client, engine = demo
+    headers = account(client)
+    first = client.post('/bets', json=payload(request_key='first'), headers=headers).json()
+    second = client.post('/bets', json=payload(request_key='second'), headers=headers).json()
+    # Simulate one previously settled bet alongside a still-pending bet.
+    with engine.begin() as connection:
+        connection.execute(bets.update().where(bets.c.id == first['id']).values(status='WON'))
+        connection.execute(wallets.update().values(balance=wallets.c.balance + first['potential_payout']))
+        connection.execute(insert(transactions).values(user_id=first['user_id'], amount=first['potential_payout'],
+                           kind='PAYOUT', reference=f"bet:{first['id']}:settlement"))
+        first_before = connection.execute(select(bets).where(bets.c.id == first['id'])).one()
+        credit_before = connection.execute(select(transactions).where(transactions.c.reference == f"bet:{first['id']}:settlement")).one()
+    mark_external_result(engine, 1, 3, 1)
+    with Session(engine) as db:
+        assert settle_match(db, 1, 3, 1)['settled'] == 1
+    assert client.get('/wallet').json()['balance'] == 1300
+    assert client.get(f"/bets/{second['id']}").json()['status'] == 'WON'
+    with engine.connect() as connection:
+        assert connection.execute(select(bets).where(bets.c.id == first['id'])).one() == first_before
+        assert connection.execute(select(transactions).where(transactions.c.reference == f"bet:{first['id']}:settlement")).one() == credit_before
+    assert len(client.get('/wallet/transactions').json()) == 5
+
+
+def test_external_settlement_failure_rolls_back(demo):
+    from sqlalchemy import event
+    client, engine = demo
+    headers = account(client)
+    assert client.post('/bets', json=payload(), headers=headers).status_code == 201
+    mark_external_result(engine, 1, 3, 1)
+    before = settlement_snapshot(engine)
+
+    def fail_after_payout(connection, cursor, statement, parameters, context, executemany):
+        if statement.lstrip().upper().startswith('UPDATE DEMO_MARKETS'):
+            raise RuntimeError('Synthetic failure after payout and bet status writes')
+
+    event.listen(engine, 'before_cursor_execute', fail_after_payout)
+    try:
+        with pytest.raises(RuntimeError, match='Synthetic failure'), Session(engine) as db:
+            settle_match(db, 1, 3, 1)
+    finally:
+        event.remove(engine, 'before_cursor_execute', fail_after_payout)
+    assert settlement_snapshot(engine) == before
+    with Session(engine) as db:
+        assert settle_match(db, 1, 3, 1)['settled'] == 1
+    assert client.get('/wallet').json()['balance'] == 1150
+
+
+@pytest.mark.parametrize('external_final', [True, False])
+@pytest.mark.parametrize('conflicting', [False, True])
+def test_postgres_concurrent_settlement(demo, external_final, conflicting):
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Barrier
+    client, engine = demo
+    if engine.dialect.name != 'postgresql':
+        pytest.skip('Settlement concurrency requires PostgreSQL row locks')
+    headers = account(client)
+    assert client.post('/bets', json=payload(request_key='home'), headers=headers).status_code == 201
+    assert client.post('/bets', json=payload(outcome_id=12, request_key='away'), headers=headers).status_code == 201
+    if external_final:
+        mark_external_result(engine, 1, 3, 1)
+    barrier = Barrier(2)
+
+    def settle(scores):
+        with Session(engine) as db:
+            barrier.wait(timeout=10)
+            try:
+                return ('ok', settle_match(db, 1, *scores)['settled'])
+            except ValueError as exc:
+                assert str(exc) == 'Match already settled with a different result.'
+                return ('conflict', 0)
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        results = list(pool.map(settle, [(3, 1), (1, 3) if conflicting else (3, 1)]))
+    assert sum(count for status, count in results if status == 'ok') == 2
+    assert sum(status == 'conflict' for status, _ in results) == (1 if conflicting else 0)
+    if not conflicting:
+        assert sorted(count for _, count in results) == [0, 2]
+    history = client.get('/bets').json()
+    assert sorted(row['status'] for row in history) == ['LOST', 'WON']
+    ledger = client.get('/wallet/transactions').json()
+    payouts = [row for row in ledger if row['kind'] == 'PAYOUT']
+    assert len(ledger) == 4 and len(payouts) == 1 and payouts[0]['amount'] == 250
+    assert len({row['reference'] for row in ledger}) == len(ledger)
+    assert client.get('/wallet').json()['balance'] == sum(row['amount'] for row in ledger) == 1050
+    with engine.connect() as connection:
+        stored = connection.execute(text('SELECT home_score,away_score FROM matches WHERE id=1')).one()
+        winner = 'home' if stored.home_score > stored.away_score else 'away'
+        assert next(row for row in history if row['selection'] == winner)['status'] == 'WON'
+        assert not connection.execute(select(markets.c.is_open).where(markets.c.match_id == 1)).scalar_one()

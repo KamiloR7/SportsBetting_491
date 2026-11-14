@@ -83,11 +83,14 @@ def settle_match(db, match_id, home_score=None, away_score=None, void=False):
     if match['abbreviation'] not in {'EPL','NFL','MLB'}: raise ValueError('Unsupported league.')
     if not void and (type(home_score) is not int or type(away_score) is not int or min(home_score, away_score) < 0):
         raise ValueError('Nonnegative integer final scores are required.')
-    if match['status'] in {'final','cancelled'}:
-        if (void and match['status'] == 'cancelled') or (not void and match['status'] == 'final' and match['home_score'] == home_score and match['away_score'] == away_score):
-            db.commit()
-            return {'match_id': match_id, 'settled': 0}
-        raise ValueError('Match already settled with a different result.')
+    already_completed = match['status'] in {'final','cancelled'}
+    if already_completed:
+        same_result = ((void and match['status'] == 'cancelled') or
+                       (not void and match['status'] == 'final' and
+                        match['home_score'] == home_score and match['away_score'] == away_score))
+        if not same_result:
+            raise ValueError('Match already settled with a different result.')
+        # Match completion by another writer does not imply its bets were settled.
     db.execute(select(markets).where(markets.c.match_id == match_id).with_for_update()).all()
     # Two-way markets refund ties; EPL settles draw as its own outcome.
     refund = void or (home_score == away_score and match['abbreviation'] != 'EPL')
@@ -104,7 +107,8 @@ def settle_match(db, match_id, home_score=None, away_score=None, void=False):
             db.execute(insert(transactions).values(user_id=bet['user_id'], amount=amount, kind='REFUND' if refund else 'PAYOUT', reference=f"bet:{bet['id']}:settlement"))
         db.execute(update(bets).where(bets.c.id == bet['id']).values(status=status))
     db.execute(update(markets).where(markets.c.match_id == match_id).values(is_open=False))
-    db.execute(text('UPDATE matches SET status=:status, home_score=:home, away_score=:away WHERE id=:id'),
-               {'status': 'cancelled' if void else 'final', 'home': None if void else home_score, 'away': None if void else away_score, 'id': match_id})
+    if not already_completed:
+        db.execute(text('UPDATE matches SET status=:status, home_score=:home, away_score=:away WHERE id=:id'),
+                   {'status': 'cancelled' if void else 'final', 'home': None if void else home_score, 'away': None if void else away_score, 'id': match_id})
     db.commit()
     return {'match_id': match_id, 'settled': len(pending)}
