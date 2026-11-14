@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     DATABASE_PASSWORD: str
     MODEL_DIRECTORY: Path = Path("build/sprint2-models")
     AUTH_ASSESSMENT_ENABLED: bool = False
+    LOCAL_DEMO_HTTP: bool = False
+    VIRTUAL_BETTING_ENABLED: bool = False
 
     @property
     def DATABASE_URL(self) -> str:

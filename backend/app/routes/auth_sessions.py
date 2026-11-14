@@ -94,7 +94,7 @@ def login(user: UserLogin, request: Request, response: Response, db: Session = D
     db.execute(delete(challenges).where(challenges.c.nonce_digest == digest(request.cookies[CHALLENGE_COOKIE])))
     db.commit()
     set_auth_cookie(response, SESSION_COOKIE, token, SESSION_SECONDS)
-    response.delete_cookie(CHALLENGE_COOKIE, path="/", secure=True, httponly=True, samesite="strict")
+    response.delete_cookie(CHALLENGE_COOKIE, path="/", secure=not settings.LOCAL_DEMO_HTTP, httponly=True, samesite="strict")
     response.headers["Cache-Control"] = "no-store"
     logger.info("event=login_succeeded")
     return account
@@ -110,7 +110,7 @@ def me(response: Response, session=Depends(current_session)):
 def logout(response: Response, session=Depends(csrf_session), db: Session = Depends(get_db)):
     db.execute(delete(sessions).where(sessions.c.token_digest == session.token_digest))
     db.commit()
-    response.delete_cookie(SESSION_COOKIE, path="/", secure=True, httponly=True, samesite="strict")
+    response.delete_cookie(SESSION_COOKIE, path="/", secure=not settings.LOCAL_DEMO_HTTP, httponly=True, samesite="strict")
     response.headers["Cache-Control"] = "no-store"
     logger.info("event=logout_succeeded")
 

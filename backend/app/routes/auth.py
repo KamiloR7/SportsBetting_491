@@ -6,6 +6,8 @@ from sqlalchemy.orm import Session
 from app.core.authentication import require_https
 from app.core.passwords import hash_password
 from app.database.db import get_db
+from app.core.config import settings
+from app.services.virtual_betting import ensure_wallet
 from app.schemas.auth import UserOut, UserRegister
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -93,6 +95,8 @@ def _insert_user(user, email, password_hash, db):
         },
     ).first()
 
+    if settings.VIRTUAL_BETTING_ENABLED:
+        ensure_wallet(db, result.id)
     db.commit()
 
     return UserOut(
