@@ -1,5 +1,7 @@
 # Sports Match Prediction — Backend
 
+For the current localhost virtual-betting setup and frontend/ML/Data Engineering contracts, start with [Backend integration readiness](docs/backend_integration_readiness.md). The Sprint 1–3 notes below are retained for historical context.
+
 This directory contains the FastAPI backend for the CPSC 491 Sports Match Prediction application.
 
 The Sprint 1 backend currently includes:
