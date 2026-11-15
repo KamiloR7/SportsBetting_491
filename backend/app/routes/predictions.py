@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from app.database.db import get_db
 from app.schemas.predictions import PredictionOut, PredictionRequest, PredictionResponse
 from app.services.match_prediction import predict_probabilities
+from app.services.model_registry import ModelRegistryError
 from app.services.prediction_service import (
     MatchNotFoundError,
     PredictionService,
@@ -21,10 +22,17 @@ router = APIRouter(prefix="/predictions", tags=["predictions"])
 
 
 def prediction_service_dependency(db: Session = Depends(get_db)) -> PredictionService:
-    return get_prediction_service(db)
+    try:
+        return get_prediction_service(db)
+    except ModelRegistryError:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Prediction service is temporarily unavailable.",
+        ) from None
 
 
-@router.post("", response_model=PredictionResponse)
+@router.post("", response_model=PredictionResponse,
+             responses={503: {"description": "Prediction model configuration is unavailable."}})
 def create_prediction(
     request: PredictionRequest,
     service: PredictionService = Depends(prediction_service_dependency),

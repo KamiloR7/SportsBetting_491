@@ -2,8 +2,7 @@
 import argparse
 from sqlalchemy.orm import Session
 from app.database.db import engine
-from app.database.auth_tables import initialize_auth_tables
-from app.database.betting_tables import initialize_betting_tables
+from app.database.setup_virtual_betting import initialize_virtual_betting
 from app.services.virtual_betting import settle_match
 from app.database.virtual_demo_fixtures import create_demo_fixtures
 
@@ -22,8 +21,10 @@ def main():
     if engine.url.host not in {'localhost','127.0.0.1','::1'}:
         parser.error('Only a local database is permitted.')
     if args.command=='setup':
-        initialize_auth_tables(engine)
-        initialize_betting_tables(engine)
+        try:
+            initialize_virtual_betting(engine)
+        except ValueError as exc:
+            parser.error(str(exc))
         print('Additive virtual betting setup complete.')
     elif args.command == 'seed-demo':
         with Session(engine) as db:
