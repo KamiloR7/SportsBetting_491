@@ -4,6 +4,7 @@ import hashlib
 import re
 import secrets
 import time
+from urllib.parse import urlsplit
 from dataclasses import dataclass
 
 from fastapi import Depends, HTTPException, Request
@@ -12,9 +13,10 @@ from sqlalchemy.orm import Session
 
 from app.database.auth_tables import sessions, users
 from app.database.db import get_db
+from app.core.config import settings
 
-SESSION_COOKIE = "__Host-vigor_session"
-CHALLENGE_COOKIE = "__Host-vigor_csrf"
+SESSION_COOKIE = "vigor_session" if settings.LOCAL_DEMO_HTTP else "__Host-vigor_session"
+CHALLENGE_COOKIE = "vigor_csrf" if settings.LOCAL_DEMO_HTTP else "__Host-vigor_csrf"
 SESSION_SECONDS = 30 * 60
 WINDOW_SECONDS = 5 * 60
 BLOCK_SECONDS = 15 * 60
@@ -31,7 +33,8 @@ def digest(value: str) -> str:
 
 
 def require_https(request: Request):
-    if request.url.scheme != "https":
+    local_demo = settings.LOCAL_DEMO_HTTP and request.url.hostname in {"localhost", "127.0.0.1", "::1"}
+    if request.url.scheme != "https" and not local_demo:
         raise HTTPException(403, "HTTPS is required for authentication.")
 
 
@@ -41,14 +44,18 @@ def check_request_origin(request: Request):
     if request.headers.get("sec-fetch-site") == "cross-site":
         raise HTTPException(403, "Cross-site authentication request denied.")
     origin = request.headers.get("origin")
-    if origin is not None and origin != str(request.base_url).rstrip("/"):
+    demo_origin = False
+    if settings.LOCAL_DEMO_HTTP and request.url.hostname in {"localhost", "127.0.0.1", "::1"} and origin:
+        parsed = urlsplit(origin)
+        demo_origin = origin in {"http://127.0.0.1:5173", "http://localhost:5173"} and parsed.hostname == request.url.hostname
+    if origin is not None and origin != str(request.base_url).rstrip("/") and not demo_origin:
         raise HTTPException(403, "Cross-site authentication request denied.")
 
 
 def set_auth_cookie(response, name, value, lifetime):
     response.set_cookie(
         name, value, max_age=lifetime, path="/",
-        secure=True, httponly=True, samesite="strict",
+        secure=not settings.LOCAL_DEMO_HTTP, httponly=True, samesite="strict",
     )
 
 

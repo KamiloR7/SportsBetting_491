@@ -1,0 +1,68 @@
+flowchart TD
+    %% Source-derived application flows; no database writes are performed by this diagram.
+    %% All amounts are simulated integer virtual points, never currency.
+    subgraph Registration["1. Registration and wallet initialization"]
+        R0["POST /auth/register: validate account input"] --> R1{"Duplicate email or username?"}
+        R1 -->|Yes| RERR["409; no new account"]
+        R1 -->|No| R2["Hash password with bcrypt; insert users row"]
+        R2 --> R3{"Virtual betting enabled?"}
+        R3 -->|Yes| R4["Upsert virtual_wallets: initial balance 1000"]
+        R4 --> R5["Only when newly created: ledger INITIAL +1000"]
+        R5 --> R6["Commit user, wallet and ledger together"]
+        R3 -->|No| R7["Commit account; wallet can be initialized later when enabled"]
+        R6 --> R8["Return account fields without stored hash"]
+        R7 --> R8
+    end
+    subgraph Login["2. Login and persistent sessions"]
+        L0["GET /auth/csrf"] --> L1["Store challenge digest, CSRF material and expiry; commit"]
+        L1 --> L2["POST /auth/login with credentials and challenge header/cookie"]
+        L2 --> L3["Verify origin, transport and challenge; lock auth_login_attempts row"]
+        L3 --> L4{"Credentials valid, user active, not throttled?"}
+        L4 -->|No| L5["Persist failure history or block; 401 or 429"]
+        L4 -->|Yes| L6["Reset throttle; generate new session; store digest and user FK"]
+        L6 --> L7["Consume challenge and commit; set HttpOnly session cookie"]
+        L7 --> L8["GET /auth/me: lookup digest, expiry and active user"]
+        L8 --> L9["Session survives backend restart until expiry or logout"]
+        L8 --> L10["POST /auth/logout with bound CSRF: delete presented session and commit"]
+    end
+    subgraph Selection["3. Match and outcome selection"]
+        M0["GET /leagues; GET /matches filtered by league/status"] --> M1["Read leagues, matches and home/away teams"]
+        M1 --> M2["GET /matches/id/markets: read demo_markets and demo_outcomes"]
+        M2 --> M3["Choose home or away; EPL also permits draw; synthetic decimal odds"]
+        M3 --> M4["POST /bets: match_id, outcome_id, integer stake, expected_odds, request_key"]
+    end
+    subgraph Deduction["4. Atomic bet placement and point deduction"]
+        M4 --> B0["Require active session and bound CSRF; feature must be enabled"]
+        B0 --> B1["Lock match, market and user wallet; ensure wallet once"]
+        B1 --> B2{"Existing user/request_key?"}
+        B2 -->|Identical payload| B3["Return original bet; no new deduction"]
+        B2 -->|Different payload| B4["409 conflict; rollback"]
+        B2 -->|No| B5["Validate future scheduled match, open market, supported outcome and unchanged odds"]
+        B5 --> B6{"Valid and sufficient balance?"}
+        B6 -->|No| B7["Reject; rollback all uncommitted changes"]
+        B6 -->|Yes| B8["Insert PENDING bet with accepted odds and floor of stake times odds"]
+        B8 --> B9["Deduct stake from virtual_wallets; insert negative STAKE ledger entry"]
+        B9 --> B10["Commit bet, wallet and ledger atomically"]
+        B10 --> B11["GET /bets and /bets/id filter by session user"]
+    end
+    subgraph Settlement["5. Local CLI settlement: won, lost or void"]
+        S0["Local operator CLI only; no ordinary-user settlement endpoint"] --> S1["Lock match and market; validate result"]
+        S1 --> S2{"Already settled?"}
+        S2 -->|Same result| S3["Zero bets processed; no duplicate payout"]
+        S2 -->|Conflicting result| S4["Reject; no replacement result"]
+        S2 -->|No| S5["Read pending bets in stable user and bet order; lock wallets"]
+        S5 --> S6{"Cancellation or NFL/MLB tie?"}
+        S6 -->|Yes| S7["VOID: refund original stake; positive REFUND ledger"]
+        S6 -->|No| S8{"Bet selection matches final winner or EPL draw?"}
+        S8 -->|Yes| S9["WON: credit stored potential_payout; positive PAYOUT ledger"]
+        S8 -->|No| S10["LOST: no credit or payout ledger entry"]
+        S7 --> S11["Set bet status; close market; save final scores/status or cancellation"]
+        S9 --> S11
+        S10 --> S11
+        S11 --> S12["Commit match, bets, wallet balances and ledger together"]
+        S12 --> S13["On any failure, transaction rolls back"]
+    end
+    subgraph Persistence["6. Persistence verification boundary"]
+        P0["PostgreSQL stores users, sessions, wallets, bets and ledger"] --> P1["Stop Uvicorn; start a new backend process"]
+        P1 --> P2["Read same authenticated user, balance, bet status and ledger over HTTP"]
+    end

@@ -1,0 +1,211 @@
+erDiagram
+    %% Verified public schema: 22 tables. All column names are schema metadata, never stored values.
+    %% PK/FK indicate physical keys. Single-column unique keys use UK; composite uniqueness is detailed in inventory.
+    sports {
+        bigint id PK "BIGINT; not null"
+        varchar name UK "VARCHAR(80); not null"
+        varchar slug UK "VARCHAR(80); not null"
+        timestamp created_at "TIMESTAMP WITH TIME ZONE; nullable"
+        timestamp updated_at "TIMESTAMP WITH TIME ZONE; nullable"
+    }
+    leagues {
+        bigint id PK "BIGINT; not null"
+        bigint sport_id FK "BIGINT; nullable"
+        varchar name "VARCHAR(120); not null"
+        varchar abbreviation "VARCHAR(30); nullable"
+        varchar country "VARCHAR(80); nullable"
+        boolean active "BOOLEAN; nullable"
+        timestamp created_at "TIMESTAMP WITH TIME ZONE; nullable"
+        timestamp updated_at "TIMESTAMP WITH TIME ZONE; nullable"
+    }
+    seasons {
+        bigint id PK "BIGINT; not null"
+        bigint league_id FK "BIGINT; nullable"
+        varchar name "VARCHAR(60); not null"
+        date start_date "DATE; nullable"
+        date end_date "DATE; nullable"
+        boolean is_current "BOOLEAN; nullable"
+        timestamp created_at "TIMESTAMP WITH TIME ZONE; nullable"
+        timestamp updated_at "TIMESTAMP WITH TIME ZONE; nullable"
+    }
+    teams {
+        bigint id PK "BIGINT; not null"
+        bigint sport_id FK "BIGINT; nullable"
+        varchar name "VARCHAR(140); not null"
+        varchar abbreviation "VARCHAR(20); nullable"
+        varchar city "VARCHAR(100); nullable"
+        text logo_url "TEXT; nullable"
+        boolean active "BOOLEAN; nullable"
+        timestamp created_at "TIMESTAMP WITH TIME ZONE; nullable"
+        timestamp updated_at "TIMESTAMP WITH TIME ZONE; nullable"
+    }
+    season_teams {
+        bigint season_id PK, FK "BIGINT; not null"
+        bigint team_id PK, FK "BIGINT; not null"
+        varchar conference_name "VARCHAR(80); nullable"
+        varchar division_name "VARCHAR(80); nullable"
+    }
+    matches {
+        bigint id PK "BIGINT; not null"
+        bigint league_id FK "BIGINT; nullable"
+        bigint season_id FK "BIGINT; nullable"
+        bigint home_team_id FK "BIGINT; nullable"
+        bigint away_team_id FK "BIGINT; nullable"
+        timestamp start_time "TIMESTAMP WITH TIME ZONE; not null"
+        varchar status "VARCHAR(30); nullable"
+        integer home_score "INTEGER; nullable"
+        integer away_score "INTEGER; nullable"
+        boolean neutral_site "BOOLEAN; nullable"
+        timestamp created_at "TIMESTAMP WITH TIME ZONE; nullable"
+        timestamp updated_at "TIMESTAMP WITH TIME ZONE; nullable"
+    }
+    match_predictions {
+        bigint id PK "BIGINT; not null"
+        bigint match_id FK "BIGINT; nullable"
+        bigint model_version_id FK "BIGINT; nullable"
+        bigint predicted_winner_id FK "BIGINT; nullable"
+        numeric home_win_probability "NUMERIC(5, 4); nullable"
+        numeric away_win_probability "NUMERIC(5, 4); nullable"
+        numeric confidence "NUMERIC(5, 4); nullable"
+        timestamp generated_at "TIMESTAMP WITH TIME ZONE; nullable"
+        jsonb explanation_json "JSONB; nullable"
+    }
+    model_versions {
+        bigint id PK "BIGINT; not null"
+        varchar name "VARCHAR(120); not null"
+        varchar version "VARCHAR(50); not null"
+        varchar algorithm "VARCHAR(120); nullable"
+        timestamp training_cutoff "TIMESTAMP WITH TIME ZONE; nullable"
+        jsonb metrics_json "JSONB; nullable"
+        boolean active "BOOLEAN; nullable"
+        timestamp created_at "TIMESTAMP WITH TIME ZONE; nullable"
+    }
+    user_predictions {
+        bigint id PK "BIGINT; not null"
+        bigint user_id FK "BIGINT; nullable"
+        bigint match_id FK "BIGINT; nullable"
+        bigint predicted_winner_id FK "BIGINT; nullable"
+        timestamp created_at "TIMESTAMP WITH TIME ZONE; nullable"
+        boolean is_correct "BOOLEAN; nullable"
+    }
+    users {
+        bigint id PK "BIGINT; not null"
+        varchar email UK "VARCHAR(254); not null"
+        varchar username UK "VARCHAR(80); nullable"
+        varchar display_name "VARCHAR(120); nullable"
+        boolean is_active "BOOLEAN; nullable"
+        timestamp created_at "TIMESTAMP WITH TIME ZONE; nullable"
+        timestamp updated_at "TIMESTAMP WITH TIME ZONE; nullable"
+        varchar password_hash "VARCHAR(255); not null"
+    }
+    data_sources {
+        bigint id PK "BIGINT; not null"
+        varchar name UK "VARCHAR(100); not null"
+        text base_url "TEXT; nullable"
+        varchar source_type "VARCHAR(30); nullable"
+        boolean active "BOOLEAN; nullable"
+        timestamp created_at "TIMESTAMP WITH TIME ZONE; nullable"
+    }
+    external_mappings {
+        bigint id PK "BIGINT; not null"
+        bigint data_source_id FK "BIGINT; nullable"
+        varchar entity_type "VARCHAR(30); nullable"
+        bigint entity_id "BIGINT; not null"
+        varchar external_id "VARCHAR(160); not null"
+        timestamp created_at "TIMESTAMP WITH TIME ZONE; nullable"
+    }
+    ingestion_runs {
+        bigint id PK "BIGINT; not null"
+        bigint data_source_id FK "BIGINT; nullable"
+        timestamp started_at "TIMESTAMP WITH TIME ZONE; nullable"
+        timestamp completed_at "TIMESTAMP WITH TIME ZONE; nullable"
+        varchar status "VARCHAR(20); nullable"
+        integer records_read "INTEGER; nullable"
+        integer records_written "INTEGER; nullable"
+        text error_message "TEXT; nullable"
+    }
+    auth_sessions {
+        varchar token_digest PK "VARCHAR(64); not null"
+        bigint user_id FK "BIGINT; not null"
+        varchar csrf_token "VARCHAR(43); not null"
+        double expires_at "DOUBLE PRECISION; not null"
+    }
+    auth_csrf_challenges {
+        varchar nonce_digest PK "VARCHAR(64); not null"
+        varchar csrf_token "VARCHAR(43); not null"
+        double expires_at "DOUBLE PRECISION; not null"
+    }
+    auth_login_attempts {
+        varchar key_digest PK "VARCHAR(64); not null"
+        double window_start "DOUBLE PRECISION; not null"
+        integer failure_count "INTEGER; not null"
+        double blocked_until "DOUBLE PRECISION; not null"
+        json failure_times "JSON; not null"
+    }
+    auth_assessment_records {
+        bigint id PK "BIGINT; not null"
+        bigint owner_id FK "BIGINT; not null"
+        text note "TEXT; not null"
+    }
+    virtual_wallets {
+        bigint user_id PK, FK "BIGINT; not null"
+        integer balance "INTEGER; not null"
+    }
+    demo_markets {
+        bigint id PK "BIGINT; not null"
+        bigint match_id FK, UK "BIGINT; not null"
+        boolean is_open "BOOLEAN; not null"
+    }
+    virtual_wallet_transactions {
+        bigint id PK "BIGINT; not null"
+        bigint user_id FK "BIGINT; not null"
+        integer amount "INTEGER; not null"
+        varchar kind "VARCHAR(20); not null"
+        varchar reference "VARCHAR(120); not null"
+        timestamp created_at "TIMESTAMP WITH TIME ZONE; nullable"
+    }
+    demo_outcomes {
+        bigint id PK "BIGINT; not null"
+        bigint market_id FK "BIGINT; not null"
+        varchar selection "VARCHAR(10); not null"
+        numeric decimal_odds "NUMERIC(9, 4); not null"
+    }
+    virtual_bets {
+        bigint id PK "BIGINT; not null"
+        bigint user_id FK "BIGINT; not null"
+        bigint match_id FK "BIGINT; not null"
+        bigint outcome_id FK "BIGINT; not null"
+        varchar selection "VARCHAR(10); not null"
+        integer stake "INTEGER; not null"
+        numeric accepted_odds "NUMERIC(9, 4); not null"
+        integer potential_payout "INTEGER; not null"
+        varchar status "VARCHAR(10); not null"
+        varchar request_key "VARCHAR(100); not null"
+        timestamp created_at "TIMESTAMP WITH TIME ZONE; nullable"
+    }
+    sports |o--o{ leagues : "sport_id"
+    leagues |o--o{ seasons : "league_id"
+    sports |o--o{ teams : "sport_id"
+    seasons ||--o{ season_teams : "season_id"
+    teams ||--o{ season_teams : "team_id"
+    teams |o--o{ matches : "away_team_id"
+    teams |o--o{ matches : "home_team_id"
+    leagues |o--o{ matches : "league_id"
+    seasons |o--o{ matches : "season_id"
+    matches |o--o{ match_predictions : "match_id"
+    model_versions |o--o{ match_predictions : "model_version_id"
+    teams |o--o{ match_predictions : "predicted_winner_id"
+    matches |o--o{ user_predictions : "match_id"
+    teams |o--o{ user_predictions : "predicted_winner_id"
+    users |o--o{ user_predictions : "user_id"
+    data_sources |o--o{ external_mappings : "data_source_id"
+    data_sources |o--o{ ingestion_runs : "data_source_id"
+    users ||--o{ auth_sessions : "user_id"
+    users ||--o{ auth_assessment_records : "owner_id"
+    users ||--o| virtual_wallets : "user_id"
+    matches ||--o| demo_markets : "match_id"
+    users ||--o{ virtual_wallet_transactions : "user_id"
+    demo_markets ||--o{ demo_outcomes : "market_id"
+    matches ||--o{ virtual_bets : "match_id"
+    demo_outcomes ||--o{ virtual_bets : "outcome_id"
+    users ||--o{ virtual_bets : "user_id"

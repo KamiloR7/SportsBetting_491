@@ -8,6 +8,7 @@ from pathlib import Path
 from fastapi.routing import iter_route_contexts
 
 PUBLIC = {
+    ("GET", "/matches/{match_id}/markets"): "Public synthetic demo markets; betting opt-in required.",
     ("GET", "/health"): "Operational status and explicit data mode; no account data.",
     ("GET", "/sports"): "Public sport catalogue.",
     ("GET", "/leagues"): "Public league catalogue.",
@@ -22,6 +23,12 @@ PUBLIC = {
     ("POST", "/auth/login"): "HTTPS-only pre-login CSRF challenge plus credentials and database throttle.",
 }
 PROTECTED = {
+    ("GET", "/wallet"): "Betting opt-in and active-user session; only own wallet.",
+    ("GET", "/wallet/transactions"): "Betting opt-in and active-user session; only own ledger.",
+    ("POST", "/wallet/demo-topup"): "Betting opt-in, active session and CSRF; idempotent own-wallet refill.",
+    ("POST", "/bets"): "Betting opt-in, active session and CSRF; transactional own-wallet debit.",
+    ("GET", "/bets"): "Betting opt-in and active session; own bets only.",
+    ("GET", "/bets/{bet_id}"): "Betting opt-in, active session and owner filter.",
     ("GET", "/auth/me"): "Valid active-user session; return only that user's public account fields.",
     ("POST", "/auth/logout"): "Valid session and bound CSRF; revoke only the presented session.",
     ("GET", "/auth/assessment/records/{record_id}"): "Assessment opt-in plus valid session and owner check.",

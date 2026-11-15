@@ -15,6 +15,7 @@ from app.core.authentication import csrf_session, current_session
 from app.main import app
 from app.security_assessment import PROTECTED, route_inventory
 from backend.tests.test_auth_security import PROTECTED as TEST_CASES
+from backend.tests.test_virtual_betting import BETTING_PROTECTED
 
 
 def dependency_calls(dependant):
@@ -30,9 +31,10 @@ def test_every_runtime_route_has_explicit_access_policy():
         (
             method,
             path.replace("/records/1", "/records/{record_id}")
-                .replace("/predictions/1", "/predictions/{prediction_id}"),
+                .replace("/predictions/1", "/predictions/{prediction_id}")
+                .replace("/bets/1", "/bets/{bet_id}"),
         )
-        for method, path, _ in TEST_CASES
+        for method, path, _ in TEST_CASES + BETTING_PROTECTED
     }
 
     assert covered == set(PROTECTED), "Every protected policy needs a denial/zero-write test"
