@@ -1,9 +1,10 @@
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import MatchCard from "../components/MatchCard";
 import DemoNotice from "../components/DemoNotice";
 import { getLeagues, getMatches } from "../services/matches";
+import { getPredictionHistory } from "../services/predictionHistory";
 
 const SPORT_OPTIONS = [
   {
@@ -126,6 +127,52 @@ function LeagueMatches({ sportOption, status }) {
   );
 }
 
+function PredictionHistory() {
+  const [history] = useState(() => getPredictionHistory());
+
+  return (
+    <section className="prediction-history" aria-labelledby="prediction-history-heading">
+      <div className="prediction-history-heading">
+        <h2 id="prediction-history-heading">Recent predictions</h2>
+        <p>Saved only in this browser on this device.</p>
+      </div>
+      {!history.length ? (
+        <p role="status">Your generated predictions will appear here.</p>
+      ) : (
+        <ol className="prediction-history-list">
+          {history.map((prediction, index) => {
+            const predictedHomeWin = prediction.predicted_outcome === "HOME_WIN";
+            const savedDate = new Date(prediction.saved_at);
+            const dateLabel = Number.isNaN(savedDate.getTime())
+              ? "Date unavailable"
+              : savedDate.toLocaleString();
+            return (
+              <li key={`${prediction.match_id}-${prediction.saved_at}-${index}`}>
+                <div>
+                  <p className="prediction-history-match">
+                    {prediction.home_team_name || "Home team"} vs {prediction.away_team_name || "Away team"}
+                    {prediction.sport ? ` · ${prediction.sport}` : ""}
+                  </p>
+                  <p>Outcome: {predictedHomeWin ? "Home win" : "Not a home win"}</p>
+                  <p>
+                    Home win {Math.round((prediction.probabilities?.home_win ?? 0) * 100)}%
+                    {" · "}
+                    Not a home win {Math.round((prediction.probabilities?.not_home_win ?? 0) * 100)}%
+                    {" · "}
+                    Confidence {Math.round((prediction.confidence ?? 0) * 100)}%
+                  </p>
+                  <p className="prediction-history-date">{dateLabel}</p>
+                </div>
+                <Link to={`/matches/${encodeURIComponent(prediction.match_id)}`}>View match</Link>
+              </li>
+            );
+          })}
+        </ol>
+      )}
+    </section>
+  );
+}
+
 function Dashboard() {
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedSportOption = getSportOption(searchParams.get("league") || DEFAULT_SPORT);
@@ -185,6 +232,7 @@ function Dashboard() {
         sportOption={selectedSportOption}
         status={selectedStatus}
       />
+      <PredictionHistory />
     </div>
   );
 }
