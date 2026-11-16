@@ -1,6 +1,6 @@
 """Fetch ESPN fixtures to a reviewable snapshot; apply explicitly to a local database.
 
-No synthetic fixtures are inserted. Prices are explicitly synthetic demo odds.
+No synthetic fixtures are inserted. Model pricing replaces legacy seed prices when enabled.
 Existing provider match IDs are preserved by the project's upsert service.
 """
 import argparse
@@ -34,7 +34,9 @@ def normalize(payload, league):
         for side,c in sides.items():
             team=c["team"]
             row.update({f"{side}_team_id":f"{league}:{team['id']}", f"{side}_team_name":team["displayName"], f"{side}_team_abbr":team["abbreviation"],
-                        f"{side}_score":int(c["score"]) if state=="completed" else None})
+                        f"{side}_score":int(c["score"]) if state in {"completed","in_progress"} and c.get("score") not in {None,""} else None})
+        if state == "completed" and (row["home_score"] is None or row["away_score"] is None):
+            raise ValueError("Completed game requires both final scores")
         rows.append(row)
     return rows
 

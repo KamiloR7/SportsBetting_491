@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     DATABASE_NAME: str
     DATABASE_USER: str
     DATABASE_PASSWORD: str
+    AUTO_REFRESH_ENABLED: bool = False
+    AUTO_REFRESH_INTERVAL_SECONDS: int = 120
     PARLAYS_ENABLED: bool = False
     MODEL_ODDS_ENABLED: bool = False
     MARKET_MODEL_DIRECTORY: Path = Path(__file__).resolve().parents[3] / "build" / "market-models"

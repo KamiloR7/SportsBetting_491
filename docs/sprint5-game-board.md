@@ -1,3 +1,5 @@
+Latest result-refresh update: see [Automatic local fixture updates](automatic-fixture-updates.md). Automatic polling is now available as an opt-in localhost feature; earlier manual-refresh snapshots below describe prior behavior.
+
 # Game board and return navigation
 
 November 15, 2026. The Explore board now requests 12 games per page instead of 30, groups them by local calendar day and uses compact cards with distinct sport accents. Page navigation remains server-paginated. Search, sport, status and offset are included in each match link and preserved by the styled Back to NFL/MLB/EPL games control. Direct match links infer the sport from the loaded league.

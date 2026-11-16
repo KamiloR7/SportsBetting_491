@@ -1,3 +1,4 @@
+import FixtureRefreshStatus from "../components/FixtureRefreshStatus";
 import ModelInsights from "../components/ModelInsights";
 import AccountPanel from "../components/AccountPanel";
 
@@ -65,8 +66,11 @@ function LeagueMatches({ sportOption, status, search, offset, onPage, returnPara
 
   useEffect(() => {
     let ignore = false;
+    let running = false;
 
     async function load() {
+      if (running) return;
+      running = true;
       try {
         const leagues = await getLeagues();
         const league = leagues.find(
@@ -101,13 +105,15 @@ function LeagueMatches({ sportOption, status, search, offset, onPage, returnPara
             error: error.message,
           });
         }
-      }
+      } finally { running = false; }
     }
 
     load();
+    const timer = setInterval(load, 30000);
 
     return () => {
       ignore = true;
+      clearInterval(timer);
     };
   }, [sportOption.leagueAbbreviation, status, search, offset]);
 
@@ -209,7 +215,7 @@ function Dashboard() {
       <DemoNotice />
       <AccountPanel />
       <header className="dashboard-header">
-        <div className="eyebrow"><span/> THE MATCHDAY DESK</div><h1>Every game.<br/><em>A different edge.</em></h1>
+        <div className="eyebrow"><span/> THE MATCHDAY DESK</div><h1>Every game.<br/><em>Make you call</em></h1>
         <p>Explore the fixtures. Read the model. Make your pick.</p><div className="hero-label">NFL <span>•</span> MLB <span>•</span> PREMIER LEAGUE</div>
       </header>
 
@@ -245,6 +251,7 @@ function Dashboard() {
         </select>
       </div>
 
+      <FixtureRefreshStatus/>
       <LeagueMatches
         key={`${selectedSportOption.key}-${selectedStatus}-${searchParams.get("search") || ""}-${searchParams.get("offset") || "0"}`}
         returnParams={new URLSearchParams({ ...Object.fromEntries(searchParams), league: selectedSportOption.key, status: selectedStatus })}

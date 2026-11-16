@@ -142,15 +142,18 @@ function MatchData({ id, searchParams }) {
   useEffect(() => {
     let ignore = false;
 
-    getMatchById(id)
+    const refresh = () => getMatchById(id)
       .then((match) => {
         if (!ignore) setResult({ loading: false, match, error: "" });
       })
       .catch((error) => {
         if (!ignore) setResult({ loading: false, match: null, error: error.message });
       });
+    refresh();
+    const timer = setInterval(refresh, 30000);
     return () => {
       ignore = true;
+      clearInterval(timer);
     };
   }, [id]);
 

@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.exception_handlers import request_validation_exception_handler
@@ -12,7 +13,23 @@ from app.routes.predictions import router as predictions_router
 from app.routes.sports import router as sports_router
 from app.routes.ownership_assessment import router as ownership_router
 
+@asynccontextmanager
+async def lifespan(application):
+    from app.core.config import settings
+    worker = None
+    if settings.AUTO_REFRESH_ENABLED:
+        from app.database.db import engine
+        from app.services.fixture_refresh import FixtureRefreshWorker
+        worker = FixtureRefreshWorker(engine,settings.AUTO_REFRESH_INTERVAL_SECONDS)
+        application.state.fixture_refresh = worker
+        worker.start()
+    try:
+        yield
+    finally:
+        if worker: worker.stop()
+
 app = FastAPI(
+    lifespan=lifespan,
     title="Sports Match Prediction API",
     description="Backend API for the CPSC 491 sports match-prediction application.",
     version="0.1.0",
@@ -37,7 +54,9 @@ async def redact_auth_validation(request: Request, exc: RequestValidationError):
 
 @app.get("/health")
 def health_check(request: Request):
-    return {"status": "ok", "data_mode": getattr(request.app.state, "data_mode", "database")}
+    worker = getattr(request.app.state,"fixture_refresh",None)
+    return {"status": "ok", "data_mode": getattr(request.app.state, "data_mode", "database"),
+            "fixture_refresh":worker.status() if worker else {"enabled":False}}
 
 
 @app.get("/insights/evaluation")
