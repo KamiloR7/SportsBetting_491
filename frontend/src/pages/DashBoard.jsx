@@ -48,7 +48,7 @@ function getSportOption(value) {
 
 function EmptyUpcomingMatches({ sportOption, status }) {
   const league = sportOption.leagueAbbreviation;
-  const title = status === "matchday" ? `No ${league} games today, in progress, or coming up.`
+  const title = status === "matchday" ? `No ${league} games in progress or coming up.`
     : status === "in_progress" ? `No ${league} games in progress.`
     : status === "scheduled" ? `No upcoming ${league} games.`
     : `No ${league} ${status === "final" ? "completed" : status} games found.`;
@@ -81,7 +81,7 @@ function LeagueMatches({ sportOption, status, search, offset, onPage, returnPara
           throw new Error(`${sportOption.leagueAbbreviation} is currently unavailable.`);
         }
 
-        const matches = await getMatches(league.id, { status, search, offset, limit: PAGE_SIZE });
+        const matches = await getMatches(league.id, { status, search, offset, limit: status === "today_results" ? 200 : PAGE_SIZE });
 
         if (status === "matchday") {
           const today = new Date(); today.setHours(0, 0, 0, 0);
@@ -117,6 +117,13 @@ function LeagueMatches({ sportOption, status, search, offset, onPage, returnPara
     };
   }, [sportOption.leagueAbbreviation, status, search, offset]);
 
+  if (status === "today_results") {
+    if (result.loading) return <p className="results-loading" role="status">Loading today’s completed games…</p>;
+    if (result.error) return <p role="alert">Today’s results are temporarily unavailable.</p>;
+    if (!result.matches.length) return null;
+    return <details className="played-today"><summary><span><span className="section-kicker">THE FINAL WHISTLE</span><strong>Played today</strong></span><span>{result.matches.length} completed {result.matches.length === 1 ? "game" : "games"}<span className="results-chevron" aria-hidden="true">⌄</span></span></summary><p>Final scores and model replays. These games are closed for betting.</p><div className="match-grid">{result.matches.map(match => <MatchCard key={match.id} match={match} returnParams={returnParams}/>)}</div></details>;
+  }
+
   if (result.loading) {
     return <p role="status">Loading {sportOption.leagueAbbreviation} matches...</p>;
   }
@@ -141,7 +148,7 @@ function LeagueMatches({ sportOption, status, search, offset, onPage, returnPara
     groups.get(day).push(match);
   });
   return <>
-    <div className="results-toolbar"><span>{result.matches.length} games · {sportOption.leagueAbbreviation}</span><span>Your local time · {status === "matchday" ? "In progress → Today → Coming up" : status === "in_progress" ? "No live score feed" : "Grouped by game day"}</span></div>
+    <div className="results-toolbar"><span>{result.matches.length} games · {sportOption.leagueAbbreviation}</span><span>Your local time · {status === "matchday" ? "In progress first · upcoming games" : status === "in_progress" ? "No live score feed" : "Grouped by game day"}</span></div>
     <div className="fixture-days">{[...groups].map(([day, matches]) => <section className={`fixture-day ${day === "In progress" ? "day-in-progress" : day.startsWith("Today") ? "day-today" : ""}`} key={day} aria-label={day}><div className="fixture-day-heading"><h3>{day}</h3><span>{matches.length} {matches.length === 1 ? "game" : "games"}</span></div><div className="match-grid">{matches.map(match => <MatchCard key={match.id} match={match} returnParams={returnParams} />)}</div></section>)}</div>
     <div className="pagination"><button disabled={offset === 0} onClick={() => onPage(Math.max(0, offset - PAGE_SIZE))}>← Previous</button><span>Page {Math.floor(offset / PAGE_SIZE) + 1}</span><button disabled={result.matches.length < PAGE_SIZE} onClick={() => onPage(offset + PAGE_SIZE)}>Next →</button></div>
   </>;
@@ -261,6 +268,7 @@ function Dashboard() {
         offset={Math.max(0,Number(searchParams.get("offset"))||0)}
         onPage={offset=>updateSelection("offset",String(offset))}
       />
+      {selectedStatus === "matchday" && <LeagueMatches key={`results-${selectedSportOption.key}-${searchParams.get("search") || ""}`} sportOption={selectedSportOption} status="today_results" search={searchParams.get("search") || ""} offset={0} returnParams={new URLSearchParams({ ...Object.fromEntries(searchParams), league: selectedSportOption.key, status: "matchday" })}/>}
       <div className="insights-link-row"><Link to="/insights">How are predictions and percentages calculated? Explore Model Insights →</Link></div>
       <ModelInsights />
       <PredictionHistory />

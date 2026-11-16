@@ -27,8 +27,9 @@ def test_matchday_excludes_old_games_and_sorts_before_pagination(demo):
     params={"league_id":1,"view":"matchday","day_start":"2026-11-15T00:00:00-08:00","day_end":"2026-11-16T00:00:00-08:00"}
     result=client.get("/matches",params=params)
     assert result.status_code==200,result.text
-    assert [m["id"] for m in result.json()]==[1,2,9,3,4]
-    assert [m["id"] for m in client.get("/matches",params={**params,"limit":2,"offset":2}).json()]==[9,3]
+    assert [m["id"] for m in result.json()]==[1,3,4]
+    assert [m["id"] for m in client.get("/matches",params={**params,"limit":2,"offset":2}).json()]==[4]
+    assert [m["id"] for m in client.get("/matches",params={**params,"view":"today_results"}).json()]==[2]
     assert 5 in [m["id"] for m in client.get("/matches",params={"league_id":1,"status":"final"}).json()]
     for invalid in ({"day_start":"2026-11-15T00:00:00"},{"day_end":"2026-12-16T00:00:00-08:00"},{"status":"final"}):
         assert client.get("/matches",params={**params,**invalid}).status_code==422

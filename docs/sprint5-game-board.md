@@ -37,3 +37,12 @@ This also covers started fixtures that never had a betting market: their preview
 MLB's empty Matchday view explicitly says No MLB games today, in progress, or coming up and links to completed games. Upcoming and In progress filters have their own specific empty-state wording. This describes the available imported schedule rather than claiming games never exist.
 
 Full backend run after matchday/reset work: 640 passed, 69 skipped. Subsequent closed-odds focused checks include unchanged stored prices/quote counts, missing-market read-only previews, kickoff betting denial and rejection of models trained after a target game. Frontend build/lint and the MLB/odds browser checks passed. Screenshots: docs/evidence/in-progress-model-odds.jpg and docs/evidence/mlb-empty-schedule.jpg.
+
+
+## Upcoming first and separate completed results
+
+Matchday now gives the main paginated slots exclusively to recent in-progress and scheduled games: ongoing first, today's scheduled fixtures next, then future fixtures. Today's completed games are fetched independently with view=today_results and displayed in a collapsible Played today section below the upcoming board. Completed games therefore cannot displace bettable games from page one. Cancellation/postponement views remain accessible through the status filters.
+
+The same local-day boundaries apply to both queries. A PostgreSQL/SQLite regression confirms the upcoming query excludes finals and old history before pagination, while the separate results query includes only today's finals. Latest focused matchday/reset/refresh checks: 20 passed, 1 skipped (SQLite row-lock concurrency).
+
+Match cards now use deterministic team-colored gradients, decorative initial shields (not official team logos), larger colored odds tiles, and a prominent action footer. Completed cards are quieter. A lone fixture fills its row. The headline retains the exact requested second line, Make you call.
