@@ -1,5 +1,4 @@
 import BetSlip from "../components/BetSlip";
-import AccountPanel from "../components/AccountPanel";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import MatchSummary from "../components/MatchSummary";
@@ -193,7 +192,7 @@ function MatchDetails() {
   return (
     <div className="match-details">
       <DemoNotice />
-      <AccountPanel />
+
       <MatchData key={id} id={id} searchParams={searchParams} />
     </div>
   );

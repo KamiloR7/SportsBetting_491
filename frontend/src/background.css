@@ -157,3 +157,48 @@
 .board-quick-slip .bet-actions button { flex: 1; min-height: 44px; }
 .team-pick-button:focus-visible,.board-odds-pick:focus-visible,.board-bet-now:focus-visible { outline: 3px solid #e0ffae; outline-offset: 3px; }
 @media(max-width: 680px) { .team-pick-hint { font-size: 9px; } .app-frame::after { opacity: .7; } }
+/* Compact account controls share the header instead of a page-wide account banner. */
+.site-header { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 13px 20px; padding-top: 15px; padding-bottom: 15px; min-height: 0; }
+.site-header > .brand { grid-column: 1; justify-self: start; }
+.site-header > nav { grid-column: 1 / -1; width: 100%; display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); }
+.header-account { grid-column: 2; justify-self: end; position: relative; display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 9px; min-width: 0; margin: 0; }
+.header-balance { display: flex; align-items: center; gap: 7px; padding-right: 8px; color: #d4fa8c; }
+.header-balance > strong { font: 700 29px/1 'Barlow Condensed',sans-serif; }
+.header-balance > span { font-size: 9px; letter-spacing: .6px; color: #d9e9c1; }
+.header-balance small { display: block; font-size: 8px; letter-spacing: 0; color: #a9c0cd; margin-top: 3px; }
+.header-account > button,.header-join { padding: 9px 12px; min-height: 36px; font-size: 10px; border: 1px solid #a3bfe844; border-radius: 8px; background: #1c2e4b99; color: #e1ebf5; }
+.header-account > .header-topup { color: #ddf9b5; border-color: #bce47866; background: #53734433; }
+.header-guest > span { font-size: 10px; color: #b7c7d8; }
+.header-join { color: #e0ffaf; }
+.header-topup-panel { position: absolute; top: calc(100% + 12px); right: 0; width: min(350px,calc(100vw - 36px)); padding: 18px; border: 1px solid #b8df7f88; border-radius: 13px; background: #172d46; box-shadow: 0 16px 45px #0008; z-index: 30; }
+.header-topup-panel > strong { font-size: 15px; }
+.header-account-email { overflow-wrap: anywhere; font-size: 10px; color: #a7bdd0; margin: 5px 0 14px; }
+.header-topup-panel .demo-points-form { margin: 0; }
+.header-topup-panel .demo-points-form label { font-size: 12px; }
+.header-topup-panel .amount-entry { display: flex; flex-wrap: wrap; gap: 8px; }
+.header-topup-panel .amount-entry input { width: 100%; min-width: 0; flex: 1 1 150px; font-size: 12px; }
+.header-topup-panel .amount-entry button { font-size: 11px; }
+.header-topup-panel .demo-points-form p { font-size: 10px; }
+.header-account-error { position: absolute; right: 0; top: 100%; padding: 9px; background: #382b34; border-radius: 8px; font-size: 11px; z-index: 31; }
+.odds-insights-link { display: inline-block; color: #d2f596; font-size: 12px; text-decoration: underline; text-underline-offset: 3px; padding: 7px 0; }
+#odds-explained { scroll-margin-top: 20px; }
+.dashboard > .dashboard-header { margin-top: 8px; }
+@media(max-width:1100px) {
+  .site-header > nav { grid-template-columns: repeat(12,minmax(0,1fr)); }
+}
+@media(max-width:650px) {
+  .site-header { padding: 14px 18px; gap: 13px 10px; }
+  .site-header .brand { font-size: 18px; gap: 7px; }
+  .header-account { gap: 5px; }
+  .header-account > button,.header-join { padding: 8px; font-size: 9px; }
+  .header-balance { padding-right: 0; gap: 4px; }
+  .header-balance > strong { font-size: 24px; }
+  .header-balance small { display: none; }
+  .header-guest > span { display: none; }
+}
+@media(max-width:420px) {
+  .header-account { max-width: 215px; }
+  .header-balance { flex-basis: 100%; justify-content: flex-end; }
+  .site-header > .brand { align-self: start; margin-top: 9px; }
+}
+.site-header { position: relative; z-index: 20; overflow: visible; }

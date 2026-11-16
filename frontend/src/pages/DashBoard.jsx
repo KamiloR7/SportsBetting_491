@@ -1,6 +1,5 @@
 import FixtureRefreshStatus from "../components/FixtureRefreshStatus";
 import ModelInsights from "../components/ModelInsights";
-import AccountPanel from "../components/AccountPanel";
 
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
@@ -220,9 +219,9 @@ function Dashboard() {
   return (
     <div className={`dashboard board-${selectedSportOption.key}`}>
       <DemoNotice />
-      <AccountPanel />
+
       <header className="dashboard-header">
-        <div className="eyebrow"><span/> THE MATCHDAY DESK</div><h1>Every game.<br/><em>Make your call</em></h1>
+        <div className="eyebrow"><span/> THE MATCHDAY DESK</div><h1>Every game.<br/><em>Make your call.</em></h1>
         <p>Explore the fixtures. Read the model. Make your pick.</p><div className="hero-label">NFL <span>•</span> MLB <span>•</span> PREMIER LEAGUE</div>
       </header>
 

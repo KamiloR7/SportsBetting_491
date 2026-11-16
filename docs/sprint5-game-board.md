@@ -62,3 +62,12 @@ Upcoming fixtures with an open model-priced market now expose clickable team row
 The heading is corrected to Make your call. A repeating, lightweight SVG zigzag texture replaces the single lightning stroke behind the page; its soft cyan/lilac lines sit over the existing colored gradient without animation.
 
 Browser checks: selecting Los Angeles Chargers on match 70 selected the away price 2.67; a 100-point stake previewed 267 total return / 167 profit. Add to parlay transferred that exact pick and price to the builder; the temporary test selection was then removed, restoring the empty draft. Selecting an EPL draw tile selected Draw at 4.18 with a 100-point preview. These are observed local quote examples, not fixed future prices. No new bet was submitted during this UI check. Frontend build and lint passed. Evidence: docs/evidence/direct-board-betting.jpg, board-inline-bet-slip.jpg and zigzag-background-and-headline.jpg.
+
+
+## Compact header account and odds wording
+
+Account balance, custom demo-point entry and sign out now live in the global header. Repeated page-wide account panels are removed from the board, match center, standings, ticket pages and parlay builder. The balance still links to Wallet Activity. Demo points open an anchored form that closes with its toggle, Escape, an outside click or navigation. The wallet page retains its dedicated refill form. The header refreshes after sign-in/navigation and wallet events. Guests see a small Sign in / Join link.
+
+The heading now reads Make your call. with a period. The bet slip uses odds instead of prices for its loading, explanation and refresh controls. How are these odds calculated? Model Insights links directly to /insights#odds-explained. The calculation and payout behavior are unchanged: in this context price and odds refer to the same offered decimal payout multiplier.
+
+Browser checks verified the signed-in balance, opening/closing the custom-points popover, headline punctuation, absence of repeated account banners and navigation from a match's odds question to the Model Insights odds example. No refill, reset or bet was submitted. Frontend production build and lint passed. Evidence: docs/evidence/compact-header-account.jpg, header-demo-points-panel.jpg and linked-model-odds-example.jpg.

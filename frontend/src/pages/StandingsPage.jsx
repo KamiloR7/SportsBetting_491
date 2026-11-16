@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { apiRequest } from "../services/api";
 import TeamBadge from "../components/TeamBadge";
-import AccountPanel from "../components/AccountPanel";
 
 const LEAGUES=[{key:"NFL",name:"Football",slug:"football"},{key:"MLB",name:"Baseball",slug:"baseball"},{key:"EPL",name:"Premier League",slug:"soccer"}];
 const VIEWS={conference:"Conferences",division:"Divisions",league:"AL / NL",overall:"Overall records",table:"League table"};
@@ -29,5 +28,5 @@ function LeagueStandings({league,params,setParams}){
 }
 export default function StandingsPage(){
  const [params,setParams]=useSearchParams();const requested=(params.get("league")||"NFL").toUpperCase();const league=LEAGUES.some(option=>option.key===requested)?requested:"NFL";
- return <main className="dashboard standings-page"><header className="page-heading"><span className="eyebrow"><span/>THE SEASON PICTURE</span><h1>Standings.</h1><p>Conference records, division races and the league table.</p></header><AccountPanel/><div className="sport-selector" role="group" aria-label="Standings league">{LEAGUES.map(option=><button className="sport-option" key={option.key} aria-pressed={league===option.key} onClick={()=>setParams({league:option.key})}><span className="sport-option-name">{option.name}</span><span className="sport-option-league">{option.key}</span></button>)}</div><LeagueStandings key={league} league={league} params={params} setParams={setParams}/></main>;
+ return <main className="dashboard standings-page"><header className="page-heading"><span className="eyebrow"><span/>THE SEASON PICTURE</span><h1>Standings.</h1><p>Conference records, division races and the league table.</p></header><div className="sport-selector" role="group" aria-label="Standings league">{LEAGUES.map(option=><button className="sport-option" key={option.key} aria-pressed={league===option.key} onClick={()=>setParams({league:option.key})}><span className="sport-option-name">{option.name}</span><span className="sport-option-league">{option.key}</span></button>)}</div><LeagueStandings key={league} league={league} params={params} setParams={setParams}/></main>;
 }
