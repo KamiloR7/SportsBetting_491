@@ -128,3 +128,32 @@
   .board-controls .match-filter select { max-width: 180px; }
   .board-results-toolbar { align-items: flex-start; }
 }
+/* Repeating angular lines give the open background a quiet sense of movement. */
+.app-frame::after {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: url("./assets/zigzag-grid.svg") repeat;
+  background-size: 320px 240px;
+  opacity: .8;
+}
+.fixture-card .team-pick-button { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; min-width: 0; padding: 7px; text-align: left; border: 1px solid #ffffff2a; border-radius: 11px; background: #0b1d3155; color: #fff; }
+.team-pick-hint { flex-shrink: 0; color: #d2f799; font-size: 10px; }
+.fixture-card .team-pick-button:hover { border-color: #cdf58c; background: #c8ed7b14; }
+.fixture-card .browse-odds > .board-odds-pick { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; padding: 12px; border: 1px solid #ffffff55; border-radius: 10px; text-align: left; color: #fff; background: #17394f; }
+.fixture-card .browse-odds > .odds-home.board-odds-pick { background: rgb(var(--home-rgb) / var(--home-odds-alpha)); }
+.fixture-card .browse-odds > .odds-away.board-odds-pick { background: rgb(var(--away-rgb) / var(--away-odds-alpha)); }
+.fixture-card .board-odds-pick small { text-transform: none; letter-spacing: 0; line-height: 1.3; overflow-wrap: anywhere; }
+.board-odds-pick > span { font-size: 10px; color: #e0ffb0; }
+.fixture-card .browse-odds > .board-odds-pick:hover,.fixture-card .browse-odds > .board-odds-pick[aria-pressed=true] { border-color: #d5ff99; box-shadow: 0 0 0 2px #c8f37533; }
+.board-bet-actions { grid-column: 1 / -1; display: grid; gap: 9px; margin: 15px 0; }
+.fixture-card .board-bet-now { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 14px 17px; min-height: 48px; border: 1px solid #deff9d; border-radius: 10px; background: linear-gradient(110deg, #d0f783, #9de4bc); color: #102b30; font-size: 15px; font-weight: 800; }
+.fixture-card .board-bet-now:hover { background: #dfffaa; box-shadow: 0 4px 20px #bdf07533; }
+.board-bet-actions > a { text-align: center; font-size: 11px; color: #c2d9ed; padding: 4px; }
+.board-quick-slip { grid-column: 1 / -1; min-width: 0; margin-bottom: 18px; border: 1px solid #bee88588; border-radius: 12px; background: #102439f5; overflow: hidden; }
+.quick-slip-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; background: #c3ed7c18; font-size: 13px; }
+.quick-slip-heading button { padding: 6px 10px; font-size: 11px; background: transparent; color: #d3e5f4; border-color: #b2d2eb44; }
+.board-quick-slip .bet-slip { border: 0; padding: 16px; background: transparent; margin: 0; }
+.board-quick-slip .bet-slip h2 { font-size: 23px; margin: 5px 0 8px; }
+.board-quick-slip .bet-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.board-quick-slip .bet-actions button { flex: 1; min-height: 44px; }
+.team-pick-button:focus-visible,.board-odds-pick:focus-visible,.board-bet-now:focus-visible { outline: 3px solid #e0ffae; outline-offset: 3px; }
+@media(max-width: 680px) { .team-pick-hint { font-size: 9px; } .app-frame::after { opacity: .7; } }

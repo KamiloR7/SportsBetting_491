@@ -222,7 +222,7 @@ function Dashboard() {
       <DemoNotice />
       <AccountPanel />
       <header className="dashboard-header">
-        <div className="eyebrow"><span/> THE MATCHDAY DESK</div><h1>Every game.<br/><em>Make you call</em></h1>
+        <div className="eyebrow"><span/> THE MATCHDAY DESK</div><h1>Every game.<br/><em>Make your call</em></h1>
         <p>Explore the fixtures. Read the model. Make your pick.</p><div className="hero-label">NFL <span>•</span> MLB <span>•</span> PREMIER LEAGUE</div>
       </header>
 

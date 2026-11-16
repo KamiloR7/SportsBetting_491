@@ -45,7 +45,7 @@ Matchday now gives the main paginated slots exclusively to recent in-progress an
 
 The same local-day boundaries apply to both queries. A PostgreSQL/SQLite regression confirms the upcoming query excludes finals and old history before pagination, while the separate results query includes only today's finals. Latest focused matchday/reset/refresh checks: 20 passed, 1 skipped (SQLite row-lock concurrency).
 
-Match cards now use deterministic team-colored gradients, decorative initial shields (not official team logos), larger colored odds tiles, and a prominent action footer. Completed cards are quieter. A lone fixture fills its row. The headline retains the exact requested second line, Make you call.
+Match cards now use deterministic team-colored gradients, decorative initial shields (not official team logos), larger colored odds tiles, and a prominent action footer. Completed cards are quieter. A lone fixture fills its row. The headline now reads Every game. Make your call.
 
 
 ## Compact board and clean color refinements
@@ -53,3 +53,12 @@ Match cards now use deterministic team-colored gradients, decorative initial shi
 The board puts team search and the status filter beside the league heading on wider screens, and wraps them below it on narrow screens. The game count and provider refresh details share one compact metadata row; the previous full-width refresh panel is removed. Search/status labels remain accessible and delayed-update warnings are retained. Date headers and the space below sport tabs are tighter, bringing match cards closer to the controls.
 
 A smooth blue/purple/teal background and colored surface borders add contrast without decorative field artwork. Match cards retain their actual team colors. Frontend production build and lint passed; the running NFL board was visually checked. Evidence: `docs/evidence/compact-match-board.jpg`.
+
+
+## Direct picks from the board
+
+Upcoming fixtures with an open model-priced market now expose clickable team rows and named odds tiles. Either opens an inline bet slip with that outcome selected; a large Place a bet button also opens the slip. The slip fetches current available prices, previews the stake/return and offers Place single bet or Add to parlay. Submission still uses the existing authenticated, CSRF-protected, idempotent betting API and expected-price check. Switching/closing the card selection is disabled during submission. Started/closed/unpriced fixtures do not expose these controls, and the API remains authoritative at kickoff. Model insights and match details remain a separate link. EPL draw tiles work the same way as team picks.
+
+The heading is corrected to Make your call. A repeating, lightweight SVG zigzag texture replaces the single lightning stroke behind the page; its soft cyan/lilac lines sit over the existing colored gradient without animation.
+
+Browser checks: selecting Los Angeles Chargers on match 70 selected the away price 2.67; a 100-point stake previewed 267 total return / 167 profit. Add to parlay transferred that exact pick and price to the builder; the temporary test selection was then removed, restoring the empty draft. Selecting an EPL draw tile selected Draw at 4.18 with a 100-point preview. These are observed local quote examples, not fixed future prices. No new bet was submitted during this UI check. Frontend build and lint passed. Evidence: docs/evidence/direct-board-betting.jpg, board-inline-bet-slip.jpg and zigzag-background-and-headline.jpg.

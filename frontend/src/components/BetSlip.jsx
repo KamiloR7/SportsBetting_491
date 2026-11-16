@@ -2,13 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { apiRequest, mutation } from "../services/api";
 import { addParlayLeg } from "../services/parlayDraft";
-export default function BetSlip({match}) {
+export default function BetSlip({match, initialSelection = null, onBusyChange}) {
  const [markets,setMarkets]=useState(null),[error,setError]=useState(""),[authRequired,setAuthRequired]=useState(false),[selected,setSelected]=useState(null),[stake,setStake]=useState("100"),[busy,setBusy]=useState(false),[receipt,setReceipt]=useState(null);
  const pending=useRef(null);
  const [parlayMessage,setParlayMessage]=useState("");
  const [now,setNow]=useState(()=>Date.now());
  useEffect(()=>{const timer=setInterval(()=>setNow(Date.now()),1000);return()=>clearInterval(timer);},[]);
- useEffect(()=>{const controller=new AbortController();apiRequest(`/matches/${match.id}/markets`,{signal:controller.signal}).then(setMarkets).catch(e=>{if(!controller.signal.aborted)setError(e.message);});return()=>controller.abort();},[match.id]);
+ useEffect(()=>{const controller=new AbortController();apiRequest(`/matches/${match.id}/markets`,{signal:controller.signal}).then(data=>{if(controller.signal.aborted)return;setMarkets(data);const pick=data.filter(m=>m.is_open&&m.odds_source==="model_derived").flatMap(m=>m.outcomes).find(o=>o.selection===initialSelection);if(pick)setSelected(pick);}).catch(e=>{if(!controller.signal.aborted)setError(e.message);});return()=>controller.abort();},[match.id,initialSelection]);
  function refresh(){setError("");setSelected(null);setMarkets(null);apiRequest(`/matches/${match.id}/markets`).then(setMarkets).catch(e=>setError(e.message));}
  const open=markets?.filter(m=>m.is_open)||[];
  const market=open[0]||markets?.[0];
@@ -19,11 +19,11 @@ export default function BetSlip({match}) {
  const scaled=BigInt(parts[0])*10000n+BigInt((parts[1]||"").padEnd(4,"0").slice(0,4));
  const payout=selected&&/^[1-9]\d{0,6}$/.test(stake)?Number(BigInt(stake)*scaled/10000n):null;
  async function submit(e){
-  e.preventDefault();if(!selected||busy)return;setBusy(true);setError("");setAuthRequired(false);
+  e.preventDefault();if(!selected||busy)return;setBusy(true);onBusyChange?.(true);setError("");setAuthRequired(false);
   const payload={match_id:match.id,outcome_id:selected.id,stake:Number(stake),expected_odds:selected.decimal_odds};const signature=JSON.stringify(payload);
   if(!pending.current||pending.current.signature!==signature)pending.current={signature,body:{...payload,request_key:crypto.randomUUID()}};
   try{const result=await mutation("/bets",pending.current.body);setReceipt(result);pending.current=null;setSelected(null);window.dispatchEvent(new Event("wallet-updated"));}
-  catch(e){setError(e.message);setAuthRequired(e.status===401);if(e.status>=400&&e.status<500)pending.current=null;}finally{setBusy(false);}
+  catch(e){setError(e.message);setAuthRequired(e.status===401);if(e.status>=400&&e.status<500)pending.current=null;}finally{setBusy(false);onBusyChange?.(false);}
  }
  function addToParlay(){if(!selected)return;try{addParlayLeg({match_id:match.id,outcome_id:selected.id,expected_odds:selected.decimal_odds,selection:selected.selection,selection_name:name(selected.selection),home_team_name:match.home_team_name,away_team_name:match.away_team_name,start_time:match.start_time});setParlayMessage("Selection added. Choose another game to complete your parlay.");setError("");}catch(e){setError(e.message);}}
  const name=selection=>selection==="home"?match.home_team_name:selection==="away"?match.away_team_name:"Draw";
