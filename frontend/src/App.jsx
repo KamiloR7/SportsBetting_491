@@ -10,6 +10,7 @@ import StandingsPage from "./pages/StandingsPage";
 import ParlayBuilder from "./pages/ParlayBuilder";
 
 import "./App.css";
+import "./background.css";
 import AppFrame from "./components/AppFrame";
 
 function App() {

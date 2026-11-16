@@ -125,16 +125,16 @@ function LeagueMatches({ sportOption, status, search, offset, onPage, returnPara
   }
 
   if (result.loading) {
-    return <p role="status">Loading {sportOption.leagueAbbreviation} matches...</p>;
+    return <><FixtureRefreshStatus compact/><p role="status">Loading {sportOption.leagueAbbreviation} matches...</p></>;
   }
 
   if (result.error) {
-    return <p role="alert">{result.error}</p>;
+    return <><FixtureRefreshStatus compact/><p role="alert">{result.error}</p></>;
   }
 
   if (!result.matches.length) {
     return (
-      <EmptyUpcomingMatches sportOption={sportOption} status={status} />
+      <><FixtureRefreshStatus compact/><EmptyUpcomingMatches sportOption={sportOption} status={status} /></>
     );
   }
 
@@ -148,7 +148,7 @@ function LeagueMatches({ sportOption, status, search, offset, onPage, returnPara
     groups.get(day).push(match);
   });
   return <>
-    <div className="results-toolbar"><span>{result.matches.length} games · {sportOption.leagueAbbreviation}</span><span>Your local time · {status === "matchday" ? "In progress first · upcoming games" : status === "in_progress" ? "No live score feed" : "Grouped by game day"}</span></div>
+    <div className="results-toolbar board-results-toolbar"><span className="board-result-count">{result.matches.length} games · {sportOption.leagueAbbreviation}<small>Your local time · {status === "matchday" ? "In progress first" : status === "in_progress" ? "No live score feed" : "By game day"}</small></span><FixtureRefreshStatus compact/></div>
     <div className="fixture-days">{[...groups].map(([day, matches]) => <section className={`fixture-day ${day === "In progress" ? "day-in-progress" : day.startsWith("Today") ? "day-today" : ""}`} key={day} aria-label={day}><div className="fixture-day-heading"><h3>{day}</h3><span>{matches.length} {matches.length === 1 ? "game" : "games"}</span></div><div className="match-grid">{matches.map(match => <MatchCard key={match.id} match={match} returnParams={returnParams} />)}</div></section>)}</div>
     <div className="pagination"><button disabled={offset === 0} onClick={() => onPage(Math.max(0, offset - PAGE_SIZE))}>← Previous</button><span>Page {Math.floor(offset / PAGE_SIZE) + 1}</span><button disabled={result.matches.length < PAGE_SIZE} onClick={() => onPage(offset + PAGE_SIZE)}>Next →</button></div>
   </>;
@@ -245,7 +245,7 @@ function Dashboard() {
         ))}
       </div>
 
-      <div className="fixtures-heading"><div><span className="section-kicker">THE BOARD</span><h2>{selectedSportOption.leagueAbbreviation} matchups</h2><Link className="standings-inline-link" to={`/standings?league=${selectedSportOption.leagueAbbreviation}`}>View {selectedSportOption.leagueAbbreviation} standings ↗</Link></div><label className="search-field"><span className="sr-only">Search teams</span><input type="search" placeholder="Search a team…" value={searchParams.get("search") || ""} onChange={e=>updateSelection("search",e.target.value)}/></label></div><div className="match-filter">
+      <div className="fixtures-heading"><div><span className="section-kicker">THE BOARD</span><h2>{selectedSportOption.leagueAbbreviation} matchups</h2><Link className="standings-inline-link" to={`/standings?league=${selectedSportOption.leagueAbbreviation}`}>View {selectedSportOption.leagueAbbreviation} standings ↗</Link></div><div className="board-controls"><label className="search-field"><span className="sr-only">Search teams</span><input type="search" placeholder="Search a team…" value={searchParams.get("search") || ""} onChange={e=>updateSelection("search",e.target.value)}/></label><div className="match-filter">
         <label htmlFor="match-status">Match status</label>
         <select
           id="match-status"
@@ -256,9 +256,7 @@ function Dashboard() {
             <option key={item.value} value={item.value}>{item.label}</option>
           ))}
         </select>
-      </div>
-
-      <FixtureRefreshStatus/>
+      </div></div></div>
       <LeagueMatches
         key={`${selectedSportOption.key}-${selectedStatus}-${searchParams.get("search") || ""}-${searchParams.get("offset") || "0"}`}
         returnParams={new URLSearchParams({ ...Object.fromEntries(searchParams), league: selectedSportOption.key, status: selectedStatus })}

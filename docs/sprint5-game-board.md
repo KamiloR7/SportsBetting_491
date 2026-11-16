@@ -46,3 +46,10 @@ Matchday now gives the main paginated slots exclusively to recent in-progress an
 The same local-day boundaries apply to both queries. A PostgreSQL/SQLite regression confirms the upcoming query excludes finals and old history before pagination, while the separate results query includes only today's finals. Latest focused matchday/reset/refresh checks: 20 passed, 1 skipped (SQLite row-lock concurrency).
 
 Match cards now use deterministic team-colored gradients, decorative initial shields (not official team logos), larger colored odds tiles, and a prominent action footer. Completed cards are quieter. A lone fixture fills its row. The headline retains the exact requested second line, Make you call.
+
+
+## Compact board and clean color refinements
+
+The board puts team search and the status filter beside the league heading on wider screens, and wraps them below it on narrow screens. The game count and provider refresh details share one compact metadata row; the previous full-width refresh panel is removed. Search/status labels remain accessible and delayed-update warnings are retained. Date headers and the space below sport tabs are tighter, bringing match cards closer to the controls.
+
+A smooth blue/purple/teal background and colored surface borders add contrast without decorative field artwork. Match cards retain their actual team colors. Frontend production build and lint passed; the running NFL board was visually checked. Evidence: `docs/evidence/compact-match-board.jpg`.
