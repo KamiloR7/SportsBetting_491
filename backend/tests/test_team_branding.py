@@ -4,6 +4,7 @@ from app.services.team_branding import team_brand,match_brand_fields,clean_color
 
 
 def test_known_teams_and_historical_names_resolve_to_the_same_verified_profile():
+    assert team_brand("MLB","D-backs")["name"]=="Arizona Diamondbacks"
     bengals=team_brand("National Football League","Cincinnati Bengals")
     assert bengals["primary_color"]=="#fb4f14"
     assert urlsplit(bengals["logo_url"]).netloc=="a.espncdn.com"

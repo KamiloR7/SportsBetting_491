@@ -8,6 +8,7 @@ from pathlib import Path
 from fastapi.routing import iter_route_contexts
 
 PUBLIC = {
+    ("GET", "/standings/{league}"): "Public cached provider league standings; no user, wallet or prediction writes.",
     ("POST", "/predictions/replay"): "Public historical inference from prior-day results; no account writes.",
     ("GET", "/insights/evaluation"): "Public aggregate baseline metrics; no account or model-path disclosure.",
     ("GET", "/matches/{match_id}/markets"): "Public virtual-point markets; betting opt-in required. Model-pricing mode refreshes only quote/price records under match and market locks.",

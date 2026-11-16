@@ -24,6 +24,7 @@ def normalize_team(league,team):
     # The historical Oakland name is the same Athletics franchise. Images and
     # colors describe the current provider profile, not a period-specific kit.
     if league=="MLB" and team.get("displayName")=="Athletics":aliases.append("Oakland Athletics")
+    if league=="MLB" and team.get("displayName")=="Arizona Diamondbacks":aliases.append("D-backs")
     logos=team.get("logos",[])
     logo=next((clean_logo(item.get("href")) for item in logos if "default" in item.get("rel",[]) and clean_logo(item.get("href"))),None)
     if logo is None:logo=next((clean_logo(item.get("href")) for item in logos if clean_logo(item.get("href"))),None)

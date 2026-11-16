@@ -6,6 +6,7 @@ import Dashboard from "./pages/DashBoard";
 import MatchDetails from "./pages/MatchDetails";
 import ModelInsightsPage from "./pages/ModelInsightsPage";
 import AccountPage from "./pages/AccountPage";
+import StandingsPage from "./pages/StandingsPage";
 import ParlayBuilder from "./pages/ParlayBuilder";
 
 import "./App.css";
@@ -19,6 +20,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/matches/:id" element={<MatchDetails />} />
+        <Route path="/standings" element={<StandingsPage />} />
         <Route path="/insights" element={<ModelInsightsPage />} />
         <Route path="/parlay" element={<ParlayBuilder />} />
         <Route path="/bets/active" element={<AccountPage key="active" tab="active" />} />

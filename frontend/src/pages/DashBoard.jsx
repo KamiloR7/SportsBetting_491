@@ -245,7 +245,7 @@ function Dashboard() {
         ))}
       </div>
 
-      <div className="fixtures-heading"><div><span className="section-kicker">THE BOARD</span><h2>{selectedSportOption.leagueAbbreviation} matchups</h2></div><label className="search-field"><span className="sr-only">Search teams</span><input type="search" placeholder="Search a team…" value={searchParams.get("search") || ""} onChange={e=>updateSelection("search",e.target.value)}/></label></div><div className="match-filter">
+      <div className="fixtures-heading"><div><span className="section-kicker">THE BOARD</span><h2>{selectedSportOption.leagueAbbreviation} matchups</h2><Link className="standings-inline-link" to={`/standings?league=${selectedSportOption.leagueAbbreviation}`}>View {selectedSportOption.leagueAbbreviation} standings ↗</Link></div><label className="search-field"><span className="sr-only">Search teams</span><input type="search" placeholder="Search a team…" value={searchParams.get("search") || ""} onChange={e=>updateSelection("search",e.target.value)}/></label></div><div className="match-filter">
         <label htmlFor="match-status">Match status</label>
         <select
           id="match-status"

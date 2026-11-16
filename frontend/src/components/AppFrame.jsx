@@ -1,7 +1,7 @@
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getParlayDraft } from "../services/parlayDraft";
-const tabs=[["/dashboard","Explore games","◈"],["/insights","Model insights","◎"],["/parlay","Parlay builder","⊕"],["/bets/active","Active bets","◷"],["/bets/history","Bet history","≡"],["/wallet","Wallet activity","◇"]];
+const tabs=[["/dashboard","Explore games","◈"],["/standings","Standings","▤"],["/insights","Model insights","◎"],["/parlay","Parlay builder","⊕"],["/bets/active","Active bets","◷"],["/bets/history","Bet history","≡"],["/wallet","Wallet activity","◇"]];
 export default function AppFrame({children}){
  const location=useLocation(),[count,setCount]=useState(()=>getParlayDraft().length);
  useEffect(()=>{const target=location.hash?document.getElementById(location.hash.slice(1)):null;if(target)target.scrollIntoView();else window.scrollTo(0,0);},[location.pathname,location.hash]);

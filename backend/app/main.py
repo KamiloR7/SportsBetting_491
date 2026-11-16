@@ -4,6 +4,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.exception_handlers import request_validation_exception_handler
 from fastapi.responses import JSONResponse
 
+from app.routes.standings import router as standings_router
 from app.routes.parlays import router as parlay_router
 from app.routes.virtual_betting import router as betting_router
 from app.routes.auth import router as auth_router
@@ -35,6 +36,7 @@ app = FastAPI(
     version="0.1.0",
 )
 
+app.include_router(standings_router)
 app.include_router(parlay_router)
 app.include_router(betting_router)
 app.include_router(sports_router)
