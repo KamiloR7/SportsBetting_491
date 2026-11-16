@@ -22,16 +22,20 @@ def locked_wallet(db, user_id):
     return db.execute(select(wallets).where(wallets.c.user_id == user_id).with_for_update()).mappings().one()
 
 
-def topup(db, user_id, key):
+def topup(db, user_id, key, amount=1000):
+    if type(amount) is not int or not 1 <= amount <= 1_000_000:
+        raise HTTPException(422, "Enter a whole-point amount between 1 and 1,000,000.")
     wallet = locked_wallet(db, user_id)
     reference = 'topup:' + key
     previous = db.execute(select(transactions).where(transactions.c.user_id == user_id,
                                                     transactions.c.reference == reference)).mappings().first()
+    if previous and previous["amount"] != amount:
+        raise HTTPException(409, "This refill key was already used for a different amount.")
     if not previous:
-        if wallet['balance'] > 2_000_000_000 - 1000:
+        if wallet['balance'] > 2_000_000_000 - amount:
             raise HTTPException(409, 'Demo balance limit reached.')
-        db.execute(update(wallets).where(wallets.c.user_id == user_id).values(balance=wallet['balance'] + 1000))
-        db.execute(insert(transactions).values(user_id=user_id, amount=1000, kind='DEMO_TOPUP', reference=reference))
+        db.execute(update(wallets).where(wallets.c.user_id == user_id).values(balance=wallet['balance'] + amount))
+        db.execute(insert(transactions).values(user_id=user_id, amount=amount, kind='DEMO_TOPUP', reference=reference))
     db.commit()
     return {'balance': db.execute(select(wallets.c.balance).where(wallets.c.user_id == user_id)).scalar_one(),
             'currency': 'virtual_points'}
@@ -55,6 +59,11 @@ def place_bet(db, user_id, request):
     if start.tzinfo is None: start = start.replace(tzinfo=timezone.utc)
     if match['status'] != 'scheduled' or start <= datetime.now(timezone.utc) or not market or not market['is_open']:
         raise HTTPException(409, 'Betting is closed for this match.')
+    from app.core.config import settings
+    quote = None
+    if settings.MODEL_ODDS_ENABLED:
+        from app.services.model_odds import ensure_quote
+        quote = ensure_quote(db, match, market)
     outcome = db.execute(select(outcomes).where(outcomes.c.id == request.outcome_id,
                                                outcomes.c.market_id == market['id'])).mappings().first()
     if not outcome or match['abbreviation'] not in {'EPL','NFL','MLB'} or (outcome['selection'] == 'draw' and match['abbreviation'] != 'EPL'):
@@ -64,11 +73,16 @@ def place_bet(db, user_id, request):
         raise HTTPException(409, 'Odds changed or are unavailable. Refresh the market.')
     if wallet['balance'] < request.stake:
         raise HTTPException(409, 'Insufficient virtual points.')
+    if start <= datetime.now(timezone.utc):
+        raise HTTPException(409, "Betting is closed for this match.")
     payout = int((Decimal(request.stake) * odds).to_integral_value(rounding=ROUND_DOWN))
     row = db.execute(insert(bets).values(user_id=user_id, match_id=request.match_id,
         outcome_id=request.outcome_id, selection=outcome['selection'], stake=request.stake,
         accepted_odds=odds, potential_payout=payout, status='PENDING', request_key=request.request_key)
         .returning(*bets.c)).mappings().one()
+    if quote is not None:
+        from app.database.model_odds_tables import bet_quotes
+        db.execute(insert(bet_quotes).values(bet_id=row["id"], quote_id=quote["id"]))
     db.execute(update(wallets).where(wallets.c.user_id == user_id).values(balance=wallet['balance']-request.stake))
     db.execute(insert(transactions).values(user_id=user_id, amount=-request.stake, kind='STAKE', reference=f"bet:{row['id']}:stake"))
     db.commit()
@@ -97,6 +111,14 @@ def settle_match(db, match_id, home_score=None, away_score=None, void=False):
     winner = 'draw' if void or home_score == away_score else ('home' if home_score > away_score else 'away')
     pending = db.execute(select(bets).where(bets.c.match_id == match_id, bets.c.status == 'PENDING')
                          .order_by(bets.c.user_id, bets.c.id).with_for_update()).mappings().all()
+    from app.core.config import settings
+    affected_parlays = []
+    if settings.PARLAYS_ENABLED:
+        from app.services.parlays import prepare_settlement
+        affected_parlays = prepare_settlement(db, match_id, winner, refund)
+    # A single global wallet order covers both single bets and all affected parlays.
+    for user_id in sorted({bet["user_id"] for bet in pending} | {row["user_id"] for row in affected_parlays}):
+        locked_wallet(db, user_id)
     for bet in pending:
         wallet = locked_wallet(db, bet['user_id'])
         status = 'VOID' if refund else ('WON' if bet['selection'] == winner else 'LOST')
@@ -106,6 +128,9 @@ def settle_match(db, match_id, home_score=None, away_score=None, void=False):
             db.execute(update(wallets).where(wallets.c.user_id == bet['user_id']).values(balance=wallet['balance'] + amount))
             db.execute(insert(transactions).values(user_id=bet['user_id'], amount=amount, kind='REFUND' if refund else 'PAYOUT', reference=f"bet:{bet['id']}:settlement"))
         db.execute(update(bets).where(bets.c.id == bet['id']).values(status=status))
+    if settings.PARLAYS_ENABLED:
+        from app.services.parlays import finish_settlement
+        finish_settlement(db, affected_parlays)
     db.execute(update(markets).where(markets.c.match_id == match_id).values(is_open=False))
     if not already_completed:
         db.execute(text('UPDATE matches SET status=:status, home_score=:home, away_score=:away WHERE id=:id'),

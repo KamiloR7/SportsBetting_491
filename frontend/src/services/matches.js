@@ -9,6 +9,10 @@ export function getMatches(leagueId, filters = {}, options = {}) {
     league_id: String(leagueId),
   });
 
+  params.set("limit", String(filters.limit || 30));
+  params.set("offset", String(filters.offset || 0));
+  if (filters.search) params.set("search", filters.search);
+  if (filters.status === "final") params.set("order", "desc");
   if (filters.status) {
     params.set("status", filters.status);
   }
@@ -16,9 +20,9 @@ export function getMatches(leagueId, filters = {}, options = {}) {
   return apiRequest(`/matches?${params.toString()}`, options);
 }
 
-export function getMatchHistory(leagueId, teamId, limit = 3, options = {}) {
+export function getMatchHistory(leagueId, teamId, limit = 3, options = {}, before = null) {
   return apiRequest(
-    `/matches/history?league_id=${encodeURIComponent(leagueId)}&team_id=${encodeURIComponent(teamId)}&limit=${encodeURIComponent(limit)}`,
+    `/matches/history?league_id=${encodeURIComponent(leagueId)}&team_id=${encodeURIComponent(teamId)}&limit=${encodeURIComponent(limit)}${before ? `&before=${encodeURIComponent(before)}` : ""}`,
     options,
   );
 }

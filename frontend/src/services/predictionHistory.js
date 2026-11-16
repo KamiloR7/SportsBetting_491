@@ -21,7 +21,7 @@ export function savePredictionToHistory(prediction) {
   };
 
   try {
-    const history = [entry, ...readStoredHistory()].slice(0, MAX_HISTORY_ITEMS);
+    const history = [entry, ...readStoredHistory().filter(item => !(item.match_id === entry.match_id && item.model_version === entry.model_version))].slice(0, MAX_HISTORY_ITEMS);
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
     return history;
   } catch {

@@ -1,26 +1,17 @@
 const BASE_URL = (import.meta.env.VITE_API_URL || "/api").replace(/\/$/, "");
-
 export async function apiRequest(endpoint, options = {}) {
   let response;
-  try {
-    response = await fetch(`${BASE_URL}${endpoint}`, options);
-  } catch (error) {
-    if (error.name === "AbortError") throw error;
-    throw new Error("Unable to connect to the server. Please try again later.", { cause: error });
-  }
-
+  try { response = await fetch(`${BASE_URL}${endpoint}`, { credentials: "same-origin", ...options }); }
+  catch (error) { if (error.name === "AbortError") throw error; throw new Error("Cannot reach the backend.", {cause:error}); }
   if (!response.ok) {
     const payload = await response.json().catch(() => null);
-    const detail = typeof payload?.detail === "string" ? payload.detail : null;
-    if (response.status === 404) throw new Error("The requested item was not found.");
-    if (response.status === 422) throw new Error(detail || "This request is not valid.");
-    if (response.status === 503) throw new Error(detail || "This service is unavailable right now. Please try again later.");
-    throw new Error("The server could not load this data. Please try again later.");
+    const message = typeof payload?.detail === "string" ? payload.detail : "Request failed. Check your input and try again.";
+    const error = new Error(message); error.status = response.status; throw error;
   }
-
-  try {
-    return await response.json();
-  } catch {
-    throw new Error("The server returned an unexpected response. Please try again later.");
-  }
+  if (response.status === 204) return null;
+  return response.json();
+}
+export async function mutation(endpoint, body) {
+  const { csrf_token } = await apiRequest("/auth/csrf");
+  return apiRequest(endpoint, { method: "POST", headers: { "Content-Type": "application/json", "X-CSRF-Token": csrf_token }, body: JSON.stringify(body) });
 }

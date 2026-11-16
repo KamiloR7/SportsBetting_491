@@ -1,4 +1,5 @@
-from typing import List, Literal, Optional
+from typing import Annotated, List, Literal, Optional
+from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from sqlalchemy import text
@@ -40,6 +41,10 @@ def _match_from_row(row) -> MatchOut:
 def list_matches(
     league_id: Optional[int] = Query(default=None, ge=1),
     status: Optional[MatchStatus] = None,
+    limit: Annotated[int, Query(ge=1, le=200)] = 100,
+    offset: Annotated[int, Query(ge=0, le=100000)] = 0,
+    search: Annotated[str, Query(max_length=100)] = "",
+    order: Literal["asc", "desc"] = "asc",
     db: Session = Depends(get_db),
 ):
     try:
@@ -65,12 +70,15 @@ def list_matches(
                 LEFT JOIN teams at ON at.id = m.away_team_id
                 WHERE (:league_id IS NULL OR m.league_id = :league_id)
                   AND (:status IS NULL OR m.status = :status)
-                ORDER BY m.start_time
+                  AND (:search = '' OR LOWER(ht.name) LIKE :pattern OR LOWER(at.name) LIKE :pattern)
+                ORDER BY CASE WHEN :descending THEN m.start_time END DESC, m.start_time, m.id
+                LIMIT :limit OFFSET :offset
                 """
             ),
             {
                 "league_id": league_id,
                 "status": status,
+                "limit": limit, "offset": offset, "search": search, "pattern": "%" + search.lower() + "%", "descending": order == "desc",
             },
         ).all()
     except OperationalError:
@@ -84,8 +92,11 @@ def match_history(
     league_id: Optional[int] = Query(default=None, ge=1),
     team_id: Optional[int] = Query(default=None, ge=1),
     limit: int = Query(default=100, ge=1, le=500),
+    before: Optional[datetime] = None,
     db: Session = Depends(get_db),
 ):
+    if before is not None and before.tzinfo is None:
+        raise HTTPException(422, "History cutoff must include a timezone.")
     try:
         rows = db.execute(
             text(
@@ -110,6 +121,7 @@ def match_history(
                 WHERE m.status = 'final'
                   AND (:league_id IS NULL OR m.league_id = :league_id)
                   AND (:team_id IS NULL OR m.home_team_id = :team_id OR m.away_team_id = :team_id)
+                  AND (:before IS NULL OR m.start_time < :before)
                 ORDER BY m.start_time DESC
                 LIMIT :limit
                 """
@@ -118,6 +130,7 @@ def match_history(
                 "league_id": league_id,
                 "team_id": team_id,
                 "limit": limit,
+                "before": before,
             },
         ).all()
     except OperationalError:

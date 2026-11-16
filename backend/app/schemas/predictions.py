@@ -35,6 +35,8 @@ class PredictionResponse(BaseModel):
     confidence: float = Field(ge=0, le=1)
     model_version: str
     history: PredictionHistory
+    outcome_probabilities: dict[str, float] | None = None
+    market_outcome: str | None = None
 
 
 class PredictionOut(BaseModel):

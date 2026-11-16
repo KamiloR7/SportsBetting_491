@@ -1,3 +1,5 @@
+import BetSlip from "../components/BetSlip";
+import AccountPanel from "../components/AccountPanel";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import MatchSummary from "../components/MatchSummary";
@@ -79,8 +81,8 @@ function HistoricalTeamContext({ match }) {
     }
 
     Promise.all([
-      getMatchHistory(match.league_id, match.home_team_id),
-      getMatchHistory(match.league_id, match.away_team_id),
+      getMatchHistory(match.league_id, match.home_team_id, 3, {}, new Date(match.start_time).toISOString().slice(0,10)+"T00:00:00Z"),
+      getMatchHistory(match.league_id, match.away_team_id, 3, {}, new Date(match.start_time).toISOString().slice(0,10)+"T00:00:00Z"),
     ])
       .then(([homeHistory, awayHistory]) => {
         if (!ignore) {
@@ -106,7 +108,7 @@ function HistoricalTeamContext({ match }) {
     return () => {
       ignore = true;
     };
-  }, [match.id, match.league_id, match.home_team_id, match.away_team_id]);
+  }, [match.id, match.league_id, match.home_team_id, match.away_team_id, match.start_time]);
 
   if (result.loading) {
     return <p role="status">Loading team history...</p>;
@@ -134,7 +136,7 @@ function HistoricalTeamContext({ match }) {
   );
 }
 
-function MatchData({ id }) {
+function MatchData({ id, searchParams }) {
   const [result, setResult] = useState({ loading: true, match: null, error: "" });
 
   useEffect(() => {
@@ -156,22 +158,28 @@ function MatchData({ id }) {
   if (result.error) return <p role="alert">{result.error}</p>;
   if (!result.match) return <p role="status">This match is unavailable.</p>;
 
+  const leagueName = result.match.league_name || "";
+  const inferredLeague = /Premier|EPL/i.test(leagueName) ? "soccer" : /Baseball|MLB/i.test(leagueName) ? "baseball" : "football";
+  const league = ["football", "baseball", "soccer"].includes(searchParams.get("league")) ? searchParams.get("league") : inferredLeague;
+  const leagueLabel = { football: "NFL", baseball: "MLB", soccer: "EPL" }[league];
+  const backParams = new URLSearchParams({ league, status: searchParams.get("status") || result.match.status });
+  for (const key of ["search", "offset"]) if (searchParams.has(key)) backParams.set(key, searchParams.get(key));
   return (
     <>
+      <Link className="back-to-board" to={`/dashboard?${backParams}`}><span aria-hidden="true">←</span><span>Back to {leagueLabel} games<small>Your game list, right where you left it</small></span></Link>
+      <h1>Match center.</h1>
       <div className="match-details-summary">
         <MatchSummary match={result.match} />
       </div>
-      <section className="match-details-context" aria-labelledby="match-context-heading">
-        <h2 id="match-context-heading">Match context</h2>
-        <p>Neutral site: {result.match.neutral_site === true
-          ? "Yes"
-          : result.match.neutral_site === false ? "No" : "Unavailable"}</p>
-      </section>
+      <div className="match-details-grid">
+        <PredictionPanel key={result.match.id} matchId={result.match.id} replay={result.match.status === "final"} />
+        <BetSlip key={`bet-${result.match.id}`} match={result.match} />
+      </div>
       <section className="match-details-context" aria-labelledby="team-context-heading">
-        <h2 id="team-context-heading">Historical team context</h2>
+        <span className="section-kicker">BEFORE THE WHISTLE</span>
+        <h2 id="team-context-heading">Recent form before this match</h2>
         <HistoricalTeamContext key={result.match.id} match={result.match} />
       </section>
-      <PredictionPanel matchId={result.match.id} />
     </>
   );
 }
@@ -179,15 +187,11 @@ function MatchData({ id }) {
 function MatchDetails() {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
-  const returnToMatches = searchParams.size
-    ? `/dashboard?${searchParams.toString()}`
-    : "/dashboard";
   return (
     <div className="match-details">
       <DemoNotice />
-      <Link to={returnToMatches}>Back to matches</Link>
-      <h1>Match details</h1>
-      <MatchData key={id} id={id} />
+      <AccountPanel />
+      <MatchData key={id} id={id} searchParams={searchParams} />
     </div>
   );
 }

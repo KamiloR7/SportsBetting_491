@@ -3,6 +3,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.exception_handlers import request_validation_exception_handler
 from fastapi.responses import JSONResponse
 
+from app.routes.parlays import router as parlay_router
 from app.routes.virtual_betting import router as betting_router
 from app.routes.auth import router as auth_router
 from app.routes.auth_sessions import router as auth_sessions_router
@@ -17,6 +18,7 @@ app = FastAPI(
     version="0.1.0",
 )
 
+app.include_router(parlay_router)
 app.include_router(betting_router)
 app.include_router(sports_router)
 app.include_router(auth_router)
@@ -36,3 +38,26 @@ async def redact_auth_validation(request: Request, exc: RequestValidationError):
 @app.get("/health")
 def health_check(request: Request):
     return {"status": "ok", "data_mode": getattr(request.app.state, "data_mode", "database")}
+
+
+@app.get("/insights/evaluation")
+def evaluation_insights():
+    import json
+    from pathlib import Path
+    from fastapi import HTTPException
+    path = Path(__file__).resolve().parents[2] / "build" / "sprint2-models" / "report.json"
+    from app.core.config import settings
+    if settings.MODEL_ODDS_ENABLED:
+        manifest_path = settings.MARKET_MODEL_DIRECTORY / "manifest.json"
+        if not manifest_path.is_file():
+            raise HTTPException(503, "Pricing model evaluation is unavailable.")
+        manifest = json.loads(manifest_path.read_text())
+        return {"target": "sport_aware_match_winner", "pricing_models": True,
+                "sports": [{"sport": sport, "accuracy": item["metrics"]["accuracy"],
+                            "test_rows": item["metrics"]["test_rows"],
+                            "baseline_accuracy": item["metrics"].get("majority_baseline_accuracy"),
+                            "classes": item["classes"]} for sport, item in manifest["sports"].items()]}
+    if not path.is_file():
+        raise HTTPException(503, "No evaluated baseline report is available.")
+    report = json.loads(path.read_text())
+    return {"target":"home_win_vs_not_home_win", "sports":[{"sport":sport,"accuracy":item["metrics"]["accuracy"],"test_rows":item["metrics"]["test_rows"],"baseline_accuracy":item["metrics"]["training_prevalence_baseline"]["accuracy"]} for sport,item in report["sports"].items()]}

@@ -1,6 +1,7 @@
 """Prediction orchestration from stored matchup history to API response."""
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from dataclasses import dataclass
 from functools import lru_cache
 
@@ -34,6 +35,10 @@ class PredictionUnavailableError(PredictionServiceError):
     pass
 
 
+class InsufficientHistoryError(PredictionUnavailableError):
+    pass
+
+
 @dataclass(frozen=True)
 class MatchContext:
     match_id: int
@@ -45,6 +50,7 @@ class MatchContext:
     features: dict[str, float]
     home_history_games: int
     away_history_games: int
+    feature_cutoff: datetime | None = None
 
 
 class MatchHistoryRepository:
@@ -57,7 +63,7 @@ class MatchHistoryRepository:
         match = self.db.execute(
             text(
                 """
-                SELECT m.id, m.start_time, l.abbreviation AS sport,
+                SELECT m.id, m.start_time, m.league_id, l.abbreviation AS sport,
                        ht.id AS home_team_id, ht.name AS home_team_name,
                        at.id AS away_team_id, at.name AS away_team_name
                 FROM matches m
@@ -76,12 +82,20 @@ class MatchHistoryRepository:
         if sport not in SUPPORTED_SPORTS:
             raise UnsupportedSportError(f"Predictions are not supported for {sport or 'this league'}")
 
+        kickoff = match.start_time
+        if isinstance(kickoff, str):
+            kickoff = datetime.fromisoformat(kickoff.replace("Z", "+00:00"))
+        if kickoff.tzinfo is None:
+            kickoff = kickoff.replace(tzinfo=timezone.utc)
+        cutoff = kickoff.astimezone(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+
         games = self.db.execute(
             text(
                 """
                 SELECT home_team_id, away_team_id, home_score, away_score
                 FROM matches
                 WHERE status = 'final'
+                  AND league_id = :league_id
                   AND start_time < :start_time
                   AND (home_team_id IN (:home_team_id, :away_team_id)
                        OR away_team_id IN (:home_team_id, :away_team_id))
@@ -89,7 +103,8 @@ class MatchHistoryRepository:
                 """
             ),
             {
-                "start_time": match.start_time,
+                "start_time": cutoff,
+                "league_id": match.league_id,
                 "home_team_id": match.home_team_id,
                 "away_team_id": match.away_team_id,
             },
@@ -97,6 +112,8 @@ class MatchHistoryRepository:
 
         home_stats = self._team_stats(games, match.home_team_id)
         away_stats = self._team_stats(games, match.away_team_id)
+        if not home_stats[0] or not away_stats[0]:
+            raise InsufficientHistoryError("Both teams need completed prior-day history. Try a more recent match.")
         features = {
             "home_win_rate": home_stats[1] / home_stats[0] if home_stats[0] else 0.0,
             "away_win_rate": away_stats[1] / away_stats[0] if away_stats[0] else 0.0,
@@ -115,6 +132,7 @@ class MatchHistoryRepository:
             features=features,
             home_history_games=home_stats[0],
             away_history_games=away_stats[0],
+            feature_cutoff=cutoff,
         )
 
     @staticmethod
@@ -137,23 +155,36 @@ class MatchHistoryRepository:
 
 
 class PredictionService:
-    def __init__(self, registry: ModelRegistry, repository: MatchHistoryRepository):
+    def __init__(self, registry: ModelRegistry, repository: MatchHistoryRepository, market_models=None):
         self.registry = registry
         self.repository = repository
+        self.market_models = market_models
 
     def predict(self, match_id: int) -> PredictionResponse:
         context = self.repository.get_context(match_id)
+        distribution = None
         try:
-            model, metadata = self.registry.get(context.sport)
-            frame = pd.DataFrame([context.features], columns=FEATURE_COLUMNS)
-            result = predict_outcomes(model, frame).iloc[0]
-        except (ModelRegistryError, ValueError, TypeError) as exc:
+            if self.market_models is not None:
+                distribution, metadata = self.market_models.predict(context)
+                home_probability = distribution["home"]
+                not_home_probability = 1 - home_probability
+                home_win = home_probability >= 0.5
+            else:
+                model, metadata = self.registry.get(context.sport)
+                train_end = metadata.get("train_end")
+                if context.feature_cutoff is not None and train_end is not None:
+                    if pd.Timestamp(train_end) >= pd.Timestamp(context.feature_cutoff):
+                        raise PredictionUnavailableError("This model was trained after the selected match. Use historical replay.")
+                frame = pd.DataFrame([context.features], columns=FEATURE_COLUMNS)
+                result = predict_outcomes(model, frame).iloc[0]
+                home_probability = float(result["probability_home_win"])
+                not_home_probability = float(result["probability_not_home_win"])
+                home_win = int(result["predicted_outcome"]) == 1
+        except (ModelRegistryError, ValueError, TypeError, KeyError, OSError) as exc:
             raise PredictionUnavailableError(str(exc)) from exc
 
-        home_probability = float(result["probability_home_win"])
-        not_home_probability = float(result["probability_not_home_win"])
-        home_win = int(result["predicted_outcome"]) == 1
         return PredictionResponse(
+            **({"outcome_probabilities": distribution, "market_outcome": max(distribution, key=distribution.get)} if distribution else {}),
             match_id=context.match_id,
             sport=context.sport,
             home_team_id=context.home_team_id,
@@ -184,4 +215,8 @@ def get_model_registry() -> ModelRegistry:
 
 
 def get_prediction_service(db: Session) -> PredictionService:
+    from app.core.config import settings
+    if settings.MODEL_ODDS_ENABLED:
+        from app.services.model_odds import configured_registry
+        return PredictionService(None, MatchHistoryRepository(db), market_models=configured_registry())
     return PredictionService(get_model_registry(), MatchHistoryRepository(db))

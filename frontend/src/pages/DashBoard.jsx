@@ -1,3 +1,5 @@
+import ModelInsights from "../components/ModelInsights";
+import AccountPanel from "../components/AccountPanel";
 
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
@@ -46,12 +48,15 @@ function EmptyUpcomingMatches({ sportOption, status }) {
   return (
     <section className="empty-state" role="status">
       <h2>No {status === "scheduled" ? "upcoming " : ""}{sportOption.leagueAbbreviation} matches</h2>
-      <p>Check back when the next schedule is available.</p>
+      <p>{status === "scheduled" ? "There are no upcoming fixtures in the current provider window. You can still replay completed matches and explore past results." : "Try another status or search for a different team."}</p>
+      <Link to={`/dashboard?league=${sportOption.key}&status=final`}>Explore completed matches →</Link>
     </section>
   );
 }
 
-function LeagueMatches({ sportOption, status }) {
+const PAGE_SIZE = 12;
+
+function LeagueMatches({ sportOption, status, search, offset, onPage, returnParams }) {
   const [result, setResult] = useState({
     loading: true,
     matches: [],
@@ -72,7 +77,7 @@ function LeagueMatches({ sportOption, status }) {
           throw new Error(`${sportOption.leagueAbbreviation} is currently unavailable.`);
         }
 
-        const matches = await getMatches(league.id, { status });
+        const matches = await getMatches(league.id, { status, search, offset, limit: PAGE_SIZE });
 
         if (!ignore) {
           setResult({
@@ -97,7 +102,7 @@ function LeagueMatches({ sportOption, status }) {
     return () => {
       ignore = true;
     };
-  }, [sportOption.leagueAbbreviation, status]);
+  }, [sportOption.leagueAbbreviation, status, search, offset]);
 
   if (result.loading) {
     return <p role="status">Loading {sportOption.leagueAbbreviation} matches...</p>;
@@ -113,18 +118,18 @@ function LeagueMatches({ sportOption, status }) {
     );
   }
 
-  return (
-    <div className="match-grid">
-      {result.matches.map((match) => (
-        <MatchCard
-          key={match.id}
-          match={match}
-          league={sportOption.key}
-          status={status}
-        />
-      ))}
-    </div>
-  );
+  const groups = new Map();
+  result.matches.forEach(match => {
+    const day = new Date(match.start_time).toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+    if (!groups.has(day)) groups.set(day, []);
+    groups.get(day).push(match);
+  });
+  return <>
+    <div className="results-toolbar"><span>{result.matches.length} games · {sportOption.leagueAbbreviation}</span><span>Your local time · {status === "in_progress" ? "No live score feed" : "Grouped by game day"}</span></div>
+    <div className="fixture-days">{[...groups].map(([day, matches]) => <section className="fixture-day" key={day} aria-label={day}><div className="fixture-day-heading"><h3>{day}</h3><span>{matches.length} {matches.length === 1 ? "game" : "games"}</span></div><div className="match-grid">{matches.map(match => <MatchCard key={match.id} match={match} returnParams={returnParams} />)}</div></section>)}</div>
+    <div className="pagination"><button disabled={offset === 0} onClick={() => onPage(Math.max(0, offset - PAGE_SIZE))}>← Previous</button><span>Page {Math.floor(offset / PAGE_SIZE) + 1}</span><button disabled={result.matches.length < PAGE_SIZE} onClick={() => onPage(offset + PAGE_SIZE)}>Next →</button></div>
+  </>;
+
 }
 
 function PredictionHistory() {
@@ -153,7 +158,7 @@ function PredictionHistory() {
                     {prediction.home_team_name || "Home team"} vs {prediction.away_team_name || "Away team"}
                     {prediction.sport ? ` · ${prediction.sport}` : ""}
                   </p>
-                  <p>Outcome: {predictedHomeWin ? "Home win" : "Not a home win"}</p>
+                  <p>{prediction.mode === "historical_replay" ? "Historical replay" : "Pregame forecast"} · Outcome: {predictedHomeWin ? "Home win" : "Not a home win"}{prediction.mode === "historical_replay" ? (prediction.correct ? " · Matched result" : " · Missed result") : ""}</p>
                   <p>
                     Home win {Math.round((prediction.probabilities?.home_win ?? 0) * 100)}%
                     {" · "}
@@ -184,15 +189,17 @@ function Dashboard() {
   function updateSelection(key, value) {
     const nextParams = new URLSearchParams(searchParams);
     nextParams.set(key, value);
+    if(key !== "offset") nextParams.delete("offset");
     setSearchParams(nextParams);
   }
 
   return (
     <div className="dashboard">
       <DemoNotice />
+      <AccountPanel />
       <header className="dashboard-header">
-        <h1>Matches</h1>
-        <p>Select a sport and match status to browse available matches.</p>
+        <div className="eyebrow"><span/> THE MATCHDAY DESK</div><h1>Every game.<br/><em>A different edge.</em></h1>
+        <p>Explore the fixtures. Read the model. Make your pick.</p><div className="hero-label">NFL <span>•</span> MLB <span>•</span> PREMIER LEAGUE</div>
       </header>
 
       <div
@@ -214,7 +221,7 @@ function Dashboard() {
         ))}
       </div>
 
-      <div className="match-filter">
+      <div className="fixtures-heading"><div><span className="section-kicker">THE BOARD</span><h2>{selectedSportOption.leagueAbbreviation} matchups</h2></div><label className="search-field"><span className="sr-only">Search teams</span><input type="search" placeholder="Search a team…" value={searchParams.get("search") || ""} onChange={e=>updateSelection("search",e.target.value)}/></label></div><div className="match-filter">
         <label htmlFor="match-status">Match status</label>
         <select
           id="match-status"
@@ -228,10 +235,16 @@ function Dashboard() {
       </div>
 
       <LeagueMatches
-        key={`${selectedSportOption.key}-${selectedStatus}`}
+        key={`${selectedSportOption.key}-${selectedStatus}-${searchParams.get("search") || ""}-${searchParams.get("offset") || "0"}`}
+        returnParams={new URLSearchParams({ ...Object.fromEntries(searchParams), league: selectedSportOption.key, status: selectedStatus })}
         sportOption={selectedSportOption}
         status={selectedStatus}
+        search={searchParams.get("search") || ""}
+        offset={Math.max(0,Number(searchParams.get("offset"))||0)}
+        onPage={offset=>updateSelection("offset",String(offset))}
       />
+      <div className="insights-link-row"><Link to="/insights">How are predictions and percentages calculated? Explore Model Insights →</Link></div>
+      <ModelInsights />
       <PredictionHistory />
     </div>
   );
