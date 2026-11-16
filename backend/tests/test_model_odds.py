@@ -119,3 +119,75 @@ def test_extreme_valid_probabilities_produce_bounded_prices():
     prices=decimal_prices({"home":1e-100,"draw":.6,"away":.4})
     assert prices["home"]==Decimal("1000.00")
     assert all(Decimal("1.01")<=value<=Decimal("1000.00") for value in prices.values())
+
+
+@pytest.mark.parametrize("saved_quote", [False, True])
+def test_closed_market_model_estimates_are_read_only_and_never_bettable(priced_demo, saved_quote):
+    client,engine,state=priced_demo
+    headers=account(client)
+    if saved_quote:
+        assert client.get("/matches/2/markets").json()[0]["odds_source"]=="model_derived"
+    with engine.begin() as conn:
+        conn.execute(__import__("sqlalchemy").text("UPDATE matches SET status='in_progress',home_score=999,away_score=0 WHERE id=2"))
+    from app.database.betting_tables import outcomes
+    with engine.connect() as conn:
+        prices_before=conn.execute(select(outcomes).order_by(outcomes.c.id)).all()
+        count_before=conn.execute(select(func.count()).select_from(quotes)).scalar_one()
+    response=client.get("/matches/2/markets")
+    assert response.status_code==200,response.text
+    market=response.json()[0]
+    assert market["is_open"] is False
+    assert market["odds_source"]==("model_derived" if saved_quote else "model_reconstructed")
+    assert {o["selection"]:Decimal(str(o["decimal_odds"])) for o in market["outcomes"]}=={"home":Decimal("1.58"),"away":Decimal("2.38")}
+    if not saved_quote:assert "Reconstructed now" in market["preview_note"]
+    result=client.post("/bets",json=payload(match_id=2,outcome_id=21,expected_odds="1.58"),headers=headers)
+    assert result.status_code==409,result.text
+    assert client.get("/wallet").json()["balance"]==1000
+    with engine.connect() as conn:
+        assert conn.execute(select(outcomes).order_by(outcomes.c.id)).all()==prices_before
+        assert conn.execute(select(func.count()).select_from(quotes)).scalar_one()==count_before
+
+
+def test_failed_closed_model_never_disguises_placeholder_as_model_price(priced_demo):
+    client,engine,state=priced_demo
+    with engine.begin() as conn:conn.execute(__import__("sqlalchemy").text("UPDATE matches SET status='in_progress' WHERE id=2"))
+    state["fail"]=True
+    response=client.get("/matches/2/markets")
+    assert response.status_code==200
+    assert response.json()[0]["is_open"] is False
+    assert response.json()[0]["odds_source"] not in {"model_reconstructed","model_derived"}
+    assert response.json()[0]["probabilities"] is None
+
+
+def test_in_progress_without_a_betting_market_gets_display_only_preview(priced_demo):
+    client,engine,state=priced_demo
+    from sqlalchemy import delete,text
+    from app.database.betting_tables import markets,outcomes
+    with engine.begin() as conn:
+        conn.execute(delete(outcomes).where(outcomes.c.market_id==2))
+        conn.execute(delete(markets).where(markets.c.id==2))
+        conn.execute(text("UPDATE matches SET status='in_progress' WHERE id=2"))
+    result=client.get("/matches/2/markets")
+    assert result.status_code==200,result.text
+    preview=result.json()[0]
+    assert preview["market_id"] is None and preview["is_open"] is False
+    assert preview["odds_source"]=="model_reconstructed"
+    assert all(o["id"] is None for o in preview["outcomes"])
+    assert len(preview["outcomes"])==2
+    with engine.connect() as conn:
+        assert conn.execute(select(func.count()).select_from(markets).where(markets.c.match_id==2)).scalar_one()==0
+        assert conn.execute(select(func.count()).select_from(quotes)).scalar_one()==0
+
+
+def test_closed_reconstruction_rejects_a_model_from_after_the_match(priced_demo,monkeypatch):
+    client,engine,state=priced_demo
+    from sqlalchemy import text
+    with engine.begin() as conn:conn.execute(text("UPDATE matches SET status='in_progress' WHERE id=2"))
+    class TooLate:
+        def get(self,sport):return None,{"train_end":"2099-01-01T00:00:00Z"}
+        def predict(self,context):raise AssertionError("A later-trained model must never predict this game")
+    monkeypatch.setattr("app.services.model_odds.configured_registry",lambda:TooLate())
+    result=client.get("/matches/2/markets")
+    assert result.status_code==200
+    assert result.json()[0]["odds_source"] not in {"model_reconstructed","model_derived"}
+    assert result.json()[0]["is_open"] is False

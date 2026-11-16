@@ -252,6 +252,7 @@ def test_local_http_demo_flow(demo):
         assert remote.get('/auth/me').status_code==403
 
 BETTING_PROTECTED = [
+    ("POST", "/wallet/demo-reset", {"request_key":"denied-reset", "confirmation":"RESET"}),
     ('GET','/wallet',None), ('GET','/wallet/transactions',None),
     ('POST','/wallet/demo-topup',{'request_key':'denied-refill'}),
     ('POST','/bets',payload()), ('GET','/bets',None), ('GET','/bets/1',None),

@@ -119,3 +119,22 @@ def ensure_quote(db, match, market):
         margin=Decimal(str(settings.MODEL_ODDS_MARGIN)), probabilities=probabilities, prices=price_values,
         features=context.features, history={"home_games": context.home_history_games, "away_games": context.away_history_games})
         .returning(*quotes.c)).mappings().one()
+
+
+def reconstruct_closed_quote(db, match):
+    """Read-only prior-day estimate, never a recorded offer or in-play quote."""
+    from app.core.config import settings
+    from app.services.prediction_service import MatchHistoryRepository
+    try:
+        context = MatchHistoryRepository(db).get_context(match["id"])
+        registry = configured_registry()
+        _, metadata = registry.get(context.sport)
+        if pd.Timestamp(metadata["train_end"]) >= pd.Timestamp(context.feature_cutoff):
+            raise ValueError("Model includes results from the target day or later")
+        probabilities, metadata = registry.predict(context)
+        prices = decimal_prices(probabilities, settings.MODEL_ODDS_MARGIN)
+    except (ValueError, KeyError, OSError, RuntimeError) as exc:
+        raise HTTPException(503, "A prior-day model estimate is unavailable for this match.") from exc
+    return {"model_version": metadata["artifact_version"], "margin": settings.MODEL_ODDS_MARGIN,
+            "probabilities": probabilities, "prices": {key:str(value) for key,value in prices.items()},
+            "generated_at": datetime.now(timezone.utc)}

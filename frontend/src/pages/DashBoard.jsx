@@ -31,6 +31,7 @@ const SPORT_OPTIONS = [
 
 const DEFAULT_SPORT = SPORT_OPTIONS[0].key;
 const MATCH_STATUSES = [
+  { value: "matchday", label: "Matchday · today first" },
   { value: "scheduled", label: "Upcoming" },
   { value: "in_progress", label: "In progress" },
   { value: "final", label: "Final" },
@@ -45,13 +46,12 @@ function getSportOption(value) {
 }
 
 function EmptyUpcomingMatches({ sportOption, status }) {
-  return (
-    <section className="empty-state" role="status">
-      <h2>No {status === "scheduled" ? "upcoming " : ""}{sportOption.leagueAbbreviation} matches</h2>
-      <p>{status === "scheduled" ? "There are no upcoming fixtures in the current provider window. You can still replay completed matches and explore past results." : "Try another status or search for a different team."}</p>
-      <Link to={`/dashboard?league=${sportOption.key}&status=final`}>Explore completed matches →</Link>
-    </section>
-  );
+  const league = sportOption.leagueAbbreviation;
+  const title = status === "matchday" ? `No ${league} games today, in progress, or coming up.`
+    : status === "in_progress" ? `No ${league} games in progress.`
+    : status === "scheduled" ? `No upcoming ${league} games.`
+    : `No ${league} ${status === "final" ? "completed" : status} games found.`;
+  return <section className="empty-state" role="status"><span className="section-kicker">{league} GAME BOARD</span><h2>{title}</h2><p>{["matchday", "scheduled", "in_progress"].includes(status) ? "No fixtures match this view in the available schedule. You can still explore completed games, results and model replays." : "Try another status or a different team search."}</p><Link to={`/dashboard?league=${sportOption.key}&status=final`}>Explore completed {league} games →</Link></section>;
 }
 
 const PAGE_SIZE = 12;
@@ -79,6 +79,13 @@ function LeagueMatches({ sportOption, status, search, offset, onPage, returnPara
 
         const matches = await getMatches(league.id, { status, search, offset, limit: PAGE_SIZE });
 
+        if (status === "matchday") {
+          const today = new Date(); today.setHours(0, 0, 0, 0);
+          const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
+          if (matches.some(match => Date.parse(match.start_time) < (match.status === "in_progress" ? yesterday : today).getTime())) {
+            throw new Error("The server returned older games for Matchday. Restart the updated backend and refresh this page.");
+          }
+        }
         if (!ignore) {
           setResult({
             loading: false,
@@ -120,13 +127,16 @@ function LeagueMatches({ sportOption, status, search, offset, onPage, returnPara
 
   const groups = new Map();
   result.matches.forEach(match => {
-    const day = new Date(match.start_time).toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+    const date = new Date(match.start_time);
+    const isToday = date.toDateString() === new Date().toDateString();
+    const dateLabel = date.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+    const day = status === "matchday" && match.status === "in_progress" ? "In progress" : `${isToday ? "Today · " : ""}${dateLabel}`;
     if (!groups.has(day)) groups.set(day, []);
     groups.get(day).push(match);
   });
   return <>
-    <div className="results-toolbar"><span>{result.matches.length} games · {sportOption.leagueAbbreviation}</span><span>Your local time · {status === "in_progress" ? "No live score feed" : "Grouped by game day"}</span></div>
-    <div className="fixture-days">{[...groups].map(([day, matches]) => <section className="fixture-day" key={day} aria-label={day}><div className="fixture-day-heading"><h3>{day}</h3><span>{matches.length} {matches.length === 1 ? "game" : "games"}</span></div><div className="match-grid">{matches.map(match => <MatchCard key={match.id} match={match} returnParams={returnParams} />)}</div></section>)}</div>
+    <div className="results-toolbar"><span>{result.matches.length} games · {sportOption.leagueAbbreviation}</span><span>Your local time · {status === "matchday" ? "In progress → Today → Coming up" : status === "in_progress" ? "No live score feed" : "Grouped by game day"}</span></div>
+    <div className="fixture-days">{[...groups].map(([day, matches]) => <section className={`fixture-day ${day === "In progress" ? "day-in-progress" : day.startsWith("Today") ? "day-today" : ""}`} key={day} aria-label={day}><div className="fixture-day-heading"><h3>{day}</h3><span>{matches.length} {matches.length === 1 ? "game" : "games"}</span></div><div className="match-grid">{matches.map(match => <MatchCard key={match.id} match={match} returnParams={returnParams} />)}</div></section>)}</div>
     <div className="pagination"><button disabled={offset === 0} onClick={() => onPage(Math.max(0, offset - PAGE_SIZE))}>← Previous</button><span>Page {Math.floor(offset / PAGE_SIZE) + 1}</span><button disabled={result.matches.length < PAGE_SIZE} onClick={() => onPage(offset + PAGE_SIZE)}>Next →</button></div>
   </>;
 
@@ -184,17 +194,18 @@ function Dashboard() {
   const requestedStatus = searchParams.get("status");
   const selectedStatus = MATCH_STATUSES.some((item) => item.value === requestedStatus)
     ? requestedStatus
-    : "scheduled";
+    : "matchday";
 
   function updateSelection(key, value) {
     const nextParams = new URLSearchParams(searchParams);
     nextParams.set(key, value);
+    if (key === "league") nextParams.set("status", "matchday");
     if(key !== "offset") nextParams.delete("offset");
     setSearchParams(nextParams);
   }
 
   return (
-    <div className="dashboard">
+    <div className={`dashboard board-${selectedSportOption.key}`}>
       <DemoNotice />
       <AccountPanel />
       <header className="dashboard-header">
@@ -215,7 +226,7 @@ function Dashboard() {
             aria-pressed={selectedSportOption.key === option.key}
             onClick={() => updateSelection("league", option.key)}
           >
-            <span className="sport-option-name">{option.sportName}</span>
+            <span className="sport-option-name"><span className="sport-symbol" aria-hidden="true">{option.key === "football" ? "◈" : option.key === "baseball" ? "◉" : "⬡"}</span>{option.sportName}</span>
             <span className="sport-option-league">{option.leagueAbbreviation}</span>
           </button>
         ))}

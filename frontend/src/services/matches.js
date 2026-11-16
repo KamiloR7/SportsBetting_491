@@ -13,7 +13,14 @@ export function getMatches(leagueId, filters = {}, options = {}) {
   params.set("offset", String(filters.offset || 0));
   if (filters.search) params.set("search", filters.search);
   if (filters.status === "final") params.set("order", "desc");
-  if (filters.status) {
+  if (filters.status === "matchday") {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    params.set("view", "matchday");
+    params.set("day_start", start.toISOString());
+    params.set("day_end", end.toISOString());
+  } else if (filters.status) {
     params.set("status", filters.status);
   }
 

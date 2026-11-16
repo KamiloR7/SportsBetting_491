@@ -1,5 +1,5 @@
 from typing import Annotated, List, Literal, Optional
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from sqlalchemy import text
@@ -45,8 +45,18 @@ def list_matches(
     offset: Annotated[int, Query(ge=0, le=100000)] = 0,
     search: Annotated[str, Query(max_length=100)] = "",
     order: Literal["asc", "desc"] = "asc",
+    view: Literal["all", "matchday"] = "all",
+    day_start: Optional[datetime] = None,
+    day_end: Optional[datetime] = None,
     db: Session = Depends(get_db),
 ):
+    if view == "matchday":
+        if (day_start is None or day_end is None or day_start.tzinfo is None or day_end.tzinfo is None
+                or not timedelta(hours=22) <= day_end - day_start <= timedelta(hours=26)):
+            raise HTTPException(422, "Matchday requires timezone-aware local-day boundaries, 22–26 hours apart.")
+        if status is not None:
+            raise HTTPException(422, "Choose matchday or a status filter, not both.")
+        day_start, day_end = day_start.astimezone(timezone.utc), day_end.astimezone(timezone.utc)
     try:
         rows = db.execute(
             text(
@@ -71,7 +81,14 @@ def list_matches(
                 WHERE (:league_id IS NULL OR m.league_id = :league_id)
                   AND (:status IS NULL OR m.status = :status)
                   AND (:search = '' OR LOWER(ht.name) LIKE :pattern OR LOWER(at.name) LIKE :pattern)
-                ORDER BY CASE WHEN :descending THEN m.start_time END DESC, m.start_time, m.id
+                  AND (:matchday = false OR (m.status = 'in_progress' AND m.start_time >= :active_since)
+                       OR (m.start_time >= :day_start AND m.start_time < :day_end)
+                       OR (m.status = 'scheduled' AND m.start_time >= :day_end))
+                ORDER BY CASE WHEN :matchday THEN CASE
+                    WHEN m.status = 'in_progress' THEN 0
+                    WHEN m.start_time >= :day_start AND m.start_time < :day_end THEN 1
+                    ELSE 2 END ELSE 0 END,
+                    CASE WHEN :descending THEN m.start_time END DESC, m.start_time, m.id
                 LIMIT :limit OFFSET :offset
                 """
             ),
@@ -79,6 +96,8 @@ def list_matches(
                 "league_id": league_id,
                 "status": status,
                 "limit": limit, "offset": offset, "search": search, "pattern": "%" + search.lower() + "%", "descending": order == "desc",
+                "matchday": view == "matchday", "day_start": day_start, "day_end": day_end,
+                "active_since": day_start - timedelta(days=1) if day_start else None,
             },
         ).all()
     except OperationalError:

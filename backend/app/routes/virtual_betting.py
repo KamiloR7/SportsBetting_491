@@ -1,9 +1,10 @@
 """Virtual points only: no payments, deposits, or cash value."""
+from typing import Literal
 from decimal import Decimal
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel, Field
-from sqlalchemy import select, text
+from pydantic import BaseModel, Field, ConfigDict
+from sqlalchemy import select, text, func
 from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.core.authentication import current_session, csrf_session
@@ -23,6 +24,15 @@ class RetryRequest(BaseModel):
 
 class TopupRequest(RetryRequest):
     amount: int = Field(default=1000, gt=0, le=1_000_000, strict=True)
+
+class ResetRequest(RetryRequest):
+    model_config = ConfigDict(extra="forbid")
+    confirmation: Literal["RESET"]
+
+@router.post('/wallet/demo-reset', response_model=dict)
+def demo_reset(body: ResetRequest, session=Depends(csrf_session), db: Session=Depends(get_db)):
+    from app.services.demo_reset import reset_demo
+    return reset_demo(db, session.user['id'], body.request_key)
 
 class BetRequest(RetryRequest):
     match_id: int = Field(gt=0, strict=True)
@@ -62,12 +72,12 @@ class TransactionOut(BaseModel):
     created_at: datetime
 
 class OutcomeOut(BaseModel):
-    id: int
+    id: int | None
     selection: str
     decimal_odds: Decimal
 
 class MarketOut(BaseModel):
-    market_id: int
+    market_id: int | None
     match_id: int
     market: str = 'single_match_winner'
     odds_source: str = 'synthetic_demo'
@@ -78,6 +88,7 @@ class MarketOut(BaseModel):
     model_version: str | None = None
     quoted_at: datetime | None = None
     implied_margin: float | None = None
+    preview_note: str | None = None
 
 @router.get('/wallet', response_model=WalletOut)
 def wallet(session=Depends(current_session), db: Session=Depends(get_db)):
@@ -87,7 +98,8 @@ def wallet(session=Depends(current_session), db: Session=Depends(get_db)):
 
 @router.get('/wallet/transactions', response_model=list[TransactionOut])
 def ledger(session=Depends(current_session), db: Session=Depends(get_db)):
-    return db.execute(select(transactions).where(transactions.c.user_id==session.user['id']).order_by(transactions.c.id.desc())).mappings().all()
+    latest_reset = select(func.max(transactions.c.id)).where(transactions.c.user_id == session.user['id'], transactions.c.kind == 'DEMO_RESET').scalar_subquery()
+    return db.execute(select(transactions).where(transactions.c.user_id == session.user['id'], transactions.c.id >= func.coalesce(latest_reset, 0)).order_by(transactions.c.id.desc())).mappings().all()
 
 @router.post('/wallet/demo-topup', response_model=WalletOut)
 def demo_topup(body: TopupRequest, session=Depends(csrf_session), db: Session=Depends(get_db)):
@@ -97,13 +109,14 @@ def demo_topup(body: TopupRequest, session=Depends(csrf_session), db: Session=De
 def match_markets(match_id: int, db: Session=Depends(get_db)):
     result=[]
     if settings.MODEL_ODDS_ENABLED:
-        from app.services.model_odds import ensure_quote, latest_quote
+        from app.services.model_odds import ensure_quote, latest_quote, reconstruct_closed_quote
         query = "SELECT m.*, l.abbreviation FROM matches m JOIN leagues l ON l.id=m.league_id WHERE m.id=:id"
         if db.bind.dialect.name == "postgresql": query += " FOR UPDATE OF m"
         match = db.execute(text(query), {"id": match_id}).mappings().first()
         if match is None: raise HTTPException(404, "Match not found.")
     for market in db.execute(select(markets).where(markets.c.match_id==match_id).with_for_update()).mappings():
         quote = None
+        reconstructed = False
         if settings.MODEL_ODDS_ENABLED:
             start = match["start_time"]
             if isinstance(start, str): start = datetime.fromisoformat(start.replace("Z", "+00:00"))
@@ -112,15 +125,48 @@ def match_markets(match_id: int, db: Session=Depends(get_db)):
                 quote = ensure_quote(db, match, market)
             else:
                 quote = latest_quote(db, market["id"])
+                if quote is None and match["status"] in {"in_progress", "scheduled"}:
+                    try:
+                        quote = reconstruct_closed_quote(db, match)
+                        reconstructed = True
+                    except HTTPException:
+                        quote = None
         rows = db.execute(select(outcomes).where(outcomes.c.market_id==market['id'])).mappings().all()
+        if reconstructed:
+            if {row["selection"] for row in rows} != set(quote["prices"]):
+                quote = None
+                reconstructed = False
+            else:
+                rows = [{**row, "decimal_odds": Decimal(quote["prices"][row["selection"]])} for row in rows]
         item = {'market_id':market['id'], 'match_id':match_id, 'is_open':market['is_open'], 'outcomes':rows}
         if settings.MODEL_ODDS_ENABLED:
             item['is_open'] = bool(market['is_open'] and match['status'] == 'scheduled' and start > datetime.now(timezone.utc))
         if quote:
-            item.update(odds_source="model_derived", probabilities=quote["probabilities"],
+            item.update(odds_source="model_reconstructed" if reconstructed else "model_derived", probabilities=quote["probabilities"],
                         pricing_margin=float(quote["margin"]), model_version=quote["model_version"], quoted_at=quote["generated_at"],
                         implied_margin=sum(1/float(row["decimal_odds"]) for row in rows)-1)
+        if reconstructed:
+            item["preview_note"] = "Reconstructed now from prior-day results. Not live odds or a saved pregame offer. Betting closed."
         result.append(item)
+    missing_market_closed = False
+    if not result and settings.MODEL_ODDS_ENABLED:
+        kickoff = match["start_time"]
+        if isinstance(kickoff, str): kickoff = datetime.fromisoformat(kickoff.replace("Z", "+00:00"))
+        if kickoff.tzinfo is None: kickoff = kickoff.replace(tzinfo=timezone.utc)
+        missing_market_closed = match["status"] == "in_progress" or (match["status"] == "scheduled" and kickoff <= datetime.now(timezone.utc))
+    if missing_market_closed:
+        try:
+            preview = reconstruct_closed_quote(db, match)
+        except HTTPException:
+            preview = None
+        if preview:
+            result.append({"market_id": None, "match_id": match_id, "is_open": False,
+                "odds_source": "model_reconstructed", "probabilities": preview["probabilities"],
+                "pricing_margin": float(preview["margin"]), "model_version": preview["model_version"],
+                "quoted_at": preview["generated_at"],
+                "preview_note": "Reconstructed now from prior-day results. Not live odds or a saved pregame offer. Betting closed.",
+                "outcomes": [{"id": None, "selection": selection, "decimal_odds": Decimal(price)} for selection,price in preview["prices"].items()],
+                "implied_margin": sum(1/float(price) for price in preview["prices"].values())-1})
     db.commit()
     return result
 

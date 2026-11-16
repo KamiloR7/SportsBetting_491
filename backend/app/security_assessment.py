@@ -25,6 +25,7 @@ PUBLIC = {
     ("POST", "/auth/login"): "HTTPS-only pre-login CSRF challenge plus credentials and database throttle.",
 }
 PROTECTED = {
+    ("POST", "/wallet/demo-reset"): "Betting opt-in, active session, CSRF, explicit confirmation and owner-scoped atomic demo reset.",
     ("POST", "/parlays"): "Parlay/model/betting opt-in, active session and CSRF; atomic wallet debit and locked leg quotes.",
     ("GET", "/parlays"): "Active session; own parlays and public match context only.",
     ("GET", "/parlays/{parlay_id}"): "Active session plus owner filter; other owners return 404.",
