@@ -71,6 +71,13 @@ class TransactionOut(BaseModel):
     reference: str
     created_at: datetime
 
+    title: str | None = None
+    source_label: str | None = None
+    description: str | None = None
+    ticket_type: str | None = None
+    ticket_id: int | None = None
+    ticket_status: str | None = None
+
 class OutcomeOut(BaseModel):
     id: int | None
     selection: str
@@ -99,7 +106,9 @@ def wallet(session=Depends(current_session), db: Session=Depends(get_db)):
 @router.get('/wallet/transactions', response_model=list[TransactionOut])
 def ledger(session=Depends(current_session), db: Session=Depends(get_db)):
     latest_reset = select(func.max(transactions.c.id)).where(transactions.c.user_id == session.user['id'], transactions.c.kind == 'DEMO_RESET').scalar_subquery()
-    return db.execute(select(transactions).where(transactions.c.user_id == session.user['id'], transactions.c.id >= func.coalesce(latest_reset, 0)).order_by(transactions.c.id.desc())).mappings().all()
+    rows = db.execute(select(transactions).where(transactions.c.user_id == session.user['id'], transactions.c.id >= func.coalesce(latest_reset, 0)).order_by(transactions.c.id.desc())).mappings().all()
+    from app.services.wallet_activity import describe_activity
+    return describe_activity(db, session.user['id'], rows)
 
 @router.post('/wallet/demo-topup', response_model=WalletOut)
 def demo_topup(body: TopupRequest, session=Depends(csrf_session), db: Session=Depends(get_db)):

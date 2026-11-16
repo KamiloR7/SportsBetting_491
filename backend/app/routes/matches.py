@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.database.db import get_db
 from app.schemas.matches import MatchOut
+from app.services.team_branding import match_brand_fields
 
 router = APIRouter(prefix="/matches", tags=["matches"])
 
@@ -34,6 +35,7 @@ def _match_from_row(row) -> MatchOut:
         home_score=row.home_score,
         away_score=row.away_score,
         neutral_site=row.neutral_site,
+        **match_brand_fields(row.league_name,row.home_team_name,row.away_team_name),
     )
 
 

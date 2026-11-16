@@ -17,3 +17,9 @@ class MatchOut(BaseModel):
     home_score: Optional[int]
     away_score: Optional[int]
     neutral_site: bool
+    home_primary_color: Optional[str] = None
+    home_secondary_color: Optional[str] = None
+    home_logo_url: Optional[str] = None
+    away_primary_color: Optional[str] = None
+    away_secondary_color: Optional[str] = None
+    away_logo_url: Optional[str] = None

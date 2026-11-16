@@ -1,13 +1,11 @@
+import TeamBadge from "./TeamBadge";
+import { matchTeamStyle } from "../services/teamBranding";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { apiRequest } from "../services/api";
 
-function teamHue(name) {
-  return [...(name || "Team")].reduce((value, letter) => (value * 31 + letter.charCodeAt(0)) % 360, 0);
-}
-function TeamIdentity({ name, side }) {
-  const initials = (name || "Team").split(" ").filter(Boolean).map(word => word[0]).slice(0, 3).join("");
-  return <span className="team-identity"><span className={`team-badge badge-${side}`} aria-hidden="true">{initials}</span><span className="team-copy"><small>{side.toUpperCase()}</small><strong>{name}</strong></span></span>;
+function TeamIdentity({ name, side, match }) {
+  return <span className="team-identity"><TeamBadge name={name} logoUrl={match[`${side}_logo_url`]} primaryColor={match[`${side}_primary_color`]} secondaryColor={match[`${side}_secondary_color`]} className={`badge-${side}`}/><span className="team-copy"><small>{side.toUpperCase()}</small><strong>{name}</strong></span></span>;
 }
 export default function MatchCard({ match, returnParams }) {
   const [market, setMarket] = useState(null);
@@ -27,11 +25,11 @@ export default function MatchCard({ match, returnParams }) {
   const date = new Date(match.start_time);
   const started = match.status === "in_progress" || Date.parse(match.start_time) <= now;
   const outcomes = ["home", "draw", "away"].map(selection => market?.outcomes.find(o => o.selection === selection)).filter(Boolean);
-  return <article className={`match-card fixture-card sport-${returnParams.get("league")} ${final ? "fixture-finished" : "fixture-open"}`} style={{ "--home-hue": teamHue(match.home_team_name), "--away-hue": teamHue(match.away_team_name) }}>
+  return <article className={`match-card fixture-card sport-${returnParams.get("league")} ${final ? "fixture-finished" : "fixture-open"}`} style={matchTeamStyle(match)}>
     <div className="fixture-card-top"><time dateTime={match.start_time}>{date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</time><span className={`status-chip ${match.status}`}>{final ? "Final" : started && match.status === "scheduled" ? "Started · awaiting update" : match.status === "in_progress" ? "In progress · betting closed" : match.status.replaceAll("_", " ")}</span></div>
     <h4 className="sr-only">{match.home_team_name} vs {match.away_team_name}</h4>
-    <div className="fixture-team"><TeamIdentity name={match.home_team_name} side="home"/>{final && <strong>{match.home_score ?? "—"}</strong>}</div>
-    <div className="fixture-team"><TeamIdentity name={match.away_team_name} side="away"/>{final && <strong>{match.away_score ?? "—"}</strong>}</div>
+    <div className="fixture-team"><TeamIdentity name={match.home_team_name} side="home" match={match}/>{final && <strong>{match.home_score ?? "—"}</strong>}</div>
+    <div className="fixture-team"><TeamIdentity name={match.away_team_name} side="away" match={match}/>{final && <strong>{match.away_score ?? "—"}</strong>}</div>
     {!final && <div className="browse-market"><p>{loading ? "Loading model odds…" : market ? (market.odds_source === "model_reconstructed" ? "Reconstructed pregame model odds" : started || !market.is_open ? "Last pregame odds · betting closed" : "Model odds · match winner") : started ? "No pregame estimate available" : "Model odds unavailable"}</p>{outcomes.length > 0 && <div className="browse-odds">{outcomes.map(o => <span className={`odds-${o.selection}`} key={o.id ?? o.selection}><small>{o.selection === "home" ? "Home" : o.selection === "away" ? "Away" : "Draw"}</small><strong>{Number(o.decimal_odds).toFixed(2)}</strong></span>)}</div>}{market?.odds_source === "model_reconstructed" && <small>Prior-day data only · not live odds · betting closed.</small>}{match.status === "in_progress" && <small>Open match center for the latest stored score.</small>}</div>}
     <Link className="match-card-action" to={`/matches/${match.id}?${returnParams}`}>{final ? "View result & replay" : "View prediction & picks"}<span aria-hidden="true">↗</span></Link>
   </article>;
