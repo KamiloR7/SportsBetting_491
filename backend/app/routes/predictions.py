@@ -11,6 +11,7 @@ from app.schemas.predictions import PredictionOut, PredictionRequest, Prediction
 from app.services.match_prediction import predict_probabilities
 from app.services.model_registry import ModelRegistryError
 from app.services.prediction_service import (
+    InsufficientHistoryError,
     MatchNotFoundError,
     PredictionService,
     PredictionUnavailableError,
@@ -31,7 +32,7 @@ def prediction_service_dependency(db: Session = Depends(get_db)) -> PredictionSe
         ) from None
 
 
-@router.post("", response_model=PredictionResponse,
+@router.post("", response_model=PredictionResponse, response_model_exclude_unset=True,
              responses={503: {"description": "Prediction model configuration is unavailable."}})
 def create_prediction(
     request: PredictionRequest,
@@ -43,6 +44,8 @@ def create_prediction(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
     except UnsupportedSportError as exc:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(exc)) from exc
+    except InsufficientHistoryError as exc:
+        raise HTTPException(422, str(exc)) from None
     except PredictionUnavailableError as exc:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -106,9 +109,22 @@ def run_match_prediction(
         raise HTTPException(status_code=503, detail="Match data is unavailable.") from None
 
     try:
-        result = predict_probabilities(
-            match.sport, match.home_team_id, match.away_team_id, history
-        )
+        from app.core.config import settings
+        if settings.MODEL_ODDS_ENABLED:
+            try:
+                forecast = get_prediction_service(db).predict(match_id)
+            except PredictionUnavailableError:
+                raise HTTPException(503, "The match outcome model is unavailable.") from None
+            distribution = forecast.outcome_probabilities
+            outcome = max(distribution, key=distribution.get)
+            result = {"predicted_outcome": "draw" if outcome == "draw" else outcome + "_win",
+                      "home_win_probability": distribution["home"], "away_win_probability": distribution["away"],
+                      "draw_probability": distribution.get("draw"), "confidence": distribution[outcome],
+                      "model_version": forecast.model_version}
+        else:
+            result = predict_probabilities(
+                match.sport, match.home_team_id, match.away_team_id, history
+            )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     except RuntimeError as exc:
@@ -130,3 +146,12 @@ def run_match_prediction(
         generated_at=datetime.now(timezone.utc),
         **result,
     )
+
+
+@router.post("/replay")
+def historical_prediction(request: PredictionRequest, db: Session = Depends(get_db)):
+    from app.services.historical_replay import replay_match
+    try:
+        return replay_match(db, request.match_id)
+    except PredictionUnavailableError:
+        raise HTTPException(422, "There are not enough earlier completed games for both teams to replay this match.") from None

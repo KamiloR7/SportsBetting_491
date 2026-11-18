@@ -1,3 +1,4 @@
+from app.services.prediction_service import PredictionUnavailableError
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
@@ -71,6 +72,7 @@ def test_history_lookup_builds_prior_game_features():
     db = MagicMock()
     selected = SimpleNamespace(
         id=42,
+        league_id=2,
         start_time="2026-10-20T18:00:00Z",
         sport="NFL",
         home_team_id=10,
@@ -98,15 +100,19 @@ def test_history_lookup_builds_prior_game_features():
         "home_avg_allowed": 15.5,
         "away_avg_allowed": 3.0,
     }
+    params = db.execute.call_args.args[1]
+    assert params["start_time"].isoformat() == "2026-10-20T00:00:00+00:00"
+    assert params["league_id"] == 2
     assert context.home_history_games == 2
     assert context.away_history_games == 1
 
 
-def test_history_lookup_returns_zero_features_for_cold_start():
+def test_history_lookup_rejects_cold_start():
     db = MagicMock()
     first, second = MagicMock(), MagicMock()
     first.first.return_value = SimpleNamespace(
         id=7,
+        league_id=3,
         start_time="2026-10-20T18:00:00Z",
         sport="MLB",
         home_team_id=1,
@@ -117,10 +123,8 @@ def test_history_lookup_returns_zero_features_for_cold_start():
     second.all.return_value = []
     db.execute.side_effect = [first, second]
 
-    context = MatchHistoryRepository(db).get_context(7)
-
-    assert context.home_history_games == context.away_history_games == 0
-    assert set(context.features.values()) == {0.0}
+    with pytest.raises(PredictionUnavailableError, match="prior-day history"):
+        MatchHistoryRepository(db).get_context(7)
 
 
 def test_history_lookup_reports_unknown_match():

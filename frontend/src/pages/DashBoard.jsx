@@ -1,3 +1,5 @@
+import FixtureRefreshStatus from "../components/FixtureRefreshStatus";
+import ModelInsights from "../components/ModelInsights";
 
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
@@ -29,6 +31,7 @@ const SPORT_OPTIONS = [
 
 const DEFAULT_SPORT = SPORT_OPTIONS[0].key;
 const MATCH_STATUSES = [
+  { value: "matchday", label: "Matchday · today first" },
   { value: "scheduled", label: "Upcoming" },
   { value: "in_progress", label: "In progress" },
   { value: "final", label: "Final" },
@@ -43,15 +46,17 @@ function getSportOption(value) {
 }
 
 function EmptyUpcomingMatches({ sportOption, status }) {
-  return (
-    <section className="empty-state" role="status">
-      <h2>No {status === "scheduled" ? "upcoming " : ""}{sportOption.leagueAbbreviation} matches</h2>
-      <p>Check back when the next schedule is available.</p>
-    </section>
-  );
+  const league = sportOption.leagueAbbreviation;
+  const title = status === "matchday" ? `No ${league} games in progress or coming up.`
+    : status === "in_progress" ? `No ${league} games in progress.`
+    : status === "scheduled" ? `No upcoming ${league} games.`
+    : `No ${league} ${status === "final" ? "completed" : status} games found.`;
+  return <section className="empty-state" role="status"><span className="section-kicker">{league} GAME BOARD</span><h2>{title}</h2><p>{["matchday", "scheduled", "in_progress"].includes(status) ? "No fixtures match this view in the available schedule. You can still explore completed games, results and model replays." : "Try another status or a different team search."}</p><Link to={`/dashboard?league=${sportOption.key}&status=final`}>Explore completed {league} games →</Link></section>;
 }
 
-function LeagueMatches({ sportOption, status }) {
+const PAGE_SIZE = 12;
+
+function LeagueMatches({ sportOption, status, search, offset, onPage, returnParams }) {
   const [result, setResult] = useState({
     loading: true,
     matches: [],
@@ -60,8 +65,11 @@ function LeagueMatches({ sportOption, status }) {
 
   useEffect(() => {
     let ignore = false;
+    let running = false;
 
     async function load() {
+      if (running) return;
+      running = true;
       try {
         const leagues = await getLeagues();
         const league = leagues.find(
@@ -72,8 +80,15 @@ function LeagueMatches({ sportOption, status }) {
           throw new Error(`${sportOption.leagueAbbreviation} is currently unavailable.`);
         }
 
-        const matches = await getMatches(league.id, { status });
+        const matches = await getMatches(league.id, { status, search, offset, limit: status === "today_results" ? 200 : PAGE_SIZE });
 
+        if (status === "matchday") {
+          const today = new Date(); today.setHours(0, 0, 0, 0);
+          const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
+          if (matches.some(match => Date.parse(match.start_time) < (match.status === "in_progress" ? yesterday : today).getTime())) {
+            throw new Error("The server returned older games for Matchday. Restart the updated backend and refresh this page.");
+          }
+        }
         if (!ignore) {
           setResult({
             loading: false,
@@ -89,42 +104,54 @@ function LeagueMatches({ sportOption, status }) {
             error: error.message,
           });
         }
-      }
+      } finally { running = false; }
     }
 
     load();
+    const timer = setInterval(load, 30000);
 
     return () => {
       ignore = true;
+      clearInterval(timer);
     };
-  }, [sportOption.leagueAbbreviation, status]);
+  }, [sportOption.leagueAbbreviation, status, search, offset]);
+
+  if (status === "today_results") {
+    if (result.loading) return <p className="results-loading" role="status">Loading today’s completed games…</p>;
+    if (result.error) return <p role="alert">Today’s results are temporarily unavailable.</p>;
+    if (!result.matches.length) return null;
+    return <details className="played-today"><summary><span><span className="section-kicker">THE FINAL WHISTLE</span><strong>Played today</strong></span><span>{result.matches.length} completed {result.matches.length === 1 ? "game" : "games"}<span className="results-chevron" aria-hidden="true">⌄</span></span></summary><p>Final scores and model replays. These games are closed for betting.</p><div className="match-grid">{result.matches.map(match => <MatchCard key={match.id} match={match} returnParams={returnParams}/>)}</div></details>;
+  }
 
   if (result.loading) {
-    return <p role="status">Loading {sportOption.leagueAbbreviation} matches...</p>;
+    return <><FixtureRefreshStatus compact/><p role="status">Loading {sportOption.leagueAbbreviation} matches...</p></>;
   }
 
   if (result.error) {
-    return <p role="alert">{result.error}</p>;
+    return <><FixtureRefreshStatus compact/><p role="alert">{result.error}</p></>;
   }
 
   if (!result.matches.length) {
     return (
-      <EmptyUpcomingMatches sportOption={sportOption} status={status} />
+      <><FixtureRefreshStatus compact/><EmptyUpcomingMatches sportOption={sportOption} status={status} /></>
     );
   }
 
-  return (
-    <div className="match-grid">
-      {result.matches.map((match) => (
-        <MatchCard
-          key={match.id}
-          match={match}
-          league={sportOption.key}
-          status={status}
-        />
-      ))}
-    </div>
-  );
+  const groups = new Map();
+  result.matches.forEach(match => {
+    const date = new Date(match.start_time);
+    const isToday = date.toDateString() === new Date().toDateString();
+    const dateLabel = date.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+    const day = status === "matchday" && match.status === "in_progress" ? "In progress" : `${isToday ? "Today · " : ""}${dateLabel}`;
+    if (!groups.has(day)) groups.set(day, []);
+    groups.get(day).push(match);
+  });
+  return <>
+    <div className="results-toolbar board-results-toolbar"><span className="board-result-count">{result.matches.length} games · {sportOption.leagueAbbreviation}<small>Your local time · {status === "matchday" ? "In progress first" : status === "in_progress" ? "No live score feed" : "By game day"}</small></span><FixtureRefreshStatus compact/></div>
+    <div className="fixture-days">{[...groups].map(([day, matches]) => <section className={`fixture-day ${day === "In progress" ? "day-in-progress" : day.startsWith("Today") ? "day-today" : ""}`} key={day} aria-label={day}><div className="fixture-day-heading"><h3>{day}</h3><span>{matches.length} {matches.length === 1 ? "game" : "games"}</span></div><div className="match-grid">{matches.map(match => <MatchCard key={match.id} match={match} returnParams={returnParams} />)}</div></section>)}</div>
+    <div className="pagination"><button disabled={offset === 0} onClick={() => onPage(Math.max(0, offset - PAGE_SIZE))}>← Previous</button><span>Page {Math.floor(offset / PAGE_SIZE) + 1}</span><button disabled={result.matches.length < PAGE_SIZE} onClick={() => onPage(offset + PAGE_SIZE)}>Next →</button></div>
+  </>;
+
 }
 
 function PredictionHistory() {
@@ -153,7 +180,7 @@ function PredictionHistory() {
                     {prediction.home_team_name || "Home team"} vs {prediction.away_team_name || "Away team"}
                     {prediction.sport ? ` · ${prediction.sport}` : ""}
                   </p>
-                  <p>Outcome: {predictedHomeWin ? "Home win" : "Not a home win"}</p>
+                  <p>{prediction.mode === "historical_replay" ? "Historical replay" : "Pregame forecast"} · Outcome: {predictedHomeWin ? "Home win" : "Not a home win"}{prediction.mode === "historical_replay" ? (prediction.correct ? " · Matched result" : " · Missed result") : ""}</p>
                   <p>
                     Home win {Math.round((prediction.probabilities?.home_win ?? 0) * 100)}%
                     {" · "}
@@ -179,20 +206,23 @@ function Dashboard() {
   const requestedStatus = searchParams.get("status");
   const selectedStatus = MATCH_STATUSES.some((item) => item.value === requestedStatus)
     ? requestedStatus
-    : "scheduled";
+    : "matchday";
 
   function updateSelection(key, value) {
     const nextParams = new URLSearchParams(searchParams);
     nextParams.set(key, value);
+    if (key === "league") nextParams.set("status", "matchday");
+    if(key !== "offset") nextParams.delete("offset");
     setSearchParams(nextParams);
   }
 
   return (
-    <div className="dashboard">
+    <div className={`dashboard board-${selectedSportOption.key}`}>
       <DemoNotice />
+
       <header className="dashboard-header">
-        <h1>Matches</h1>
-        <p>Select a sport and match status to browse available matches.</p>
+        <div className="eyebrow"><span/> THE MATCHDAY DESK</div><h1>Every game.<br/><em>Make your call.</em></h1>
+        <p>Explore the fixtures. Read the model. Make your pick.</p><div className="hero-label">NFL <span>•</span> MLB <span>•</span> PREMIER LEAGUE</div>
       </header>
 
       <div
@@ -208,13 +238,13 @@ function Dashboard() {
             aria-pressed={selectedSportOption.key === option.key}
             onClick={() => updateSelection("league", option.key)}
           >
-            <span className="sport-option-name">{option.sportName}</span>
+            <span className="sport-option-name"><span className="sport-symbol" aria-hidden="true">{option.key === "football" ? "◈" : option.key === "baseball" ? "◉" : "⬡"}</span>{option.sportName}</span>
             <span className="sport-option-league">{option.leagueAbbreviation}</span>
           </button>
         ))}
       </div>
 
-      <div className="match-filter">
+      <div className="fixtures-heading"><div><span className="section-kicker">THE BOARD</span><h2>{selectedSportOption.leagueAbbreviation} matchups</h2><Link className="standings-inline-link" to={`/standings?league=${selectedSportOption.leagueAbbreviation}`}>View {selectedSportOption.leagueAbbreviation} standings ↗</Link></div><div className="board-controls"><label className="search-field"><span className="sr-only">Search teams</span><input type="search" placeholder="Search a team…" value={searchParams.get("search") || ""} onChange={e=>updateSelection("search",e.target.value)}/></label><div className="match-filter">
         <label htmlFor="match-status">Match status</label>
         <select
           id="match-status"
@@ -225,13 +255,19 @@ function Dashboard() {
             <option key={item.value} value={item.value}>{item.label}</option>
           ))}
         </select>
-      </div>
-
+      </div></div></div>
       <LeagueMatches
-        key={`${selectedSportOption.key}-${selectedStatus}`}
+        key={`${selectedSportOption.key}-${selectedStatus}-${searchParams.get("search") || ""}-${searchParams.get("offset") || "0"}`}
+        returnParams={new URLSearchParams({ ...Object.fromEntries(searchParams), league: selectedSportOption.key, status: selectedStatus })}
         sportOption={selectedSportOption}
         status={selectedStatus}
+        search={searchParams.get("search") || ""}
+        offset={Math.max(0,Number(searchParams.get("offset"))||0)}
+        onPage={offset=>updateSelection("offset",String(offset))}
       />
+      {selectedStatus === "matchday" && <LeagueMatches key={`results-${selectedSportOption.key}-${searchParams.get("search") || ""}`} sportOption={selectedSportOption} status="today_results" search={searchParams.get("search") || ""} offset={0} returnParams={new URLSearchParams({ ...Object.fromEntries(searchParams), league: selectedSportOption.key, status: "matchday" })}/>}
+      <div className="insights-link-row"><Link to="/insights">How are predictions and percentages calculated? Explore Model Insights →</Link></div>
+      <ModelInsights />
       <PredictionHistory />
     </div>
   );

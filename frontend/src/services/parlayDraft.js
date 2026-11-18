@@ -1,0 +1,8 @@
+const KEY="vigor.parlay-draft.v1";
+let volatileDraft=null;
+export const PENDING_KEY="vigor.parlay-pending.v1";
+export function getParlayDraft(){if(volatileDraft!==null)return volatileDraft;try{const items=JSON.parse(localStorage.getItem(KEY)||"[]");return Array.isArray(items)?items.filter(x=>Number.isInteger(x.match_id)&&x.match_id>0&&Number.isInteger(x.outcome_id)&&/^\d{1,4}(\.\d{1,4})?$/.test(String(x.expected_odds))&&Number(x.expected_odds)>1&&Number(x.expected_odds)<=1000).slice(0,8):[];}catch{return [];}}
+export function saveParlayDraft(items){try{localStorage.setItem(KEY,JSON.stringify(items));volatileDraft=null;}catch{volatileDraft=items;}window.dispatchEvent(new Event("parlay-updated"));}
+export function clearPendingParlay(){try{sessionStorage.removeItem(PENDING_KEY);}catch{/* In-memory retry state remains available. */}}
+export function addParlayLeg(leg){const draft=getParlayDraft();const same=draft.findIndex(x=>x.match_id===leg.match_id);if(same>=0)draft[same]=leg;else{if(draft.length>=8)throw new Error("A parlay can contain at most 8 games.");draft.push(leg);}saveParlayDraft(draft);return draft;}
+export function parlayPreview(stake,items){if(!/^[1-9]\d{0,6}$/.test(String(stake))||!items.length)return null;let product=1n,scale=1n;for(const item of items){const parts=String(item.expected_odds).split(".");const price=BigInt(parts[0])*10000n+BigInt((parts[1]||"").padEnd(4,"0").slice(0,4));product*=price;scale*=10000n;}const scaled=product*100000000n/scale;const payout=BigInt(stake)*scaled/100000000n;return{odds:(Number(scaled)/1e8).toFixed(4),payout:payout<=2000000000n?Number(payout):null};}

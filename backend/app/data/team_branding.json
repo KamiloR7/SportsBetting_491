@@ -1,0 +1,1550 @@
+{
+  "source": "ESPN team directories",
+  "retrieved_at": "2026-11-16T01:37:19.575002+00:00",
+  "source_urls": [
+    "https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams?limit=1000",
+    "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams?limit=1000",
+    "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.1/teams?limit=1000",
+    "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.2/teams?limit=1000",
+    "https://site.api.espn.com/apis/site/v2/sports/soccer/eng.3/teams?limit=1000"
+  ],
+  "branding_period": "Current provider profile; historical names do not imply period-specific logos.",
+  "teams": [
+    {
+      "league": "EPL",
+      "provider_id": "349",
+      "name": "AFC Bournemouth",
+      "aliases": [
+        "AFC Bournemouth",
+        "Bournemouth"
+      ],
+      "primary_color": "#f42727",
+      "secondary_color": "#b57edc",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/349.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "3802",
+      "name": "AFC Wimbledon",
+      "aliases": [
+        "AFC Wimbledon",
+        "Wimbledon"
+      ],
+      "primary_color": "#0000d4",
+      "secondary_color": "#ffff00",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/3802.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "359",
+      "name": "Arsenal",
+      "aliases": [
+        "Arsenal"
+      ],
+      "primary_color": "#e20520",
+      "secondary_color": "#003399",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/359.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "362",
+      "name": "Aston Villa",
+      "aliases": [
+        "Aston Villa"
+      ],
+      "primary_color": "#660e36",
+      "secondary_color": "#000000",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/362.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "397",
+      "name": "Barnsley",
+      "aliases": [
+        "Barnsley"
+      ],
+      "primary_color": "#f42727",
+      "secondary_color": "#065035",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/397.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "392",
+      "name": "Birmingham City",
+      "aliases": [
+        "Birmingham",
+        "Birmingham City"
+      ],
+      "primary_color": "#0000fa",
+      "secondary_color": "#fe5442",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/392.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "365",
+      "name": "Blackburn Rovers",
+      "aliases": [
+        "Blackburn",
+        "Blackburn Rovers"
+      ],
+      "primary_color": "#0000fa",
+      "secondary_color": "#1a1a1a",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/365.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "346",
+      "name": "Blackpool",
+      "aliases": [
+        "Blackpool"
+      ],
+      "primary_color": "#f5a12d",
+      "secondary_color": "#ffffff",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/346.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "358",
+      "name": "Bolton Wanderers",
+      "aliases": [
+        "Bolton",
+        "Bolton Wanderers"
+      ],
+      "primary_color": "#ffffff",
+      "secondary_color": "#1a1a1a",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/358.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "387",
+      "name": "Bradford City",
+      "aliases": [
+        "Bradford",
+        "Bradford City"
+      ],
+      "primary_color": "#890000",
+      "secondary_color": "#ffffff",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/387.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "337",
+      "name": "Brentford",
+      "aliases": [
+        "Brentford"
+      ],
+      "primary_color": "#f42727",
+      "secondary_color": "#0f1c3f",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/337.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "331",
+      "name": "Brighton & Hove Albion",
+      "aliases": [
+        "Brighton",
+        "Brighton & Hove Albion"
+      ],
+      "primary_color": "#0606fa",
+      "secondary_color": "#005f60",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/331.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "333",
+      "name": "Bristol City",
+      "aliases": [
+        "Bristol City"
+      ],
+      "primary_color": "#f42727",
+      "secondary_color": "#ffffff",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/333.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "3129",
+      "name": "Bromley",
+      "aliases": [
+        "Bromley"
+      ],
+      "primary_color": "#ffffff",
+      "secondary_color": "#c60000",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/3129.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "379",
+      "name": "Burnley",
+      "aliases": [
+        "Burnley"
+      ],
+      "primary_color": "#6c1d45",
+      "secondary_color": "#00ffff",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/379.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "2567",
+      "name": "Burton Albion",
+      "aliases": [
+        "Burton Albion"
+      ],
+      "primary_color": "#ffff00",
+      "secondary_color": "#ffffff",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/2567.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "351",
+      "name": "Cambridge United",
+      "aliases": [
+        "Cambridge",
+        "Cambridge United"
+      ],
+      "primary_color": "#fecd32",
+      "secondary_color": "#82dbf5",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/351.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "347",
+      "name": "Cardiff City",
+      "aliases": [
+        "Cardiff",
+        "Cardiff City"
+      ],
+      "primary_color": "#0000fa",
+      "secondary_color": "#c6d4db",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/347.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "372",
+      "name": "Charlton Athletic",
+      "aliases": [
+        "Charlton",
+        "Charlton Athletic"
+      ],
+      "primary_color": "#c8142f",
+      "secondary_color": "#020202",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/372.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "363",
+      "name": "Chelsea",
+      "aliases": [
+        "Chelsea"
+      ],
+      "primary_color": "#144992",
+      "secondary_color": "#ffffff",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/363.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "388",
+      "name": "Coventry City",
+      "aliases": [
+        "Coventry",
+        "Coventry City"
+      ],
+      "primary_color": "#87cced",
+      "secondary_color": "#ffffff",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/388.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "384",
+      "name": "Crystal Palace",
+      "aliases": [
+        "C Palace",
+        "Crystal Palace"
+      ],
+      "primary_color": "#0202fb",
+      "secondary_color": "#000000",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/384.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "374",
+      "name": "Derby County",
+      "aliases": [
+        "Derby",
+        "Derby County"
+      ],
+      "primary_color": "#ffffff",
+      "secondary_color": "#abebc5",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/374.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "279",
+      "name": "Doncaster Rovers",
+      "aliases": [
+        "Doncaster",
+        "Doncaster Rovers"
+      ],
+      "primary_color": "#c8142f",
+      "secondary_color": "#000099",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/279.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "368",
+      "name": "Everton",
+      "aliases": [
+        "Everton"
+      ],
+      "primary_color": "#0606fa",
+      "secondary_color": "#ffffff",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/368.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "370",
+      "name": "Fulham",
+      "aliases": [
+        "Fulham"
+      ],
+      "primary_color": "#ffffff",
+      "secondary_color": "#cc0000",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/370.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "335",
+      "name": "Huddersfield Town",
+      "aliases": [
+        "Huddersfield",
+        "Huddersfield Town"
+      ],
+      "primary_color": "#0074d0",
+      "secondary_color": "#f4e874",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/335.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "306",
+      "name": "Hull City",
+      "aliases": [
+        "Hull",
+        "Hull City"
+      ],
+      "primary_color": "#f28800",
+      "secondary_color": "#ffffff",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/306.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "373",
+      "name": "Ipswich Town",
+      "aliases": [
+        "Ipswich",
+        "Ipswich Town"
+      ],
+      "primary_color": "#0000fa",
+      "secondary_color": "#f5f2dc",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/373.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "357",
+      "name": "Leeds United",
+      "aliases": [
+        "Leeds",
+        "Leeds United"
+      ],
+      "primary_color": "#ffffff",
+      "secondary_color": "#ffcd00",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/357.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "375",
+      "name": "Leicester City",
+      "aliases": [
+        "Leicester",
+        "Leicester City"
+      ],
+      "primary_color": "#0202fb",
+      "secondary_color": "#000000",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/375.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "309",
+      "name": "Leyton Orient",
+      "aliases": [
+        "Leyton Orient"
+      ],
+      "primary_color": "#c8142f",
+      "secondary_color": "#0e00f7",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/309.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "314",
+      "name": "Lincoln City",
+      "aliases": [
+        "Lincoln City"
+      ],
+      "primary_color": "#c8142f",
+      "secondary_color": "#c6d4db",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/314.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "364",
+      "name": "Liverpool",
+      "aliases": [
+        "Liverpool"
+      ],
+      "primary_color": "#d11317",
+      "secondary_color": "#ffffff",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/364.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "301",
+      "name": "Luton Town",
+      "aliases": [
+        "Luton",
+        "Luton Town"
+      ],
+      "primary_color": "#ff4f00",
+      "secondary_color": "#1d428a",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/301.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "382",
+      "name": "Manchester City",
+      "aliases": [
+        "Man City",
+        "Manchester City"
+      ],
+      "primary_color": "#99c5ea",
+      "secondary_color": "#000000",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/382.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "360",
+      "name": "Manchester United",
+      "aliases": [
+        "Man Utd",
+        "Manchester United"
+      ],
+      "primary_color": "#da020e",
+      "secondary_color": "#4169e1",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/360.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "304",
+      "name": "Mansfield Town",
+      "aliases": [
+        "Mansfield",
+        "Mansfield Town"
+      ],
+      "primary_color": "#fecd32",
+      "secondary_color": "#1a1a1a",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/304.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "369",
+      "name": "Middlesbrough",
+      "aliases": [
+        "Boro",
+        "Middlesbrough"
+      ],
+      "primary_color": "#f42727",
+      "secondary_color": "#87cced",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/369.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "391",
+      "name": "Millwall",
+      "aliases": [
+        "Millwall"
+      ],
+      "primary_color": "#091453",
+      "secondary_color": "#007066",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/391.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "390",
+      "name": "Milton Keynes Dons",
+      "aliases": [
+        "MK Dons",
+        "Milton Keynes Dons"
+      ],
+      "primary_color": "#ffffff",
+      "secondary_color": "#ff4f00",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/390.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "361",
+      "name": "Newcastle United",
+      "aliases": [
+        "Newcastle",
+        "Newcastle United"
+      ],
+      "primary_color": "#000000",
+      "secondary_color": "#0b1b3d",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/361.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "381",
+      "name": "Norwich City",
+      "aliases": [
+        "Norwich City"
+      ],
+      "primary_color": "#ffff00",
+      "secondary_color": "#1d428a",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/381.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "393",
+      "name": "Nottingham Forest",
+      "aliases": [
+        "Nottingham Forest",
+        "Nottm Forest"
+      ],
+      "primary_color": "#c8102e",
+      "secondary_color": "#1b3624",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/393.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "340",
+      "name": "Notts County",
+      "aliases": [
+        "Notts County"
+      ],
+      "primary_color": "#1a1a1a",
+      "secondary_color": "#378464",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/340.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "311",
+      "name": "Oxford United",
+      "aliases": [
+        "Oxford United",
+        "Oxford Utd"
+      ],
+      "primary_color": "#ffff00",
+      "secondary_color": "#ffffff",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/311.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "342",
+      "name": "Peterborough United",
+      "aliases": [
+        "Peterborough",
+        "Peterborough United"
+      ],
+      "primary_color": "#0000fa",
+      "secondary_color": "#ebebeb",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/342.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "307",
+      "name": "Plymouth Argyle",
+      "aliases": [
+        "Plymouth",
+        "Plymouth Argyle"
+      ],
+      "primary_color": "#003e00",
+      "secondary_color": "#ffffff",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/307.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "385",
+      "name": "Portsmouth",
+      "aliases": [
+        "Portsmouth"
+      ],
+      "primary_color": "#0000fa",
+      "secondary_color": "#1a1a1a",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/385.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "394",
+      "name": "Preston North End",
+      "aliases": [
+        "Preston",
+        "Preston North End"
+      ],
+      "primary_color": "#ffffff",
+      "secondary_color": "#87cced",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/394.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "334",
+      "name": "Queens Park Rangers",
+      "aliases": [
+        "QPR",
+        "Queens Park Rangers"
+      ],
+      "primary_color": "#0000d4",
+      "secondary_color": "#1a1a1a",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/334.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "338",
+      "name": "Reading",
+      "aliases": [
+        "Reading"
+      ],
+      "primary_color": "#0000fa",
+      "secondary_color": "#e4c8de",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/338.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "398",
+      "name": "Sheffield United",
+      "aliases": [
+        "Sheffield United",
+        "Sheffield Utd"
+      ],
+      "primary_color": "#f42727",
+      "secondary_color": "#1d428a",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/398.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "399",
+      "name": "Sheffield Wednesday",
+      "aliases": [
+        "Sheffield Wed",
+        "Sheffield Wednesday"
+      ],
+      "primary_color": "#0000ff",
+      "secondary_color": "#ff4f00",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/399.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "376",
+      "name": "Southampton",
+      "aliases": [
+        "Southampton"
+      ],
+      "primary_color": "#ed1a3b",
+      "secondary_color": "#f1ee13",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/376.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "285",
+      "name": "Stevenage",
+      "aliases": [
+        "Stevenage"
+      ],
+      "primary_color": "#ffffff",
+      "secondary_color": "#091453",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/285.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "400",
+      "name": "Stockport County",
+      "aliases": [
+        "Stockport",
+        "Stockport County"
+      ],
+      "primary_color": "#0000ff",
+      "secondary_color": "#ffffff",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/400.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "336",
+      "name": "Stoke City",
+      "aliases": [
+        "Stoke",
+        "Stoke City"
+      ],
+      "primary_color": "#f42727",
+      "secondary_color": "#1a1a1a",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/336.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "366",
+      "name": "Sunderland",
+      "aliases": [
+        "Sunderland"
+      ],
+      "primary_color": "#eb172b",
+      "secondary_color": "#ffb6c1",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/366.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "318",
+      "name": "Swansea City",
+      "aliases": [
+        "Swansea",
+        "Swansea City"
+      ],
+      "primary_color": "#ffffff",
+      "secondary_color": "#1d428a",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/318.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "367",
+      "name": "Tottenham Hotspur",
+      "aliases": [
+        "Spurs",
+        "Tottenham Hotspur"
+      ],
+      "primary_color": "#ffffff",
+      "secondary_color": "#0b1426",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/367.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "395",
+      "name": "Watford",
+      "aliases": [
+        "Watford"
+      ],
+      "primary_color": "#ffff00",
+      "secondary_color": "#1d428a",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/395.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "383",
+      "name": "West Bromwich Albion",
+      "aliases": [
+        "West Brom",
+        "West Bromwich Albion"
+      ],
+      "primary_color": "#091453",
+      "secondary_color": "#ffff00",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/383.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "371",
+      "name": "West Ham United",
+      "aliases": [
+        "West Ham",
+        "West Ham United"
+      ],
+      "primary_color": "#7c2c3b",
+      "secondary_color": "#f1e7e0",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/371.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "350",
+      "name": "Wigan Athletic",
+      "aliases": [
+        "Wigan",
+        "Wigan Athletic"
+      ],
+      "primary_color": "#0000fa",
+      "secondary_color": "#1a1a1a",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/350.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "380",
+      "name": "Wolverhampton Wanderers",
+      "aliases": [
+        "Wolverhampton Wanderers",
+        "Wolves"
+      ],
+      "primary_color": "#fdb913",
+      "secondary_color": "#32a8dd",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/380.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "352",
+      "name": "Wrexham",
+      "aliases": [
+        "Wrexham"
+      ],
+      "primary_color": "#c8142f",
+      "secondary_color": "#ffffff",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/352.png"
+    },
+    {
+      "league": "EPL",
+      "provider_id": "344",
+      "name": "Wycombe Wanderers",
+      "aliases": [
+        "Wycombe",
+        "Wycombe Wanderers"
+      ],
+      "primary_color": "#4cb8e5",
+      "secondary_color": "#ffff00",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/soccer/500/344.png"
+    },
+    {
+      "league": "MLB",
+      "provider_id": "29",
+      "name": "Arizona Diamondbacks",
+      "aliases": [
+        "Arizona Diamondbacks",
+        "Diamondbacks",
+        "D-backs"
+      ],
+      "primary_color": "#aa182c",
+      "secondary_color": "#000000",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/ari.png"
+    },
+    {
+      "league": "MLB",
+      "provider_id": "11",
+      "name": "Athletics",
+      "aliases": [
+        "Athletics",
+        "Oakland Athletics"
+      ],
+      "primary_color": "#003831",
+      "secondary_color": "#efb21e",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/ath.png"
+    },
+    {
+      "league": "MLB",
+      "provider_id": "15",
+      "name": "Atlanta Braves",
+      "aliases": [
+        "Atlanta Braves",
+        "Braves"
+      ],
+      "primary_color": "#0c2340",
+      "secondary_color": "#ba0c2f",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/atl.png"
+    },
+    {
+      "league": "MLB",
+      "provider_id": "1",
+      "name": "Baltimore Orioles",
+      "aliases": [
+        "Baltimore Orioles",
+        "Orioles"
+      ],
+      "primary_color": "#df4601",
+      "secondary_color": "#000000",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/bal.png"
+    },
+    {
+      "league": "MLB",
+      "provider_id": "2",
+      "name": "Boston Red Sox",
+      "aliases": [
+        "Boston Red Sox",
+        "Red Sox"
+      ],
+      "primary_color": "#0d2b56",
+      "secondary_color": "#bd3039",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/bos.png"
+    },
+    {
+      "league": "MLB",
+      "provider_id": "16",
+      "name": "Chicago Cubs",
+      "aliases": [
+        "Chicago Cubs",
+        "Cubs"
+      ],
+      "primary_color": "#0e3386",
+      "secondary_color": "#cc3433",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/chc.png"
+    },
+    {
+      "league": "MLB",
+      "provider_id": "4",
+      "name": "Chicago White Sox",
+      "aliases": [
+        "Chicago White Sox",
+        "White Sox"
+      ],
+      "primary_color": "#000000",
+      "secondary_color": "#c4ced4",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/chw.png"
+    },
+    {
+      "league": "MLB",
+      "provider_id": "17",
+      "name": "Cincinnati Reds",
+      "aliases": [
+        "Cincinnati Reds",
+        "Reds"
+      ],
+      "primary_color": "#c6011f",
+      "secondary_color": "#ffffff",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/cin.png"
+    },
+    {
+      "league": "MLB",
+      "provider_id": "5",
+      "name": "Cleveland Guardians",
+      "aliases": [
+        "Cleveland Guardians",
+        "Guardians"
+      ],
+      "primary_color": "#002b5c",
+      "secondary_color": "#e31937",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/cle.png"
+    },
+    {
+      "league": "MLB",
+      "provider_id": "27",
+      "name": "Colorado Rockies",
+      "aliases": [
+        "Colorado Rockies",
+        "Rockies"
+      ],
+      "primary_color": "#33006f",
+      "secondary_color": "#000000",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/col.png"
+    },
+    {
+      "league": "MLB",
+      "provider_id": "6",
+      "name": "Detroit Tigers",
+      "aliases": [
+        "Detroit Tigers",
+        "Tigers"
+      ],
+      "primary_color": "#0a2240",
+      "secondary_color": "#ff4713",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/det.png"
+    },
+    {
+      "league": "MLB",
+      "provider_id": "18",
+      "name": "Houston Astros",
+      "aliases": [
+        "Astros",
+        "Houston Astros"
+      ],
+      "primary_color": "#002d62",
+      "secondary_color": "#eb6e1f",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/hou.png"
+    },
+    {
+      "league": "MLB",
+      "provider_id": "7",
+      "name": "Kansas City Royals",
+      "aliases": [
+        "Kansas City Royals",
+        "Royals"
+      ],
+      "primary_color": "#004687",
+      "secondary_color": "#7ab2dd",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/kc.png"
+    },
+    {
+      "league": "MLB",
+      "provider_id": "3",
+      "name": "Los Angeles Angels",
+      "aliases": [
+        "Angels",
+        "Los Angeles Angels"
+      ],
+      "primary_color": "#ba0021",
+      "secondary_color": "#c4ced4",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/laa.png"
+    },
+    {
+      "league": "MLB",
+      "provider_id": "19",
+      "name": "Los Angeles Dodgers",
+      "aliases": [
+        "Dodgers",
+        "Los Angeles Dodgers"
+      ],
+      "primary_color": "#005a9c",
+      "secondary_color": "#ffffff",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/lad.png"
+    },
+    {
+      "league": "MLB",
+      "provider_id": "28",
+      "name": "Miami Marlins",
+      "aliases": [
+        "Marlins",
+        "Miami Marlins"
+      ],
+      "primary_color": "#00a3e0",
+      "secondary_color": "#000000",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/mia.png"
+    },
+    {
+      "league": "MLB",
+      "provider_id": "8",
+      "name": "Milwaukee Brewers",
+      "aliases": [
+        "Brewers",
+        "Milwaukee Brewers"
+      ],
+      "primary_color": "#13294b",
+      "secondary_color": "#ffc72c",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/mil.png"
+    },
+    {
+      "league": "MLB",
+      "provider_id": "9",
+      "name": "Minnesota Twins",
+      "aliases": [
+        "Minnesota Twins",
+        "Twins"
+      ],
+      "primary_color": "#031f40",
+      "secondary_color": "#e20e32",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/min.png"
+    },
+    {
+      "league": "MLB",
+      "provider_id": "21",
+      "name": "New York Mets",
+      "aliases": [
+        "Mets",
+        "New York Mets"
+      ],
+      "primary_color": "#002d72",
+      "secondary_color": "#ff5910",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/nym.png"
+    },
+    {
+      "league": "MLB",
+      "provider_id": "10",
+      "name": "New York Yankees",
+      "aliases": [
+        "New York Yankees",
+        "Yankees"
+      ],
+      "primary_color": "#132448",
+      "secondary_color": "#c4ced4",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/nyy.png"
+    },
+    {
+      "league": "MLB",
+      "provider_id": "22",
+      "name": "Philadelphia Phillies",
+      "aliases": [
+        "Philadelphia Phillies",
+        "Phillies"
+      ],
+      "primary_color": "#e81828",
+      "secondary_color": "#003278",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/phi.png"
+    },
+    {
+      "league": "MLB",
+      "provider_id": "23",
+      "name": "Pittsburgh Pirates",
+      "aliases": [
+        "Pirates",
+        "Pittsburgh Pirates"
+      ],
+      "primary_color": "#000000",
+      "secondary_color": "#fdb827",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/pit.png"
+    },
+    {
+      "league": "MLB",
+      "provider_id": "25",
+      "name": "San Diego Padres",
+      "aliases": [
+        "Padres",
+        "San Diego Padres"
+      ],
+      "primary_color": "#2f241d",
+      "secondary_color": "#ffc425",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/sd.png"
+    },
+    {
+      "league": "MLB",
+      "provider_id": "26",
+      "name": "San Francisco Giants",
+      "aliases": [
+        "Giants",
+        "San Francisco Giants"
+      ],
+      "primary_color": "#000000",
+      "secondary_color": "#fd5a1e",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/sf.png"
+    },
+    {
+      "league": "MLB",
+      "provider_id": "12",
+      "name": "Seattle Mariners",
+      "aliases": [
+        "Mariners",
+        "Seattle Mariners"
+      ],
+      "primary_color": "#005c5c",
+      "secondary_color": "#0c2c56",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/sea.png"
+    },
+    {
+      "league": "MLB",
+      "provider_id": "24",
+      "name": "St. Louis Cardinals",
+      "aliases": [
+        "Cardinals",
+        "St. Louis Cardinals"
+      ],
+      "primary_color": "#be0a14",
+      "secondary_color": "#001541",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/stl.png"
+    },
+    {
+      "league": "MLB",
+      "provider_id": "30",
+      "name": "Tampa Bay Rays",
+      "aliases": [
+        "Rays",
+        "Tampa Bay Rays"
+      ],
+      "primary_color": "#092c5c",
+      "secondary_color": "#8fbce6",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/tb.png"
+    },
+    {
+      "league": "MLB",
+      "provider_id": "13",
+      "name": "Texas Rangers",
+      "aliases": [
+        "Rangers",
+        "Texas Rangers"
+      ],
+      "primary_color": "#003278",
+      "secondary_color": "#c0111f",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/tex.png"
+    },
+    {
+      "league": "MLB",
+      "provider_id": "14",
+      "name": "Toronto Blue Jays",
+      "aliases": [
+        "Blue Jays",
+        "Toronto Blue Jays"
+      ],
+      "primary_color": "#134a8e",
+      "secondary_color": "#6cace5",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/tor.png"
+    },
+    {
+      "league": "MLB",
+      "provider_id": "20",
+      "name": "Washington Nationals",
+      "aliases": [
+        "Nationals",
+        "Washington Nationals"
+      ],
+      "primary_color": "#ab0003",
+      "secondary_color": "#11225b",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/mlb/500/wsh.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "22",
+      "name": "Arizona Cardinals",
+      "aliases": [
+        "Arizona Cardinals",
+        "Cardinals"
+      ],
+      "primary_color": "#a40227",
+      "secondary_color": "#ffffff",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/ari.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "1",
+      "name": "Atlanta Falcons",
+      "aliases": [
+        "Atlanta Falcons",
+        "Falcons"
+      ],
+      "primary_color": "#a71930",
+      "secondary_color": "#000000",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/atl.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "33",
+      "name": "Baltimore Ravens",
+      "aliases": [
+        "Baltimore Ravens",
+        "Ravens"
+      ],
+      "primary_color": "#29126f",
+      "secondary_color": "#000000",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/bal.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "2",
+      "name": "Buffalo Bills",
+      "aliases": [
+        "Bills",
+        "Buffalo Bills"
+      ],
+      "primary_color": "#00338d",
+      "secondary_color": "#d50a0a",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/buf.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "29",
+      "name": "Carolina Panthers",
+      "aliases": [
+        "Carolina Panthers",
+        "Panthers"
+      ],
+      "primary_color": "#0085ca",
+      "secondary_color": "#000000",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/car.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "3",
+      "name": "Chicago Bears",
+      "aliases": [
+        "Bears",
+        "Chicago Bears"
+      ],
+      "primary_color": "#0b1c3a",
+      "secondary_color": "#e64100",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/chi.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "4",
+      "name": "Cincinnati Bengals",
+      "aliases": [
+        "Bengals",
+        "Cincinnati Bengals"
+      ],
+      "primary_color": "#fb4f14",
+      "secondary_color": "#000000",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/cin.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "5",
+      "name": "Cleveland Browns",
+      "aliases": [
+        "Browns",
+        "Cleveland Browns"
+      ],
+      "primary_color": "#472a08",
+      "secondary_color": "#ff3c00",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/cle.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "6",
+      "name": "Dallas Cowboys",
+      "aliases": [
+        "Cowboys",
+        "Dallas Cowboys"
+      ],
+      "primary_color": "#002a5c",
+      "secondary_color": "#b0b7bc",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/dal.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "7",
+      "name": "Denver Broncos",
+      "aliases": [
+        "Broncos",
+        "Denver Broncos"
+      ],
+      "primary_color": "#0a2343",
+      "secondary_color": "#fc4c02",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/den.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "8",
+      "name": "Detroit Lions",
+      "aliases": [
+        "Detroit Lions",
+        "Lions"
+      ],
+      "primary_color": "#0076b6",
+      "secondary_color": "#bbbbbb",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/det.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "9",
+      "name": "Green Bay Packers",
+      "aliases": [
+        "Green Bay Packers",
+        "Packers"
+      ],
+      "primary_color": "#204e32",
+      "secondary_color": "#ffb612",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/gb.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "34",
+      "name": "Houston Texans",
+      "aliases": [
+        "Houston Texans",
+        "Texans"
+      ],
+      "primary_color": "#021018",
+      "secondary_color": "#eb0028",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/hou.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "11",
+      "name": "Indianapolis Colts",
+      "aliases": [
+        "Colts",
+        "Indianapolis Colts"
+      ],
+      "primary_color": "#003b75",
+      "secondary_color": "#ffffff",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/ind.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "30",
+      "name": "Jacksonville Jaguars",
+      "aliases": [
+        "Jacksonville Jaguars",
+        "Jaguars"
+      ],
+      "primary_color": "#007487",
+      "secondary_color": "#d7a22a",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/jax.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "12",
+      "name": "Kansas City Chiefs",
+      "aliases": [
+        "Chiefs",
+        "Kansas City Chiefs"
+      ],
+      "primary_color": "#e31837",
+      "secondary_color": "#ffb612",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/kc.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "13",
+      "name": "Las Vegas Raiders",
+      "aliases": [
+        "Las Vegas Raiders",
+        "Raiders"
+      ],
+      "primary_color": "#000000",
+      "secondary_color": "#a5acaf",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/lv.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "24",
+      "name": "Los Angeles Chargers",
+      "aliases": [
+        "Chargers",
+        "Los Angeles Chargers"
+      ],
+      "primary_color": "#0080c6",
+      "secondary_color": "#ffc20e",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/lac.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "14",
+      "name": "Los Angeles Rams",
+      "aliases": [
+        "Los Angeles Rams",
+        "Rams"
+      ],
+      "primary_color": "#003594",
+      "secondary_color": "#ffd100",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/lar.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "15",
+      "name": "Miami Dolphins",
+      "aliases": [
+        "Dolphins",
+        "Miami Dolphins"
+      ],
+      "primary_color": "#008e97",
+      "secondary_color": "#fc4c02",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/mia.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "16",
+      "name": "Minnesota Vikings",
+      "aliases": [
+        "Minnesota Vikings",
+        "Vikings"
+      ],
+      "primary_color": "#4f2683",
+      "secondary_color": "#ffc62f",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/min.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "17",
+      "name": "New England Patriots",
+      "aliases": [
+        "New England Patriots",
+        "Patriots"
+      ],
+      "primary_color": "#002a5c",
+      "secondary_color": "#c60c30",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/ne.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "18",
+      "name": "New Orleans Saints",
+      "aliases": [
+        "New Orleans Saints",
+        "Saints"
+      ],
+      "primary_color": "#d3bc8d",
+      "secondary_color": "#000000",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/no.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "19",
+      "name": "New York Giants",
+      "aliases": [
+        "Giants",
+        "New York Giants"
+      ],
+      "primary_color": "#003c7f",
+      "secondary_color": "#c9243f",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/nyg.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "20",
+      "name": "New York Jets",
+      "aliases": [
+        "Jets",
+        "New York Jets"
+      ],
+      "primary_color": "#115740",
+      "secondary_color": "#ffffff",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/nyj.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "21",
+      "name": "Philadelphia Eagles",
+      "aliases": [
+        "Eagles",
+        "Philadelphia Eagles"
+      ],
+      "primary_color": "#06424d",
+      "secondary_color": "#000000",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/phi.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "23",
+      "name": "Pittsburgh Steelers",
+      "aliases": [
+        "Pittsburgh Steelers",
+        "Steelers"
+      ],
+      "primary_color": "#000000",
+      "secondary_color": "#ffb612",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/pit.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "25",
+      "name": "San Francisco 49ers",
+      "aliases": [
+        "49ers",
+        "San Francisco 49ers"
+      ],
+      "primary_color": "#aa0000",
+      "secondary_color": "#b3995d",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/sf.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "26",
+      "name": "Seattle Seahawks",
+      "aliases": [
+        "Seahawks",
+        "Seattle Seahawks"
+      ],
+      "primary_color": "#002a5c",
+      "secondary_color": "#69be28",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/sea.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "27",
+      "name": "Tampa Bay Buccaneers",
+      "aliases": [
+        "Buccaneers",
+        "Tampa Bay Buccaneers"
+      ],
+      "primary_color": "#bd1c36",
+      "secondary_color": "#3e3a35",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/tb.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "10",
+      "name": "Tennessee Titans",
+      "aliases": [
+        "Tennessee Titans",
+        "Titans"
+      ],
+      "primary_color": "#4495d2",
+      "secondary_color": "#001532",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/ten.png"
+    },
+    {
+      "league": "NFL",
+      "provider_id": "28",
+      "name": "Washington Commanders",
+      "aliases": [
+        "Commanders",
+        "Washington Commanders"
+      ],
+      "primary_color": "#5a1414",
+      "secondary_color": "#ffb612",
+      "logo_url": "https://a.espncdn.com/i/teamlogos/nfl/500/wsh.png"
+    }
+  ]
+}

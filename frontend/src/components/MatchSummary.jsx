@@ -1,25 +1,7 @@
-function MatchSummary({ match }) {
-  const hasStartTime = match.start_time != null &&
-    !(typeof match.start_time === "string" && match.start_time.trim() === "");
-  const startTime = hasStartTime ? new Date(match.start_time) : null;
-  const dateTime = !startTime || Number.isNaN(startTime.getTime())
-    ? "Date/time unavailable"
-    : startTime.toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" });
-  const status = match.status
-    ? match.status.replaceAll("_", " ")
-    : "Unavailable";
-
-  return (
-    <>
-      <p className="league-name">{match.league_name || "League unavailable"}</p>
-      <h2>{match.home_team_name || "Home team unavailable"} vs {match.away_team_name || "Away team unavailable"}</h2>
-      <p>{dateTime}</p>
-      <p>Status: {status}</p>
-      {(match.home_score != null || match.away_score != null) && (
-        <p>Score (home–away): {match.home_score ?? "—"} – {match.away_score ?? "—"}</p>
-      )}
-    </>
-  );
+import TeamBadge from "./TeamBadge";
+import { matchTeamStyle } from "../services/teamBranding";
+export default function MatchSummary({match}) {
+ const date=new Date(match.start_time);
+ const valid=!Number.isNaN(date.getTime());
+ return <div className="match-summary" style={matchTeamStyle(match)}><div className="fixture-meta"><span className="league-name">{match.league_name||"Match"}</span><span className={`status-chip ${match.status}`}>{match.status?.replaceAll("_"," ")||"Unavailable"}</span></div><h2 className="sr-only">{match.home_team_name} vs {match.away_team_name}</h2><div className="team-row"><TeamBadge name={match.home_team_name} logoUrl={match.home_logo_url} primaryColor={match.home_primary_color} secondaryColor={match.home_secondary_color} className="summary-team-logo"/><span><strong>{match.home_team_name||"Home team"}</strong><small>HOME</small></span><b className="score">{match.home_score??"—"}</b></div><div className="team-row"><TeamBadge name={match.away_team_name} logoUrl={match.away_logo_url} primaryColor={match.away_primary_color} secondaryColor={match.away_secondary_color} className="summary-team-logo"/><span><strong>{match.away_team_name||"Away team"}</strong><small>AWAY</small></span><b className="score">{match.away_score??"—"}</b></div>{match.status === "in_progress" && <p className="score-refresh-note">Latest provider score · updates may be delayed.</p>}<div className="fixture-time"><span aria-hidden="true">◷</span> {valid?date.toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}):"Time unavailable"}<span>LOCAL TIME</span></div></div>;
 }
-
-export default MatchSummary;

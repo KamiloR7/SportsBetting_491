@@ -1,57 +1,12 @@
 import { useState } from "react";
-
-function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
-
-  function handleLogin(event) {
-    event.preventDefault();
-
-    // No authenticated login endpoint is available yet. Do not log credentials
-    // or imply that this form established an authenticated session.
-    setEmail("");
-    setPassword("");
-    setMessage(
-      "Sign-in is unavailable. This prototype does not authenticate accounts. Your credentials were not sent or saved."
-    );
-  }
-
-  return (
-    <div className="login-page">
-      <div className="login-card">
-        <h1>Welcome Back</h1>
-        <p>Login prototype</p>
-
-        <form onSubmit={handleLogin}>
-          <label htmlFor="login-email">Email</label>
-          <input
-            id="login-email"
-            type="email"
-            placeholder="Enter email"
-            autoComplete="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-          />
-
-          <label htmlFor="login-password">Password</label>
-          <input
-            id="login-password"
-            type="password"
-            placeholder="Enter password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-          />
-
-          <button type="submit">Continue</button>
-          <p role="status" aria-live="polite">{message}</p>
-        </form>
-      </div>
-    </div>
-  );
+import { useNavigate, Link } from "react-router-dom";
+import { apiRequest, mutation } from "../services/api";
+export default function Login() {
+ const [register,setRegister]=useState(false), [error,setError]=useState(""), [busy,setBusy]=useState(false), [show,setShow]=useState(false);
+ const navigate=useNavigate();
+ async function submit(event) {
+  event.preventDefault();setBusy(true);setError("");const form=new FormData(event.currentTarget);const body={email:form.get("email"),password:form.get("password")};
+  try {if(register) await apiRequest("/auth/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});await mutation("/auth/login",body);navigate("/dashboard");} catch(e){setError(e.message);}finally{setBusy(false);}
+ }
+ return <main className="auth-layout"><section className="auth-story"><div className="eyebrow"><span/> YOUR EDGE STARTS HERE</div><h1>Know the game.<br/><em>Find your edge.</em></h1><p>Explore real matchups, see what the model thinks, and put your instincts to the test.</p><div className="auth-visual" aria-hidden="true"><div className="orbit orbit-one"/><div className="orbit orbit-two"/><div className="visual-center">V</div><span className="floating-tag tag-one">NFL · MLB · EPL</span><span className="floating-tag tag-two">INSIGHT → ACTION</span></div><div className="auth-proof"><div><strong>Real fixtures</strong><span>Historical & upcoming games</span></div><div><strong>Virtual stakes</strong><span>No deposits. No cash value.</span></div></div></section><section className="auth-form-wrap"><div className="auth-card"><span className="section-kicker">WELCOME TO VIGOR</span><h2>{register?"Join the game.":"Back in the game."}</h2><p>{register?"Start with 1,000 virtual points and make your first pick.":"Sign in to track your picks and keep the momentum going."}</p><div className="auth-tabs" role="group" aria-label="Account action"><button aria-pressed={!register} onClick={()=>{setRegister(false);setError("");}}>Sign in</button><button aria-pressed={register} onClick={()=>{setRegister(true);setError("");}}>Create account</button></div><form key={String(register)} onSubmit={submit}><label htmlFor="email">Email address</label><input id="email" name="email" type="email" placeholder="you@example.com" autoComplete="email" required disabled={busy}/><div className="password-label"><label htmlFor="password">Password</label><button type="button" className="text-button" onClick={()=>setShow(!show)}>{show?"Hide":"Show"}</button></div><input id="password" name="password" minLength={register?8:undefined} type={show?"text":"password"} placeholder={register?"Choose a strong password":"Enter your password"} autoComplete={register?"new-password":"current-password"} required disabled={busy}/>{register&&<small>Use at least 8 characters. Choose a unique demonstration password.</small>}{error&&<p className="error-banner" role="alert">{error}</p>}<button className="primary-button auth-submit" disabled={busy}>{busy?"Connecting…":register?"Create account & start playing →":"Sign in →"}</button></form><Link className="browse-link" to="/dashboard">Just exploring? Browse the games</Link><p className="auth-note">Virtual points only. Your session stays on this device.</p></div></section></main>;
 }
-
-export default Login;
