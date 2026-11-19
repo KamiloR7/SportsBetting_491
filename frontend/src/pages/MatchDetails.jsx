@@ -64,6 +64,7 @@ function TeamHistory({ headingId, label, teamId, history }) {
 }
 
 function HistoricalTeamContext({ match }) {
+  const [retryCount, setRetryCount] = useState(0);
   const [result, setResult] = useState({
     loading: Boolean(match.league_id && match.home_team_id && match.away_team_id),
     homeHistory: [],
@@ -78,6 +79,7 @@ function HistoricalTeamContext({ match }) {
       return undefined;
     }
 
+    setResult((current) => ({ ...current, loading: true, error: "" }));
     Promise.all([
       getMatchHistory(match.league_id, match.home_team_id),
       getMatchHistory(match.league_id, match.away_team_id),
@@ -106,14 +108,21 @@ function HistoricalTeamContext({ match }) {
     return () => {
       ignore = true;
     };
-  }, [match.id, match.league_id, match.home_team_id, match.away_team_id]);
+  }, [match.id, match.league_id, match.home_team_id, match.away_team_id, retryCount]);
 
   if (result.loading) {
     return <p role="status">Loading team history...</p>;
   }
 
   if (result.error) {
-    return <p role="alert">Historical team context is unavailable.</p>;
+    return (
+      <div className="request-error">
+        <p role="alert">Historical team context is unavailable.</p>
+        <button type="button" onClick={() => setRetryCount((count) => count + 1)}>
+          Retry loading team history
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -136,10 +145,12 @@ function HistoricalTeamContext({ match }) {
 
 function MatchData({ id }) {
   const [result, setResult] = useState({ loading: true, match: null, error: "" });
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     let ignore = false;
 
+    setResult({ loading: true, match: null, error: "" });
     getMatchById(id)
       .then((match) => {
         if (!ignore) setResult({ loading: false, match, error: "" });
@@ -150,10 +161,19 @@ function MatchData({ id }) {
     return () => {
       ignore = true;
     };
-  }, [id]);
+  }, [id, retryCount]);
 
   if (result.loading) return <p role="status">Loading match…</p>;
-  if (result.error) return <p role="alert">{result.error}</p>;
+  if (result.error) {
+    return (
+      <div className="request-error">
+        <p role="alert">{result.error}</p>
+        <button type="button" onClick={() => setRetryCount((count) => count + 1)}>
+          Retry loading match
+        </button>
+      </div>
+    );
+  }
   if (!result.match) return <p role="status">This match is unavailable.</p>;
 
   return (

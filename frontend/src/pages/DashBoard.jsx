@@ -46,11 +46,13 @@ function LeagueMatches({ sportOption }) {
     matches: [],
     error: "",
   });
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     let ignore = false;
 
     async function load() {
+      setResult((current) => ({ ...current, loading: true, error: "" }));
       try {
         const leagues = await getLeagues();
         const league = leagues.find(
@@ -86,14 +88,21 @@ function LeagueMatches({ sportOption }) {
     return () => {
       ignore = true;
     };
-  }, [sportOption.leagueAbbreviation]);
+  }, [sportOption.leagueAbbreviation, retryCount]);
 
   if (result.loading) {
     return <p role="status">Loading {sportOption.leagueAbbreviation} matches...</p>;
   }
 
   if (result.error) {
-    return <p role="alert">{result.error}</p>;
+    return (
+      <div className="request-error">
+        <p role="alert">{result.error}</p>
+        <button type="button" onClick={() => setRetryCount((count) => count + 1)}>
+          Retry loading matches
+        </button>
+      </div>
+    );
   }
 
   if (!result.matches.length) {
