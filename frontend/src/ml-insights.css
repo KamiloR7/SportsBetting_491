@@ -1,0 +1,73 @@
+.ml-evaluation { margin: 0 0 30px; padding: 25px; border: 1px solid #8ab8e377; border-radius: 16px; background: linear-gradient(125deg,#19374de8,#30294ce8); scroll-margin-top: 20px; }
+.ml-section-heading { display:flex; justify-content:space-between; align-items:center; gap:15px; flex-wrap:wrap; margin-bottom:12px; }
+.ml-section-heading h2 { font-size:26px; margin:6px 0 0; line-height:1.2; }
+.ml-evaluation > p,.ml-analysis-card > p { font-size:12px; line-height:1.8; color:#c0d1e1; }
+.ml-sport-tabs { display:flex; gap:9px; margin:20px 0; }
+.ml-sport-tabs button { flex:1; padding:12px 15px; border:1px solid #8eb6d855; background:#11273d; color:#c9daeb; text-align:left; font-size:16px; }
+.ml-sport-tabs button small { display:block; margin-top:4px; font-size:10px; color:#a3bad0; }
+.ml-sport-tabs button[aria-pressed=true] { color:#d9ffa8; border-color:#d1f397; background:#45634344; box-shadow:inset 0 2px 0 #d1f397; }
+.ml-metric-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.ml-metric-grid article { padding:18px; border:1px solid #8da8cb44; border-radius:12px; background:#11283cbb; }
+.ml-metric-grid article > span { display:block; color:#b9ccdd; font-size:11px; }
+.ml-metric-grid strong { display:block; color:#eff7ff; font:700 39px/1.3 'Barlow Condensed',sans-serif; margin:6px 0; }
+.ml-metric-grid strong.ml-positive { color:#d0f48d; }
+.ml-metric-grid strong.ml-caution { color:#ffcc98; }
+.ml-metric-grid em { font-size:22px; font-style:normal; }
+.ml-metric-grid small { display:block; font-size:10px; color:#a9bfd1; line-height:1.7; }
+.ml-evidence-strip { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; padding:17px 0; margin:5px 0 15px; border-bottom:1px solid #8eafcc33; }
+.ml-evidence-strip span { font-size:10px; display:block; color:#9db8ce; margin-bottom:5px; }
+.ml-evidence-strip strong { font-size:11px; font-weight:500; color:#d4e4f3; }
+.ml-version,.ml-model-context code { font-family:monospace; overflow-wrap:anywhere; }
+.ml-analysis-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+.ml-analysis-card { min-width:0; padding:20px; border:1px solid #8bafd14d; border-radius:13px; background:linear-gradient(140deg,#162e44ed,#222b43ed); }
+.ml-analysis-card h3 { font-size:22px; margin:8px 0 12px; }
+.ml-table-scroll { max-width:100%; overflow-x:auto; margin:18px 0; }
+.confusion-table,.match-input-table { width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; font-size:11px; }
+.confusion-table caption,.match-input-table caption { text-align:left; font-size:10px; color:#9bb7cc; padding-bottom:9px; }
+.confusion-table th,.confusion-table td { border:1px solid #87a7c333; padding:13px 9px; text-align:center; }
+.confusion-table th { background:#122638; font-size:10px; color:#b9cfe1; font-weight:500; }
+.confusion-table td strong { font:700 26px/1.2 'Barlow Condensed',sans-serif; color:#f3f8fa; }
+.confusion-table td small { display:block; font-size:9px; color:#aac2ce; margin-top:5px; white-space:nowrap; }
+.ml-correct-cell { background:#4b8f6133; }
+.ml-missed-cell { background:#b6804b12; }
+.ml-calibration-legend { display:flex; gap:14px; flex-wrap:wrap; font-size:10px; margin:15px 0; color:#7cddf0; }
+.ml-calibration-legend span:last-child { color:#cdf08d; }
+.ml-calibration-row { padding:10px 0; border-top:1px solid #86a4c12b; display:grid; grid-template-columns:100px minmax(0,1fr); gap:12px; align-items:center; }
+.ml-bin-label strong { display:block; font-size:12px; }
+.ml-bin-label small { font-size:9px; color:#acc1d1; line-height:1.5; }
+.ml-bin-bars > div { height:17px; margin:4px 0; display:flex; align-items:center; position:relative; background:#0c1e3088; border-radius:3px; padding-right:43px; }
+.ml-bin-bars span { height:7px; border-radius:3px; background:#7cddf0; display:block; max-width:100%; }
+.ml-bin-bars > div:last-child span { background:#cdf08d; }
+.ml-bin-bars b { position:absolute; right:0; font-size:9px; width:40px; text-align:right; font-weight:500; color:#c6d9e7; }
+.ml-method { margin-top:17px; padding:15px; background:#11273c88; border:1px solid #7896ba3b; border-radius:10px; }
+.ml-method summary { color:#d6f3ab; cursor:pointer; font-size:12px; }
+.ml-method ol { padding-left:19px; font-size:11px; line-height:1.9; color:#bdd0df; }
+.ml-method li { margin:9px 0; }
+.ml-method p { font-size:11px; line-height:1.8; color:#b7cddd; }
+.ml-method code { display:block; font-size:10px; overflow-wrap:anywhere; color:#96b2ca; margin-top:10px; }
+.ml-evaluation .ml-report-note,.match-inputs .ml-report-note { font-size:10px; color:#a1bacd; margin:15px 0 0; line-height:1.8; }
+.ml-unavailable { padding:15px; border:1px solid #c4975d88; border-radius:10px; color:#ebd1a8; font-size:12px; }
+.match-inputs { margin-top:24px; }
+.match-inputs .ml-section-heading a { font-size:11px; color:#d5f2a6; }
+.match-input-table th,.match-input-table td { padding:15px 13px; border-bottom:1px solid #9bb7cb2b; text-align:left; }
+.match-input-table thead th { color:#d8e9f5; background:#163048; width:34%; }
+.match-input-table thead th:first-child { width:32%; }
+.match-input-table th small { display:block; font-size:9px; color:#9db9cd; margin:3px 0; font-weight:400; }
+.match-input-table tbody th { font-weight:500; color:#bacede; }
+.match-input-table td { font:700 25px/1.2 'Barlow Condensed',sans-serif; color:#def6b6; }
+.match-input-table .ml-history-row td { font-size:21px; color:#abc8dc; }
+.ml-model-context { font-size:10px!important; color:#b3c9dc; line-height:1.8; }
+@media(max-width:1000px) { .ml-analysis-grid { grid-template-columns:1fr; } }
+@media(max-width:650px) {
+ .ml-evaluation { padding:17px; }
+ .ml-section-heading h2 { font-size:23px; }
+ .ml-metric-grid { grid-template-columns:1fr; gap:8px; }
+ .ml-metric-grid article { padding:13px 15px; }
+ .ml-metric-grid strong { font-size:34px; }
+ .ml-evidence-strip { grid-template-columns:1fr; gap:11px; }
+ .ml-sport-tabs button { padding:10px; }
+ .ml-analysis-card { padding:15px; }
+ .confusion-table th,.confusion-table td { padding:10px 6px; }
+ .match-input-table { min-width:420px; }
+ .ml-calibration-row { grid-template-columns:85px minmax(0,1fr); }
+}

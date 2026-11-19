@@ -11,6 +11,7 @@ import ParlayBuilder from "./pages/ParlayBuilder";
 
 import "./App.css";
 import "./background.css";
+import "./ml-insights.css";
 import AppFrame from "./components/AppFrame";
 
 function App() {
