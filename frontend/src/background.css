@@ -156,6 +156,7 @@
 .board-quick-slip .bet-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .board-quick-slip .bet-actions button { flex: 1; min-height: 44px; }
 .team-pick-button:focus-visible,.board-odds-pick:focus-visible,.board-bet-now:focus-visible { outline: 3px solid #e0ffae; outline-offset: 3px; }
+.board-quick-slip:focus { outline: 3px solid #e0ffae; outline-offset: 3px; }
 @media(max-width: 680px) { .team-pick-hint { font-size: 9px; } .app-frame::after { opacity: .7; } }
 /* Compact account controls share the header instead of a page-wide account banner. */
 .site-header { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 13px 20px; padding-top: 15px; padding-bottom: 15px; min-height: 0; }
