@@ -1,5 +1,10 @@
 # SportsBetting_491
 
+## Run the app locally (Windows or macOS)
+
+Start with [Team local setup](docs/team-local-setup.md). A fresh clone needs its own PostgreSQL database, private settings, dependencies, downloaded real data and trained models. The older Start-LocalApp.ps1 assumes Andrew's project-local Windows database; use Run-LocalApp.py after the shared setup instead.
+
+
 
 ## Testing and CI
 
