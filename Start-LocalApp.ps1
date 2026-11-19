@@ -10,7 +10,7 @@ function Test-LocalPort([int]$Port) {
 }
 $pgBin = Join-Path $projectRoot 'build/postgres-runtime/pgsql/bin'
 $pgData = Join-Path $projectRoot 'build/postgres-data'
-if (!(Test-Path (Join-Path $pgData 'PG_VERSION'))) { throw 'Local database has not been initialized.' }
+if (!(Test-Path (Join-Path $pgData 'PG_VERSION'))) { throw 'This legacy launcher requires Andrew''s private build/postgres-data database. For a fresh Windows or Mac install, follow docs/team-local-setup.md and use Run-LocalApp.py.' }
 & (Join-Path $pgBin 'pg_ctl.exe') -D $pgData status *> $null
 if ($LASTEXITCODE -ne 0) {
     $pgArgs = @('-D', "`"$pgData`"", '-l', "`"$(Join-Path $projectRoot 'build/postgres.log')`"", '-o', '"-h 127.0.0.1 -p 5432"', '-w', 'start')

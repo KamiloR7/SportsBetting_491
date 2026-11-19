@@ -1,3 +1,4 @@
+import MatchInputs from "../components/MatchInputs";
 import BetSlip from "../components/BetSlip";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -177,6 +178,7 @@ function MatchData({ id, searchParams }) {
         <PredictionPanel key={result.match.id} matchId={result.match.id} replay={result.match.status === "final"} />
         <BetSlip key={`bet-${result.match.id}`} match={result.match} />
       </div>
+      <MatchInputs key={`inputs-${result.match.id}`} matchId={result.match.id}/>
       <section className="match-details-context" aria-labelledby="team-context-heading">
         <span className="section-kicker">BEFORE THE WHISTLE</span>
         <h2 id="team-context-heading">Recent form before this match</h2>

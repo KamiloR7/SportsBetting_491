@@ -1,5 +1,7 @@
 Latest account/parlay update: see [Parlays and account pages](../backend/docs/parlays_and_account_pages.md) for current navigation, setup and verified balance. Earlier snapshots below are historical.
 
+For the detailed ML evaluation and match-input breakdown, including the read-only audit setup command, see [ML evaluation dashboard](ml-evaluation-dashboard.md).
+
 # Andrew local PostgreSQL demo
 
 For the subsequent multi-season import, redesigned UI and historical replay, see [Expanded app handoff](sprint5-expanded-app.md). Its current data counts and model paths supersede the initial setup snapshot below.
