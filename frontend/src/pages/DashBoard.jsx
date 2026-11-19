@@ -157,6 +157,30 @@ function LeagueMatches({ sportOption, status, search, offset, onPage, returnPara
 function PredictionHistory() {
   const [history] = useState(() => getPredictionHistory());
 
+  function formatProbability(value) {
+    return Number.isFinite(value) ? `${Math.round(value * 100)}%` : "Unavailable";
+  }
+
+  function outcomeLabel(prediction) {
+    const labels = {
+      home: "Home win",
+      home_win: "Home win",
+      away: "Away win",
+      away_win: "Away win",
+      draw: "Draw",
+    };
+    const predictedOutcome = String(prediction.predicted_outcome || "").toLowerCase();
+    if (labels[predictedOutcome]) return labels[predictedOutcome];
+    if (predictedOutcome === "not_home_win") return "Not a home win";
+
+    const distribution = prediction.outcome_probabilities;
+    if (distribution && typeof distribution === "object") {
+      const highest = Object.entries(distribution).sort((a, b) => b[1] - a[1])[0]?.[0];
+      if (labels[highest]) return labels[highest];
+    }
+    return "Outcome unavailable";
+  }
+
   return (
     <section className="prediction-history" aria-labelledby="prediction-history-heading">
       <div className="prediction-history-heading">
@@ -168,11 +192,20 @@ function PredictionHistory() {
       ) : (
         <ol className="prediction-history-list">
           {history.map((prediction, index) => {
-            const predictedHomeWin = prediction.predicted_outcome === "HOME_WIN";
             const savedDate = new Date(prediction.saved_at);
             const dateLabel = Number.isNaN(savedDate.getTime())
               ? "Date unavailable"
               : savedDate.toLocaleString();
+            const distribution = prediction.outcome_probabilities;
+            const hasOutcomeDistribution = distribution && typeof distribution === "object";
+            const distributionValues = hasOutcomeDistribution
+              ? Object.values(distribution).filter(Number.isFinite)
+              : [];
+            const confidence = Number.isFinite(prediction.confidence)
+              ? prediction.confidence
+              : distributionValues.length
+                ? Math.max(...distributionValues)
+                : undefined;
             return (
               <li key={`${prediction.match_id}-${prediction.saved_at}-${index}`}>
                 <div>
@@ -180,13 +213,15 @@ function PredictionHistory() {
                     {prediction.home_team_name || "Home team"} vs {prediction.away_team_name || "Away team"}
                     {prediction.sport ? ` · ${prediction.sport}` : ""}
                   </p>
-                  <p>{prediction.mode === "historical_replay" ? "Historical replay" : "Pregame forecast"} · Outcome: {predictedHomeWin ? "Home win" : "Not a home win"}{prediction.mode === "historical_replay" ? (prediction.correct ? " · Matched result" : " · Missed result") : ""}</p>
+                  <p>{prediction.mode === "historical_replay" ? "Historical replay" : "Pregame forecast"} · Outcome: {outcomeLabel(prediction)}{prediction.mode === "historical_replay" ? (prediction.correct ? " · Matched result" : " · Missed result") : ""}</p>
                   <p>
-                    Home win {Math.round((prediction.probabilities?.home_win ?? 0) * 100)}%
-                    {" · "}
-                    Not a home win {Math.round((prediction.probabilities?.not_home_win ?? 0) * 100)}%
-                    {" · "}
-                    Confidence {Math.round((prediction.confidence ?? 0) * 100)}%
+                    {hasOutcomeDistribution
+                      ? Object.entries(distribution).map(([outcome, probability]) => {
+                        const label = outcomeLabel({ predicted_outcome: outcome });
+                        return `${label} ${formatProbability(probability)}`;
+                      }).join(" · ")
+                      : `Home win ${formatProbability(prediction.probabilities?.home_win)} · Not a home win ${formatProbability(prediction.probabilities?.not_home_win)}`}
+                    {` · Confidence ${formatProbability(confidence)}`}
                   </p>
                   <p className="prediction-history-date">{dateLabel}</p>
                 </div>
