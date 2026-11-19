@@ -92,6 +92,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -c backend/requirements-sprint2-tested.txt pytest
+          pip install -c backend/requirements-sprint2-tested.txt pytest-cov
           pip install -e .
           pip install -c backend/requirements-sprint2-tested.txt -r backend/requirements.txt
 
@@ -104,7 +105,20 @@ jobs:
       - name: Run automated tests
         env:
           PYTHONPATH: backend
-        run: python -m pytest -v --junitxml=build/test-results.xml
+        run: >-
+          python -m pytest -v
+          --cov=backend/app/ml
+          --cov-report=term-missing
+          --cov-report=xml:build/coverage.xml
+          --cov-fail-under=80
+          --junitxml=build/test-results.xml
+
+      - name: Upload ML coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ steps.metadata.outputs.build_id }}
+          path: build/coverage.xml
 
       - name: Upload test results
         if: always()
