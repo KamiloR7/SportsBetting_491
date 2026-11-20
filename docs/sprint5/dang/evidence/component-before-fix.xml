@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="33" failures="2" errors="0" time="0.472728292">
+    <testsuite name="src/components/MatchCard.test.jsx" timestamp="2026-11-19T20:19:01.927Z" hostname="Dangs-MacBook-Air-207.local" tests="12" failures="1" errors="0" skipped="0" time="0.240298333">
+        <testcase classname="src/components/MatchCard.test.jsx" name="SCRUM-226 MatchCard rendering and eligibility &gt; shows teams, loading state and the contextual details link" time="0.110546958">
+        </testcase>
+        <testcase classname="src/components/MatchCard.test.jsx" name="SCRUM-226 MatchCard rendering and eligibility &gt; enables picks only for an open future model-priced market" time="0.020648667">
+        </testcase>
+        <testcase classname="src/components/MatchCard.test.jsx" name="SCRUM-226 MatchCard rendering and eligibility &gt; shows the final score and replay link without fetching odds" time="0.005023167">
+        </testcase>
+        <testcase classname="src/components/MatchCard.test.jsx" name="SCRUM-226 MatchCard rendering and eligibility &gt; prevents picks for closed market" time="0.007428916">
+        </testcase>
+        <testcase classname="src/components/MatchCard.test.jsx" name="SCRUM-226 MatchCard rendering and eligibility &gt; prevents picks for in-progress match" time="0.006217125">
+        </testcase>
+        <testcase classname="src/components/MatchCard.test.jsx" name="SCRUM-226 MatchCard rendering and eligibility &gt; prevents picks for kickoff passed" time="0.006413083">
+        </testcase>
+        <testcase classname="src/components/MatchCard.test.jsx" name="SCRUM-226 MatchCard rendering and eligibility &gt; prevents picks for reconstructed prices" time="0.006642083">
+        </testcase>
+        <testcase classname="src/components/MatchCard.test.jsx" name="SCRUM-226 MatchCard rendering and eligibility &gt; shows unavailable instead of an invented price" time="0.006054292">
+        </testcase>
+        <testcase classname="src/components/MatchCard.test.jsx" name="SCRUM-226 MatchCard rendering and eligibility &gt; shows unavailable instead of an invented price" time="0.005846916">
+        </testcase>
+        <testcase classname="src/components/MatchCard.test.jsx" name="SCRUM-226 MatchCard rendering and eligibility &gt; handles a market-service failure without losing navigation" time="0.0059695">
+        </testcase>
+        <testcase classname="src/components/MatchCard.test.jsx" name="SCRUM-226 MatchCard rendering and eligibility &gt; opens and closes the inline slip with keyboard-accessible controls" time="0.04402025">
+        </testcase>
+        <testcase classname="src/components/MatchCard.test.jsx" name="SCRUM-226 MatchCard rendering and eligibility &gt; does not offer the previous match price when a card receives another match" time="0.014131292">
+            <failure message="expected &lt;button type=&quot;button&quot; …(3)&gt;…(3)&lt;/button&gt; to be null" type="AssertionError">
+AssertionError: expected &lt;button type=&quot;button&quot; …(3)&gt;…(3)&lt;/button&gt; to be null
+
+- Expected:
+null
+
++ Received:
+&lt;button
+  aria-label=&quot;Select New team at 1.60&quot;
+  aria-pressed=&quot;false&quot;
+  class=&quot;odds-home board-odds-pick&quot;
+  type=&quot;button&quot;
+&gt;
+  &lt;small&gt;
+    New team
+  &lt;/small&gt;
+  &lt;strong&gt;
+    1.60
+  &lt;/strong&gt;
+  &lt;span&gt;
+    Bet / Parlay +
+  &lt;/span&gt;
+&lt;/button&gt;
+
+ ❯ src/components/MatchCard.test.jsx:74:79
+            </failure>
+        </testcase>
+    </testsuite>
+    <testsuite name="src/components/PredictionPanel.test.jsx" timestamp="2026-11-19T20:19:01.930Z" hostname="Dangs-MacBook-Air-207.local" tests="8" failures="1" errors="0" skipped="0" time="0.218273709">
+        <testcase classname="src/components/PredictionPanel.test.jsx" name="SCRUM-226/227 PredictionPanel &gt; announces loading and prevents repeat requests while pending" time="0.060119833">
+        </testcase>
+        <testcase classname="src/components/PredictionPanel.test.jsx" name="SCRUM-226/227 PredictionPanel &gt; renders the forecast, probability meter and sample sizes from the API" time="0.04530525">
+        </testcase>
+        <testcase classname="src/components/PredictionPanel.test.jsx" name="SCRUM-226/227 PredictionPanel &gt; shows EPL draw as an explicit leading outcome for three-way predictions" time="0.011246084">
+            <failure message="Found multiple elements with the text: 50%
+
+Here are the matching elements:
+
+Ignored nodes: comments, script, style
+&lt;div
+  class=&quot;confidence-value&quot;
+&gt;
+  50%
+  &lt;span&gt;
+    model probability
+  &lt;/span&gt;
+&lt;/div&gt;
+
+Ignored nodes: comments, script, style
+&lt;strong&gt;
+  50%
+&lt;/strong&gt;
+
+(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).
+
+Ignored nodes: comments, script, style
+&lt;body&gt;
+  &lt;div&gt;
+    &lt;section
+      aria-labelledby=&quot;prediction-heading&quot;
+      class=&quot;prediction-panel&quot;
+    &gt;
+      &lt;div
+        class=&quot;section-kicker&quot;
+      &gt;
+        VIGOR MODEL INSIGHT
+      &lt;/div&gt;
+      &lt;h2
+        id=&quot;prediction-heading&quot;
+      &gt;
+        Match forecast
+      &lt;/h2&gt;
+      &lt;p&gt;
+        Your pregame insight, ready automatically. Based on prior team results.
+      &lt;/p&gt;
+      &lt;button
+        type=&quot;button&quot;
+      &gt;
+        Refresh insight
+      &lt;/button&gt;
+      &lt;div
+        aria-live=&quot;polite&quot;
+        class=&quot;prediction-result&quot;
+      &gt;
+        &lt;p&gt;
+          &lt;strong&gt;
+            Draw is the leading outcome
+          &lt;/strong&gt;
+        &lt;/p&gt;
+        &lt;p&gt;
+          Cincinnati Bengals
+           vs
+          Kansas City Chiefs
+           ·
+          EPL
+        &lt;/p&gt;
+        &lt;div
+          class=&quot;confidence-value&quot;
+        &gt;
+          50%
+          &lt;span&gt;
+            model probability
+          &lt;/span&gt;
+        &lt;/div&gt;
+        &lt;label&gt;
+          Home win ·
+          60%
+          &lt;meter
+            max=&quot;1&quot;
+            min=&quot;0&quot;
+            value=&quot;0.6&quot;
+          /&gt;
+        &lt;/label&gt;
+        &lt;div
+          class=&quot;outcome-probabilities&quot;
+        &gt;
+          &lt;p&gt;
+            Home win
+            &lt;strong&gt;
+              20%
+            &lt;/strong&gt;
+          &lt;/p&gt;
+          &lt;p&gt;
+            Draw
+            &lt;strong&gt;
+              50%
+            &lt;/strong&gt;
+          &lt;/p&gt;
+          &lt;p&gt;
+            Away win
+            &lt;strong&gt;
+              30%
+            &lt;/strong&gt;
+          &lt;/p&gt;
+        &lt;/div&gt;
+        &lt;p&gt;
+          History:
+          12
+           home-team games ·
+          15
+           away-team games
+        &lt;/p&gt;
+        &lt;p
+          class=&quot;prediction-note&quot;
+        &gt;
+          These outcome probabilities also generate the market prices. Estimates, never guarantees.
+        &lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/section&gt;
+  &lt;/div&gt;
+&lt;/body&gt;" type="TestingLibraryElementError">
+TestingLibraryElementError: Found multiple elements with the text: 50%
+
+Here are the matching elements:
+
+Ignored nodes: comments, script, style
+&lt;div
+  class=&quot;confidence-value&quot;
+&gt;
+  50%
+  &lt;span&gt;
+    model probability
+  &lt;/span&gt;
+&lt;/div&gt;
+
+Ignored nodes: comments, script, style
+&lt;strong&gt;
+  50%
+&lt;/strong&gt;
+
+(If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).
+
+Ignored nodes: comments, script, style
+&lt;body&gt;
+  &lt;div&gt;
+    &lt;section
+      aria-labelledby=&quot;prediction-heading&quot;
+      class=&quot;prediction-panel&quot;
+    &gt;
+      &lt;div
+        class=&quot;section-kicker&quot;
+      &gt;
+        VIGOR MODEL INSIGHT
+      &lt;/div&gt;
+      &lt;h2
+        id=&quot;prediction-heading&quot;
+      &gt;
+        Match forecast
+      &lt;/h2&gt;
+      &lt;p&gt;
+        Your pregame insight, ready automatically. Based on prior team results.
+      &lt;/p&gt;
+      &lt;button
+        type=&quot;button&quot;
+      &gt;
+        Refresh insight
+      &lt;/button&gt;
+      &lt;div
+        aria-live=&quot;polite&quot;
+        class=&quot;prediction-result&quot;
+      &gt;
+        &lt;p&gt;
+          &lt;strong&gt;
+            Draw is the leading outcome
+          &lt;/strong&gt;
+        &lt;/p&gt;
+        &lt;p&gt;
+          Cincinnati Bengals
+           vs
+          Kansas City Chiefs
+           ·
+          EPL
+        &lt;/p&gt;
+        &lt;div
+          class=&quot;confidence-value&quot;
+        &gt;
+          50%
+          &lt;span&gt;
+            model probability
+          &lt;/span&gt;
+        &lt;/div&gt;
+        &lt;label&gt;
+          Home win ·
+          60%
+          &lt;meter
+            max=&quot;1&quot;
+            min=&quot;0&quot;
+            value=&quot;0.6&quot;
+          /&gt;
+        &lt;/label&gt;
+        &lt;div
+          class=&quot;outcome-probabilities&quot;
+        &gt;
+          &lt;p&gt;
+            Home win
+            &lt;strong&gt;
+              20%
+            &lt;/strong&gt;
+          &lt;/p&gt;
+          &lt;p&gt;
+            Draw
+            &lt;strong&gt;
+              50%
+            &lt;/strong&gt;
+          &lt;/p&gt;
+          &lt;p&gt;
+            Away win
+            &lt;strong&gt;
+              30%
+            &lt;/strong&gt;
+          &lt;/p&gt;
+        &lt;/div&gt;
+        &lt;p&gt;
+          History:
+          12
+           home-team games ·
+          15
+           away-team games
+        &lt;/p&gt;
+        &lt;p
+          class=&quot;prediction-note&quot;
+        &gt;
+          These outcome probabilities also generate the market prices. Estimates, never guarantees.
+        &lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/section&gt;
+  &lt;/div&gt;
+&lt;/body&gt;
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ getElementError node_modules/@testing-library/dom/dist/query-helpers.js:20:35
+ ❯ getMultipleElementsFoundError node_modules/@testing-library/dom/dist/query-helpers.js:23:10
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:55:13
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/components/PredictionPanel.test.jsx:26:19
+            </failure>
+        </testcase>
+        <testcase classname="src/components/PredictionPanel.test.jsx" name="SCRUM-226/227 PredictionPanel &gt; labels historical replay and its correctness (true)" time="0.008137292">
+        </testcase>
+        <testcase classname="src/components/PredictionPanel.test.jsx" name="SCRUM-226/227 PredictionPanel &gt; labels historical replay and its correctness (false)" time="0.007269292">
+        </testcase>
+        <testcase classname="src/components/PredictionPanel.test.jsx" name="SCRUM-226/227 PredictionPanel &gt; shows a service error and allows a successful retry" time="0.022412708">
+        </testcase>
+        <testcase classname="src/components/PredictionPanel.test.jsx" name="SCRUM-226/227 PredictionPanel &gt; keeps a prediction visible if browser storage is unavailable" time="0.0042625">
+        </testcase>
+        <testcase classname="src/components/PredictionPanel.test.jsx" name="SCRUM-226/227 PredictionPanel &gt; aborts an old request and ignores its late response after changing matches" time="0.058090042">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/services/api.test.js" timestamp="2026-11-19T20:19:01.932Z" hostname="Dangs-MacBook-Air-207.local" tests="13" failures="0" errors="0" skipped="0" time="0.01415625">
+        <testcase classname="src/services/api.test.js" name="SCRUM-227 service integration with mocked fetch &gt; sends pre-login CSRF and same-origin credentials before a mutation" time="0.006430458">
+        </testcase>
+        <testcase classname="src/services/api.test.js" name="SCRUM-227 service integration with mocked fetch &gt; stops before mutation if CSRF fails" time="0.001494542">
+        </testcase>
+        <testcase classname="src/services/api.test.js" name="SCRUM-227 service integration with mocked fetch &gt; preserves a 401 service status and useful message" time="0.000512125">
+        </testcase>
+        <testcase classname="src/services/api.test.js" name="SCRUM-227 service integration with mocked fetch &gt; preserves a 409 service status and useful message" time="0.0004085">
+        </testcase>
+        <testcase classname="src/services/api.test.js" name="SCRUM-227 service integration with mocked fetch &gt; preserves a 422 service status and useful message" time="0.000374209">
+        </testcase>
+        <testcase classname="src/services/api.test.js" name="SCRUM-227 service integration with mocked fetch &gt; preserves a 429 service status and useful message" time="0.000325917">
+        </testcase>
+        <testcase classname="src/services/api.test.js" name="SCRUM-227 service integration with mocked fetch &gt; preserves a 503 service status and useful message" time="0.000294041">
+        </testcase>
+        <testcase classname="src/services/api.test.js" name="SCRUM-227 service integration with mocked fetch &gt; handles malformed error payloads without crashing the UI" time="0.000393166">
+        </testcase>
+        <testcase classname="src/services/api.test.js" name="SCRUM-227 service integration with mocked fetch &gt; handles no-content logout" time="0.000470125">
+        </testcase>
+        <testcase classname="src/services/api.test.js" name="SCRUM-227 service integration with mocked fetch &gt; distinguishes a network failure from a request cancellation" time="0.001167667">
+        </testcase>
+        <testcase classname="src/services/api.test.js" name="SCRUM-227 service integration with mocked fetch &gt; rejects invalid match ID 0 without fetching" time="0.000510833">
+        </testcase>
+        <testcase classname="src/services/api.test.js" name="SCRUM-227 service integration with mocked fetch &gt; rejects invalid match ID -1 without fetching" time="0.000209958">
+        </testcase>
+        <testcase classname="src/services/api.test.js" name="SCRUM-227 service integration with mocked fetch &gt; rejects invalid match ID invalid without fetching" time="0.000165209">
+        </testcase>
+    </testsuite>
+</testsuites>

@@ -57,6 +57,8 @@ Thumbs.db
 .coverage
 htmlcov/
 *.inspect.ndjson
+frontend/test-results/
+frontend/playwright-report/
 
 
 # =========================

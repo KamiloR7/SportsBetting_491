@@ -1,0 +1,18 @@
+{
+  "checked_utc": "2026-11-20T02:43:28.253597+00:00",
+  "operation": "read-only schema inspection; no account created",
+  "users_table_present": true,
+  "missing_registration_columns": [],
+  "local_http_demo_configured": true,
+  "virtual_betting_configured": true,
+  "auth_tables_present": [
+    "auth_assessment_records",
+    "auth_csrf_challenges",
+    "auth_login_attempts",
+    "auth_sessions"
+  ],
+  "wallet_tables_present": [
+    "virtual_wallet_transactions",
+    "virtual_wallets"
+  ]
+}

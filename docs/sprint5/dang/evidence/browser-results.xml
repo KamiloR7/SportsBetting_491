@@ -1,0 +1,22 @@
+<testsuites id="" name="" tests="8" failures="0" skipped="0" errors="0" time="21.882084">
+<testsuite name="sprint5-ui.spec.js" timestamp="2026-11-19T20:54:38.453Z" hostname="chromium" tests="4" failures="0" skipped="0" time="11.75" errors="0">
+<testcase name="Scenario 2 / SCRUM-229 dashboard to selected match, team history and contextual back navigation" classname="sprint5-ui.spec.js" time="3.112">
+</testcase>
+<testcase name="SCRUM-227/229 empty and unavailable lists remain navigable" classname="sprint5-ui.spec.js" time="3.141">
+</testcase>
+<testcase name="Scenario 2 / SCRUM-229/230 sport, status, search and keyboard filtering" classname="sprint5-ui.spec.js" time="2.901">
+</testcase>
+<testcase name="Scenario 2 / SCRUM-229/230 mobile board and match details pass layout and axe smoke" classname="sprint5-ui.spec.js" time="2.596">
+</testcase>
+</testsuite>
+<testsuite name="sprint5-ui.spec.js" timestamp="2026-11-19T20:54:38.453Z" hostname="webkit" tests="4" failures="0" skipped="0" time="27.289" errors="0">
+<testcase name="Scenario 2 / SCRUM-229 dashboard to selected match, team history and contextual back navigation" classname="sprint5-ui.spec.js" time="8.484">
+</testcase>
+<testcase name="SCRUM-227/229 empty and unavailable lists remain navigable" classname="sprint5-ui.spec.js" time="7.881">
+</testcase>
+<testcase name="Scenario 2 / SCRUM-229/230 sport, status, search and keyboard filtering" classname="sprint5-ui.spec.js" time="6.047">
+</testcase>
+<testcase name="Scenario 2 / SCRUM-229/230 mobile board and match details pass layout and axe smoke" classname="sprint5-ui.spec.js" time="4.877">
+</testcase>
+</testsuite>
+</testsuites>

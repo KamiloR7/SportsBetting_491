@@ -1,0 +1,585 @@
+
+> frontend@0.0.0 test:e2e
+> playwright test
+
+
+Running 8 tests using 2 workers
+
+  ✘  1 [chromium] › e2e/sprint5-ui.spec.js:16:1 › SCRUM-229 dashboard to match forecast and contextual back navigation (2.3s)
+  ✓  2 [chromium] › e2e/sprint5-ui.spec.js:33:1 › SCRUM-227/229 empty and unavailable lists remain navigable (2.8s)
+  ✘  4 [chromium] › e2e/sprint5-ui.spec.js:73:1 › SCRUM-229/230 mobile login and board have no horizontal overflow and pass axe smoke (1.2s)
+  ✓  3 [chromium] › e2e/sprint5-ui.spec.js:47:1 › SCRUM-229/230 keyboard login, error feedback, sign-in and sign-out with mock API (2.0s)
+  ✘  5 [webkit] › e2e/sprint5-ui.spec.js:16:1 › SCRUM-229 dashboard to match forecast and contextual back navigation (7.4s)
+  ✓  6 [webkit] › e2e/sprint5-ui.spec.js:33:1 › SCRUM-227/229 empty and unavailable lists remain navigable (11.2s)
+  ✘  8 [webkit] › e2e/sprint5-ui.spec.js:73:1 › SCRUM-229/230 mobile login and board have no horizontal overflow and pass axe smoke (2.4s)
+  ✘  7 [webkit] › e2e/sprint5-ui.spec.js:47:1 › SCRUM-229/230 keyboard login, error feedback, sign-in and sign-out with mock API (7.8s)
+
+
+  1) [chromium] › e2e/sprint5-ui.spec.js:16:1 › SCRUM-229 dashboard to match forecast and contextual back navigation
+
+    Error: match-forecast: color-contrast
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  -  1
+    + Received  + 97
+
+    - Array []
+    + Array [
+    +   Object {
+    +     "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+    +     "help": "Elements must meet minimum color contrast ratio thresholds",
+    +     "helpUrl": "https://dequeuniversity.com/rules/axe/4.14/color-contrast?application=axeAPI",
+    +     "id": "color-contrast",
+    +     "impact": "serious",
+    +     "nodes": Array [
+    +       Object {
+    +         "all": Array [],
+    +         "any": Array [
+    +           Object {
+    +             "data": Object {
+    +               "bgColor": "#142641",
+    +               "colorParse": undefined,
+    +               "contrastRatio": 3.34,
+    +               "expectedContrastRatio": "4.5:1",
+    +               "fgColor": "#647988",
+    +               "fontSize": "7.5pt (10px)",
+    +               "fontWeight": "normal",
+    +               "messageKey": null,
+    +               "shadowColor": undefined,
+    +             },
+    +             "id": "color-contrast",
+    +             "impact": "serious",
+    +             "message": "Element has insufficient color contrast of 3.34 (foreground color: #647988, background color: #142641, font size: 7.5pt (10px), font weight: normal). Expected contrast ratio of 4.5:1",
+    +             "relatedNodes": Array [
+    +               Object {
+    +                 "html": "<div class=\"app-frame\">",
+    +                 "target": Array [
+    +                   ".app-frame",
+    +                 ],
+    +               },
+    +             ],
+    +           },
+    +         ],
+    +         "failureSummary": "Fix any of the following:
+    +   Element has insufficient color contrast of 3.34 (foreground color: #647988, background color: #142641, font size: 7.5pt (10px), font weight: normal). Expected contrast ratio of 4.5:1",
+    +         "html": "<span>Real games. Measured predictions. Virtual points.</span>",
+    +         "impact": "serious",
+    +         "none": Array [],
+    +         "target": Array [
+    +           "footer > span:nth-child(2)",
+    +         ],
+    +       },
+    +       Object {
+    +         "all": Array [],
+    +         "any": Array [
+    +           Object {
+    +             "data": Object {
+    +               "bgColor": "#142641",
+    +               "colorParse": undefined,
+    +               "contrastRatio": 3.34,
+    +               "expectedContrastRatio": "4.5:1",
+    +               "fgColor": "#647988",
+    +               "fontSize": "6.8pt (9px)",
+    +               "fontWeight": "normal",
+    +               "messageKey": null,
+    +               "shadowColor": undefined,
+    +             },
+    +             "id": "color-contrast",
+    +             "impact": "serious",
+    +             "message": "Element has insufficient color contrast of 3.34 (foreground color: #647988, background color: #142641, font size: 6.8pt (9px), font weight: normal). Expected contrast ratio of 4.5:1",
+    +             "relatedNodes": Array [
+    +               Object {
+    +                 "html": "<div class=\"app-frame\">",
+    +                 "target": Array [
+    +                   ".app-frame",
+    +                 ],
+    +               },
+    +             ],
+    +           },
+    +         ],
+    +         "failureSummary": "Fix any of the following:
+    +   Element has insufficient color contrast of 3.34 (foreground color: #647988, background color: #142641, font size: 6.8pt (9px), font weight: normal). Expected contrast ratio of 4.5:1",
+    +         "html": "<span>University project · No cash value</span>",
+    +         "impact": "serious",
+    +         "none": Array [],
+    +         "target": Array [
+    +           "span:nth-child(3)",
+    +         ],
+    +       },
+    +     ],
+    +     "tags": Array [
+    +       "cat.color",
+    +       "wcag2aa",
+    +       "wcag143",
+    +       "TTv5",
+    +       "TT13.c",
+    +       "EN-301-549",
+    +       "EN-9.1.4.3",
+    +       "ACT",
+    +       "RGAAv4",
+    +       "RGAA-3.2.1",
+    +     ],
+    +   },
+    + ]
+
+      11 |   })
+      12 |   await testInfo.attach(`axe-${label}`, { body: JSON.stringify(result, null, 2), contentType: 'application/json' })
+    > 13 |   expect(result.violations, `${label}: ${result.violations.map(v => v.id).join(', ')}`).toEqual([])
+         |                                                                                         ^
+      14 | }
+      15 |
+      16 | test('SCRUM-229 dashboard to match forecast and contextual back navigation', async ({ page }, testInfo) => {
+        at scan (./frontend/e2e/sprint5-ui.spec.js:13:89)
+        at ./frontend/e2e/sprint5-ui.spec.js:25:3
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../build/sprint5-qa/browser-artifacts/sprint5-ui-SCRUM-229-dashb-f58be--contextual-back-navigation-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../build/sprint5-qa/browser-artifacts/sprint5-ui-SCRUM-229-dashb-f58be--contextual-back-navigation-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../build/sprint5-qa/browser-artifacts/sprint5-ui-SCRUM-229-dashb-f58be--contextual-back-navigation-chromium/error-context.md
+
+  2) [chromium] › e2e/sprint5-ui.spec.js:73:1 › SCRUM-229/230 mobile login and board have no horizontal overflow and pass axe smoke
+
+    Error: login-mobile: color-contrast
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  -  1
+    + Received  + 97
+
+    - Array []
+    + Array [
+    +   Object {
+    +     "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+    +     "help": "Elements must meet minimum color contrast ratio thresholds",
+    +     "helpUrl": "https://dequeuniversity.com/rules/axe/4.14/color-contrast?application=axeAPI",
+    +     "id": "color-contrast",
+    +     "impact": "serious",
+    +     "nodes": Array [
+    +       Object {
+    +         "all": Array [],
+    +         "any": Array [
+    +           Object {
+    +             "data": Object {
+    +               "bgColor": "#142641",
+    +               "colorParse": undefined,
+    +               "contrastRatio": 3.34,
+    +               "expectedContrastRatio": "4.5:1",
+    +               "fgColor": "#647988",
+    +               "fontSize": "6.0pt (8px)",
+    +               "fontWeight": "normal",
+    +               "messageKey": null,
+    +               "shadowColor": undefined,
+    +             },
+    +             "id": "color-contrast",
+    +             "impact": "serious",
+    +             "message": "Element has insufficient color contrast of 3.34 (foreground color: #647988, background color: #142641, font size: 6.0pt (8px), font weight: normal). Expected contrast ratio of 4.5:1",
+    +             "relatedNodes": Array [
+    +               Object {
+    +                 "html": "<div class=\"app-frame\">",
+    +                 "target": Array [
+    +                   ".app-frame",
+    +                 ],
+    +               },
+    +             ],
+    +           },
+    +         ],
+    +         "failureSummary": "Fix any of the following:
+    +   Element has insufficient color contrast of 3.34 (foreground color: #647988, background color: #142641, font size: 6.0pt (8px), font weight: normal). Expected contrast ratio of 4.5:1",
+    +         "html": "<span>Real games. Measured predictions. Virtual points.</span>",
+    +         "impact": "serious",
+    +         "none": Array [],
+    +         "target": Array [
+    +           "footer > span:nth-child(2)",
+    +         ],
+    +       },
+    +       Object {
+    +         "all": Array [],
+    +         "any": Array [
+    +           Object {
+    +             "data": Object {
+    +               "bgColor": "#142641",
+    +               "colorParse": undefined,
+    +               "contrastRatio": 3.34,
+    +               "expectedContrastRatio": "4.5:1",
+    +               "fgColor": "#647988",
+    +               "fontSize": "6.0pt (8px)",
+    +               "fontWeight": "normal",
+    +               "messageKey": null,
+    +               "shadowColor": undefined,
+    +             },
+    +             "id": "color-contrast",
+    +             "impact": "serious",
+    +             "message": "Element has insufficient color contrast of 3.34 (foreground color: #647988, background color: #142641, font size: 6.0pt (8px), font weight: normal). Expected contrast ratio of 4.5:1",
+    +             "relatedNodes": Array [
+    +               Object {
+    +                 "html": "<div class=\"app-frame\">",
+    +                 "target": Array [
+    +                   ".app-frame",
+    +                 ],
+    +               },
+    +             ],
+    +           },
+    +         ],
+    +         "failureSummary": "Fix any of the following:
+    +   Element has insufficient color contrast of 3.34 (foreground color: #647988, background color: #142641, font size: 6.0pt (8px), font weight: normal). Expected contrast ratio of 4.5:1",
+    +         "html": "<span>University project · No cash value</span>",
+    +         "impact": "serious",
+    +         "none": Array [],
+    +         "target": Array [
+    +           "span:nth-child(3)",
+    +         ],
+    +       },
+    +     ],
+    +     "tags": Array [
+    +       "cat.color",
+    +       "wcag2aa",
+    +       "wcag143",
+    +       "TTv5",
+    +       "TT13.c",
+    +       "EN-301-549",
+    +       "EN-9.1.4.3",
+    +       "ACT",
+    +       "RGAAv4",
+    +       "RGAA-3.2.1",
+    +     ],
+    +   },
+    + ]
+
+      11 |   })
+      12 |   await testInfo.attach(`axe-${label}`, { body: JSON.stringify(result, null, 2), contentType: 'application/json' })
+    > 13 |   expect(result.violations, `${label}: ${result.violations.map(v => v.id).join(', ')}`).toEqual([])
+         |                                                                                         ^
+      14 | }
+      15 |
+      16 | test('SCRUM-229 dashboard to match forecast and contextual back navigation', async ({ page }, testInfo) => {
+        at scan (./frontend/e2e/sprint5-ui.spec.js:13:89)
+        at ./frontend/e2e/sprint5-ui.spec.js:79:3
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../build/sprint5-qa/browser-artifacts/sprint5-ui-SCRUM-229-230-m-b4677-overflow-and-pass-axe-smoke-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../build/sprint5-qa/browser-artifacts/sprint5-ui-SCRUM-229-230-m-b4677-overflow-and-pass-axe-smoke-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../build/sprint5-qa/browser-artifacts/sprint5-ui-SCRUM-229-230-m-b4677-overflow-and-pass-axe-smoke-chromium/error-context.md
+
+  3) [webkit] › e2e/sprint5-ui.spec.js:16:1 › SCRUM-229 dashboard to match forecast and contextual back navigation
+
+    Error: match-forecast: color-contrast
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  -  1
+    + Received  + 97
+
+    - Array []
+    + Array [
+    +   Object {
+    +     "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+    +     "help": "Elements must meet minimum color contrast ratio thresholds",
+    +     "helpUrl": "https://dequeuniversity.com/rules/axe/4.14/color-contrast?application=axeAPI",
+    +     "id": "color-contrast",
+    +     "impact": "serious",
+    +     "nodes": Array [
+    +       Object {
+    +         "all": Array [],
+    +         "any": Array [
+    +           Object {
+    +             "data": Object {
+    +               "bgColor": "#142641",
+    +               "colorParse": undefined,
+    +               "contrastRatio": 3.34,
+    +               "expectedContrastRatio": "4.5:1",
+    +               "fgColor": "#647988",
+    +               "fontSize": "7.5pt (10px)",
+    +               "fontWeight": "normal",
+    +               "messageKey": null,
+    +               "shadowColor": undefined,
+    +             },
+    +             "id": "color-contrast",
+    +             "impact": "serious",
+    +             "message": "Element has insufficient color contrast of 3.34 (foreground color: #647988, background color: #142641, font size: 7.5pt (10px), font weight: normal). Expected contrast ratio of 4.5:1",
+    +             "relatedNodes": Array [
+    +               Object {
+    +                 "html": "<div class=\"app-frame\">",
+    +                 "target": Array [
+    +                   ".app-frame",
+    +                 ],
+    +               },
+    +             ],
+    +           },
+    +         ],
+    +         "failureSummary": "Fix any of the following:
+    +   Element has insufficient color contrast of 3.34 (foreground color: #647988, background color: #142641, font size: 7.5pt (10px), font weight: normal). Expected contrast ratio of 4.5:1",
+    +         "html": "<span>Real games. Measured predictions. Virtual points.</span>",
+    +         "impact": "serious",
+    +         "none": Array [],
+    +         "target": Array [
+    +           "footer > span:nth-child(2)",
+    +         ],
+    +       },
+    +       Object {
+    +         "all": Array [],
+    +         "any": Array [
+    +           Object {
+    +             "data": Object {
+    +               "bgColor": "#142641",
+    +               "colorParse": undefined,
+    +               "contrastRatio": 3.34,
+    +               "expectedContrastRatio": "4.5:1",
+    +               "fgColor": "#647988",
+    +               "fontSize": "6.8pt (9px)",
+    +               "fontWeight": "normal",
+    +               "messageKey": null,
+    +               "shadowColor": undefined,
+    +             },
+    +             "id": "color-contrast",
+    +             "impact": "serious",
+    +             "message": "Element has insufficient color contrast of 3.34 (foreground color: #647988, background color: #142641, font size: 6.8pt (9px), font weight: normal). Expected contrast ratio of 4.5:1",
+    +             "relatedNodes": Array [
+    +               Object {
+    +                 "html": "<div class=\"app-frame\">",
+    +                 "target": Array [
+    +                   ".app-frame",
+    +                 ],
+    +               },
+    +             ],
+    +           },
+    +         ],
+    +         "failureSummary": "Fix any of the following:
+    +   Element has insufficient color contrast of 3.34 (foreground color: #647988, background color: #142641, font size: 6.8pt (9px), font weight: normal). Expected contrast ratio of 4.5:1",
+    +         "html": "<span>University project · No cash value</span>",
+    +         "impact": "serious",
+    +         "none": Array [],
+    +         "target": Array [
+    +           "span:nth-child(3)",
+    +         ],
+    +       },
+    +     ],
+    +     "tags": Array [
+    +       "cat.color",
+    +       "wcag2aa",
+    +       "wcag143",
+    +       "TTv5",
+    +       "TT13.c",
+    +       "EN-301-549",
+    +       "EN-9.1.4.3",
+    +       "ACT",
+    +       "RGAAv4",
+    +       "RGAA-3.2.1",
+    +     ],
+    +   },
+    + ]
+
+      11 |   })
+      12 |   await testInfo.attach(`axe-${label}`, { body: JSON.stringify(result, null, 2), contentType: 'application/json' })
+    > 13 |   expect(result.violations, `${label}: ${result.violations.map(v => v.id).join(', ')}`).toEqual([])
+         |                                                                                         ^
+      14 | }
+      15 |
+      16 | test('SCRUM-229 dashboard to match forecast and contextual back navigation', async ({ page }, testInfo) => {
+        at scan (./frontend/e2e/sprint5-ui.spec.js:13:89)
+        at ./frontend/e2e/sprint5-ui.spec.js:25:3
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../build/sprint5-qa/browser-artifacts/sprint5-ui-SCRUM-229-dashb-f58be--contextual-back-navigation-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../build/sprint5-qa/browser-artifacts/sprint5-ui-SCRUM-229-dashb-f58be--contextual-back-navigation-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../build/sprint5-qa/browser-artifacts/sprint5-ui-SCRUM-229-dashb-f58be--contextual-back-navigation-webkit/error-context.md
+
+  4) [webkit] › e2e/sprint5-ui.spec.js:47:1 › SCRUM-229/230 keyboard login, error feedback, sign-in and sign-out with mock API
+
+    Error: expect(locator).toBeFocused() failed
+
+    Locator:  getByRole('button', { name: 'Show', exact: true })
+    Expected: focused
+    Received: inactive
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeFocused" getByRole('button', { name: 'Show', exact: true }) with timeout 5000ms
+      - waiting for getByRole('button', { name: 'Show', exact: true })
+        14 × locator resolved to <button type="button" class="text-button">Show</button>
+           - unexpected value "inactive"
+
+
+      52 |   await page.keyboard.type('synthetic-ui@example.com')
+      53 |   await page.keyboard.press('Tab')
+    > 54 |   await expect(page.getByRole('button', { name: 'Show', exact: true })).toBeFocused()
+         |                                                                         ^
+      55 |   const focus = await page.getByRole('button', { name: 'Show', exact: true }).evaluate(el => ({ style: getComputedStyle(el).outlineStyle, width: getComputedStyle(el).outlineWidth }))
+      56 |   expect(focus.style).not.toBe('none')
+      57 |   expect(parseFloat(focus.width)).toBeGreaterThan(0)
+        at ./frontend/e2e/sprint5-ui.spec.js:54:73
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../build/sprint5-qa/browser-artifacts/sprint5-ui-SCRUM-229-230-k-c7859--and-sign-out-with-mock-API-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../build/sprint5-qa/browser-artifacts/sprint5-ui-SCRUM-229-230-k-c7859--and-sign-out-with-mock-API-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../build/sprint5-qa/browser-artifacts/sprint5-ui-SCRUM-229-230-k-c7859--and-sign-out-with-mock-API-webkit/error-context.md
+
+  5) [webkit] › e2e/sprint5-ui.spec.js:73:1 › SCRUM-229/230 mobile login and board have no horizontal overflow and pass axe smoke
+
+    Error: login-mobile: color-contrast
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  -  1
+    + Received  + 97
+
+    - Array []
+    + Array [
+    +   Object {
+    +     "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+    +     "help": "Elements must meet minimum color contrast ratio thresholds",
+    +     "helpUrl": "https://dequeuniversity.com/rules/axe/4.14/color-contrast?application=axeAPI",
+    +     "id": "color-contrast",
+    +     "impact": "serious",
+    +     "nodes": Array [
+    +       Object {
+    +         "all": Array [],
+    +         "any": Array [
+    +           Object {
+    +             "data": Object {
+    +               "bgColor": "#142641",
+    +               "colorParse": undefined,
+    +               "contrastRatio": 3.34,
+    +               "expectedContrastRatio": "4.5:1",
+    +               "fgColor": "#647988",
+    +               "fontSize": "6.0pt (8px)",
+    +               "fontWeight": "normal",
+    +               "messageKey": null,
+    +               "shadowColor": undefined,
+    +             },
+    +             "id": "color-contrast",
+    +             "impact": "serious",
+    +             "message": "Element has insufficient color contrast of 3.34 (foreground color: #647988, background color: #142641, font size: 6.0pt (8px), font weight: normal). Expected contrast ratio of 4.5:1",
+    +             "relatedNodes": Array [
+    +               Object {
+    +                 "html": "<div class=\"app-frame\">",
+    +                 "target": Array [
+    +                   ".app-frame",
+    +                 ],
+    +               },
+    +             ],
+    +           },
+    +         ],
+    +         "failureSummary": "Fix any of the following:
+    +   Element has insufficient color contrast of 3.34 (foreground color: #647988, background color: #142641, font size: 6.0pt (8px), font weight: normal). Expected contrast ratio of 4.5:1",
+    +         "html": "<span>Real games. Measured predictions. Virtual points.</span>",
+    +         "impact": "serious",
+    +         "none": Array [],
+    +         "target": Array [
+    +           "footer > span:nth-child(2)",
+    +         ],
+    +       },
+    +       Object {
+    +         "all": Array [],
+    +         "any": Array [
+    +           Object {
+    +             "data": Object {
+    +               "bgColor": "#142641",
+    +               "colorParse": undefined,
+    +               "contrastRatio": 3.34,
+    +               "expectedContrastRatio": "4.5:1",
+    +               "fgColor": "#647988",
+    +               "fontSize": "6.0pt (8px)",
+    +               "fontWeight": "normal",
+    +               "messageKey": null,
+    +               "shadowColor": undefined,
+    +             },
+    +             "id": "color-contrast",
+    +             "impact": "serious",
+    +             "message": "Element has insufficient color contrast of 3.34 (foreground color: #647988, background color: #142641, font size: 6.0pt (8px), font weight: normal). Expected contrast ratio of 4.5:1",
+    +             "relatedNodes": Array [
+    +               Object {
+    +                 "html": "<div class=\"app-frame\">",
+    +                 "target": Array [
+    +                   ".app-frame",
+    +                 ],
+    +               },
+    +             ],
+    +           },
+    +         ],
+    +         "failureSummary": "Fix any of the following:
+    +   Element has insufficient color contrast of 3.34 (foreground color: #647988, background color: #142641, font size: 6.0pt (8px), font weight: normal). Expected contrast ratio of 4.5:1",
+    +         "html": "<span>University project · No cash value</span>",
+    +         "impact": "serious",
+    +         "none": Array [],
+    +         "target": Array [
+    +           "span:nth-child(3)",
+    +         ],
+    +       },
+    +     ],
+    +     "tags": Array [
+    +       "cat.color",
+    +       "wcag2aa",
+    +       "wcag143",
+    +       "TTv5",
+    +       "TT13.c",
+    +       "EN-301-549",
+    +       "EN-9.1.4.3",
+    +       "ACT",
+    +       "RGAAv4",
+    +       "RGAA-3.2.1",
+    +     ],
+    +   },
+    + ]
+
+      11 |   })
+      12 |   await testInfo.attach(`axe-${label}`, { body: JSON.stringify(result, null, 2), contentType: 'application/json' })
+    > 13 |   expect(result.violations, `${label}: ${result.violations.map(v => v.id).join(', ')}`).toEqual([])
+         |                                                                                         ^
+      14 | }
+      15 |
+      16 | test('SCRUM-229 dashboard to match forecast and contextual back navigation', async ({ page }, testInfo) => {
+        at scan (./frontend/e2e/sprint5-ui.spec.js:13:89)
+        at ./frontend/e2e/sprint5-ui.spec.js:79:3
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../build/sprint5-qa/browser-artifacts/sprint5-ui-SCRUM-229-230-m-b4677-overflow-and-pass-axe-smoke-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../build/sprint5-qa/browser-artifacts/sprint5-ui-SCRUM-229-230-m-b4677-overflow-and-pass-axe-smoke-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../build/sprint5-qa/browser-artifacts/sprint5-ui-SCRUM-229-230-m-b4677-overflow-and-pass-axe-smoke-webkit/error-context.md
+
+  5 failed
+    [chromium] › e2e/sprint5-ui.spec.js:16:1 › SCRUM-229 dashboard to match forecast and contextual back navigation
+    [chromium] › e2e/sprint5-ui.spec.js:73:1 › SCRUM-229/230 mobile login and board have no horizontal overflow and pass axe smoke
+    [webkit] › e2e/sprint5-ui.spec.js:16:1 › SCRUM-229 dashboard to match forecast and contextual back navigation
+    [webkit] › e2e/sprint5-ui.spec.js:47:1 › SCRUM-229/230 keyboard login, error feedback, sign-in and sign-out with mock API
+    [webkit] › e2e/sprint5-ui.spec.js:73:1 › SCRUM-229/230 mobile login and board have no horizontal overflow and pass axe smoke
+  3 passed (30.0s)
+[WebServer] (node:69509) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+(node:69510) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:69511) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:69523) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:69531) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:69539) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:69632) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)

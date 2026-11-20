@@ -1,4 +1,5 @@
 import FixtureRefreshStatus from "../components/FixtureRefreshStatus";
+import TeamSearch from "../components/TeamSearch";
 import ModelInsights from "../components/ModelInsights";
 
 import { useEffect, useState } from "react";
@@ -244,7 +245,7 @@ function Dashboard() {
         ))}
       </div>
 
-      <div className="fixtures-heading"><div><span className="section-kicker">THE BOARD</span><h2>{selectedSportOption.leagueAbbreviation} matchups</h2><Link className="standings-inline-link" to={`/standings?league=${selectedSportOption.leagueAbbreviation}`}>View {selectedSportOption.leagueAbbreviation} standings ↗</Link></div><div className="board-controls"><label className="search-field"><span className="sr-only">Search teams</span><input type="search" placeholder="Search a team…" value={searchParams.get("search") || ""} onChange={e=>updateSelection("search",e.target.value)}/></label><div className="match-filter">
+      <div className="fixtures-heading"><div><span className="section-kicker">THE BOARD</span><h2>{selectedSportOption.leagueAbbreviation} matchups</h2><Link className="standings-inline-link" to={`/standings?league=${selectedSportOption.leagueAbbreviation}`}>View {selectedSportOption.leagueAbbreviation} standings ↗</Link></div><div className="board-controls"><TeamSearch value={searchParams.get("search") || ""} onChange={value=>updateSelection("search",value)}/><div className="match-filter">
         <label htmlFor="match-status">Match status</label>
         <select
           id="match-status"
