@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import MatchCard from "../components/MatchCard";
 import DemoNotice from "../components/DemoNotice";
-import { getLeagues, getMatches } from "../services/matches";
+import { getLeagues, getMatches, getTeams } from "../services/matches";
 import { getPredictionHistory } from "../services/predictionHistory";
 
 const SPORT_OPTIONS = [
@@ -51,12 +51,12 @@ function EmptyUpcomingMatches({ sportOption, status }) {
     : status === "in_progress" ? `No ${league} games in progress.`
     : status === "scheduled" ? `No upcoming ${league} games.`
     : `No ${league} ${status === "final" ? "completed" : status} games found.`;
-  return <section className="empty-state" role="status"><span className="section-kicker">{league} GAME BOARD</span><h2>{title}</h2><p>{["matchday", "scheduled", "in_progress"].includes(status) ? "No fixtures match this view in the available schedule. You can still explore completed games, results and model replays." : "Try another status or a different team search."}</p><Link to={`/dashboard?league=${sportOption.key}&status=final`}>Explore completed {league} games →</Link></section>;
+  return <section className="empty-state" role="status"><span className="section-kicker">{league} GAME BOARD</span><h2>{title}</h2><p>{["matchday", "scheduled", "in_progress"].includes(status) ? "No fixtures match this view in the available schedule. You can still explore completed games, results and model replays." : "Try another status, team, or date."}</p><Link to={`/dashboard?league=${sportOption.key}&status=final`}>Explore completed {league} games →</Link></section>;
 }
 
 const PAGE_SIZE = 12;
 
-function LeagueMatches({ sportOption, status, search, offset, onPage, returnParams }) {
+function LeagueMatches({ sportOption, status, search, teamId, date, offset, onPage, returnParams }) {
   const [result, setResult] = useState({
     loading: true,
     matches: [],
@@ -86,7 +86,7 @@ function LeagueMatches({ sportOption, status, search, offset, onPage, returnPara
           throw new Error(`${sportOption.leagueAbbreviation} is currently unavailable.`);
         }
 
-        const matches = await getMatches(league.id, { status, search, offset, limit: status === "today_results" ? 200 : PAGE_SIZE });
+        const matches = await getMatches(league.id, { status, search, teamId, date, offset, limit: status === "today_results" ? 200 : PAGE_SIZE });
 
         if (status === "matchday") {
           const today = new Date(); today.setHours(0, 0, 0, 0);
@@ -120,7 +120,7 @@ function LeagueMatches({ sportOption, status, search, offset, onPage, returnPara
       ignore = true;
       clearInterval(timer);
     };
-  }, [sportOption.leagueAbbreviation, status, search, offset, retryCount]);
+  }, [sportOption.leagueAbbreviation, status, search, teamId, date, offset, retryCount]);
 
   if (status === "today_results") {
     if (result.loading) return <p className="results-loading" role="status">Loading today’s completed games…</p>;
@@ -163,6 +163,30 @@ function LeagueMatches({ sportOption, status, search, offset, onPage, returnPara
 function PredictionHistory() {
   const [history] = useState(() => getPredictionHistory());
 
+  function formatProbability(value) {
+    return Number.isFinite(value) ? `${Math.round(value * 100)}%` : "Unavailable";
+  }
+
+  function outcomeLabel(prediction) {
+    const labels = {
+      home: "Home win",
+      home_win: "Home win",
+      away: "Away win",
+      away_win: "Away win",
+      draw: "Draw",
+    };
+    const predictedOutcome = String(prediction.predicted_outcome || "").toLowerCase();
+    if (labels[predictedOutcome]) return labels[predictedOutcome];
+    if (predictedOutcome === "not_home_win") return "Not a home win";
+
+    const distribution = prediction.outcome_probabilities;
+    if (distribution && typeof distribution === "object") {
+      const highest = Object.entries(distribution).sort((a, b) => b[1] - a[1])[0]?.[0];
+      if (labels[highest]) return labels[highest];
+    }
+    return "Outcome unavailable";
+  }
+
   return (
     <section className="prediction-history" aria-labelledby="prediction-history-heading">
       <div className="prediction-history-heading">
@@ -174,11 +198,20 @@ function PredictionHistory() {
       ) : (
         <ol className="prediction-history-list">
           {history.map((prediction, index) => {
-            const predictedHomeWin = prediction.predicted_outcome === "HOME_WIN";
             const savedDate = new Date(prediction.saved_at);
             const dateLabel = Number.isNaN(savedDate.getTime())
               ? "Date unavailable"
               : savedDate.toLocaleString();
+            const distribution = prediction.outcome_probabilities;
+            const hasOutcomeDistribution = distribution && typeof distribution === "object";
+            const distributionValues = hasOutcomeDistribution
+              ? Object.values(distribution).filter(Number.isFinite)
+              : [];
+            const confidence = Number.isFinite(prediction.confidence)
+              ? prediction.confidence
+              : distributionValues.length
+                ? Math.max(...distributionValues)
+                : undefined;
             return (
               <li key={`${prediction.match_id}-${prediction.saved_at}-${index}`}>
                 <div>
@@ -186,13 +219,15 @@ function PredictionHistory() {
                     {prediction.home_team_name || "Home team"} vs {prediction.away_team_name || "Away team"}
                     {prediction.sport ? ` · ${prediction.sport}` : ""}
                   </p>
-                  <p>{prediction.mode === "historical_replay" ? "Historical replay" : "Pregame forecast"} · Outcome: {predictedHomeWin ? "Home win" : "Not a home win"}{prediction.mode === "historical_replay" ? (prediction.correct ? " · Matched result" : " · Missed result") : ""}</p>
+                  <p>{prediction.mode === "historical_replay" ? "Historical replay" : "Pregame forecast"} · Outcome: {outcomeLabel(prediction)}{prediction.mode === "historical_replay" ? (prediction.correct ? " · Matched result" : " · Missed result") : ""}</p>
                   <p>
-                    Home win {Math.round((prediction.probabilities?.home_win ?? 0) * 100)}%
-                    {" · "}
-                    Not a home win {Math.round((prediction.probabilities?.not_home_win ?? 0) * 100)}%
-                    {" · "}
-                    Confidence {Math.round((prediction.confidence ?? 0) * 100)}%
+                    {hasOutcomeDistribution
+                      ? Object.entries(distribution).map(([outcome, probability]) => {
+                        const label = outcomeLabel({ predicted_outcome: outcome });
+                        return `${label} ${formatProbability(probability)}`;
+                      }).join(" · ")
+                      : `Home win ${formatProbability(prediction.probabilities?.home_win)} · Not a home win ${formatProbability(prediction.probabilities?.not_home_win)}`}
+                    {` · Confidence ${formatProbability(confidence)}`}
                   </p>
                   <p className="prediction-history-date">{dateLabel}</p>
                 </div>
@@ -208,7 +243,18 @@ function PredictionHistory() {
 
 function Dashboard() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [teams, setTeams] = useState([]);
+  useEffect(() => {
+    let ignore = false;
+    getTeams().then((items) => {
+      if (!ignore) setTeams(items);
+    }).catch(() => {
+      if (!ignore) setTeams([]);
+    });
+    return () => { ignore = true; };
+  }, []);
   const selectedSportOption = getSportOption(searchParams.get("league") || DEFAULT_SPORT);
+  const sportTeams = teams.filter((team) => team.sport?.slug === selectedSportOption.key);
   const requestedStatus = searchParams.get("status");
   const selectedStatus = MATCH_STATUSES.some((item) => item.value === requestedStatus)
     ? requestedStatus
@@ -216,8 +262,12 @@ function Dashboard() {
 
   function updateSelection(key, value) {
     const nextParams = new URLSearchParams(searchParams);
-    nextParams.set(key, value);
-    if (key === "league") nextParams.set("status", "matchday");
+    if (value) nextParams.set(key, value);
+    else nextParams.delete(key);
+    if (key === "league") {
+      nextParams.set("status", "matchday");
+      nextParams.delete("team_id");
+    }
     if(key !== "offset") nextParams.delete("offset");
     setSearchParams(nextParams);
   }
@@ -262,16 +312,28 @@ function Dashboard() {
           ))}
         </select>
       </div></div></div>
+      <div className="match-filters" role="group" aria-label="Additional match filters">
+        <label htmlFor="match-team">Team</label>
+        <select id="match-team" value={searchParams.get("team_id") || ""} onChange={(event) => updateSelection("team_id", event.target.value)}>
+          <option value="">All teams</option>
+          {sportTeams.map((team) => <option key={team.id} value={team.id}>{team.name}</option>)}
+        </select>
+        <label htmlFor="match-date">Date</label>
+        <input id="match-date" type="date" value={searchParams.get("date") || ""} onChange={(event) => updateSelection("date", event.target.value)} />
+        {(searchParams.has("team_id") || searchParams.has("date")) && <button className="clear-match-filters" type="button" onClick={() => { const next = new URLSearchParams(searchParams); next.delete("team_id"); next.delete("date"); next.delete("offset"); setSearchParams(next); }}>Clear filters</button>}
+      </div>
       <LeagueMatches
-        key={`${selectedSportOption.key}-${selectedStatus}-${searchParams.get("search") || ""}-${searchParams.get("offset") || "0"}`}
+        key={`${selectedSportOption.key}-${selectedStatus}-${searchParams.get("search") || ""}-${searchParams.get("team_id") || ""}-${searchParams.get("date") || ""}-${searchParams.get("offset") || "0"}`}
         returnParams={new URLSearchParams({ ...Object.fromEntries(searchParams), league: selectedSportOption.key, status: selectedStatus })}
         sportOption={selectedSportOption}
         status={selectedStatus}
         search={searchParams.get("search") || ""}
+        teamId={searchParams.get("team_id") || ""}
+        date={searchParams.get("date") || ""}
         offset={Math.max(0,Number(searchParams.get("offset"))||0)}
         onPage={offset=>updateSelection("offset",String(offset))}
       />
-      {selectedStatus === "matchday" && <LeagueMatches key={`results-${selectedSportOption.key}-${searchParams.get("search") || ""}`} sportOption={selectedSportOption} status="today_results" search={searchParams.get("search") || ""} offset={0} returnParams={new URLSearchParams({ ...Object.fromEntries(searchParams), league: selectedSportOption.key, status: "matchday" })}/>}
+      {selectedStatus === "matchday" && <LeagueMatches key={`results-${selectedSportOption.key}-${searchParams.get("search") || ""}`} sportOption={selectedSportOption} status="today_results" search={searchParams.get("search") || ""} teamId={searchParams.get("team_id") || ""} date={searchParams.get("date") || ""} offset={0} returnParams={new URLSearchParams({ ...Object.fromEntries(searchParams), league: selectedSportOption.key, status: "matchday" })}/>}
       <div className="insights-link-row"><Link to="/insights">How are predictions and percentages calculated? Explore Model Insights →</Link></div>
       <ModelInsights />
       <PredictionHistory />
