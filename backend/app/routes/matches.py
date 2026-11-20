@@ -43,6 +43,9 @@ def _match_from_row(row) -> MatchOut:
 def list_matches(
     league_id: Optional[int] = Query(default=None, ge=1),
     status: Optional[MatchStatus] = None,
+    team_id: Optional[int] = Query(default=None, ge=1),
+    date_start: Optional[datetime] = None,
+    date_end: Optional[datetime] = None,
     limit: Annotated[int, Query(ge=1, le=200)] = 100,
     offset: Annotated[int, Query(ge=0, le=100000)] = 0,
     search: Annotated[str, Query(max_length=100)] = "",
@@ -52,6 +55,13 @@ def list_matches(
     day_end: Optional[datetime] = None,
     db: Session = Depends(get_db),
 ):
+    if (date_start is None) != (date_end is None):
+        raise HTTPException(422, "Date filters require both date_start and date_end.")
+    if date_start is not None:
+        if (date_start.tzinfo is None or date_end.tzinfo is None
+                or not timedelta(hours=22) <= date_end - date_start <= timedelta(hours=26)):
+            raise HTTPException(422, "Date filters require timezone-aware local-day boundaries, 22–26 hours apart.")
+        date_start, date_end = date_start.astimezone(timezone.utc), date_end.astimezone(timezone.utc)
     if view in {"matchday", "today_results"}:
         if (day_start is None or day_end is None or day_start.tzinfo is None or day_end.tzinfo is None
                 or not timedelta(hours=22) <= day_end - day_start <= timedelta(hours=26)):
@@ -82,6 +92,8 @@ def list_matches(
                 LEFT JOIN teams at ON at.id = m.away_team_id
                 WHERE (:league_id IS NULL OR m.league_id = :league_id)
                   AND (:status IS NULL OR m.status = :status)
+                  AND (:team_id IS NULL OR m.home_team_id = :team_id OR m.away_team_id = :team_id)
+                  AND (:date_start IS NULL OR (m.start_time >= :date_start AND m.start_time < :date_end))
                   AND (:search = '' OR LOWER(ht.name) LIKE :pattern OR LOWER(at.name) LIKE :pattern)
                   AND (:matchday = false OR (m.status = 'in_progress' AND m.start_time >= :active_since)
                        OR (m.status = 'scheduled' AND m.start_time >= :day_start))
@@ -97,6 +109,7 @@ def list_matches(
             {
                 "league_id": league_id,
                 "status": status,
+                "team_id": team_id, "date_start": date_start, "date_end": date_end,
                 "limit": limit, "offset": offset, "search": search, "pattern": "%" + search.lower() + "%", "descending": order == "desc",
                 "matchday": view == "matchday", "today_results": view == "today_results", "day_start": day_start, "day_end": day_end,
                 "active_since": day_start - timedelta(days=1) if day_start else None,

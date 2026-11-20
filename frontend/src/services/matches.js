@@ -4,6 +4,10 @@ export function getLeagues(options = {}) {
   return apiRequest("/leagues", options);
 }
 
+export function getTeams(options = {}) {
+  return apiRequest("/teams", options);
+}
+
 export function getMatches(leagueId, filters = {}, options = {}) {
   const params = new URLSearchParams({
     league_id: String(leagueId),
@@ -12,6 +16,16 @@ export function getMatches(leagueId, filters = {}, options = {}) {
   params.set("limit", String(filters.limit || 30));
   params.set("offset", String(filters.offset || 0));
   if (filters.search) params.set("search", filters.search);
+  if (filters.teamId) params.set("team_id", String(filters.teamId));
+  if (filters.date) {
+    const start = new Date(`${filters.date}T00:00:00`);
+    if (!Number.isNaN(start.getTime()) && start.toISOString().slice(0, 10) === filters.date) {
+      const end = new Date(start);
+      end.setDate(end.getDate() + 1);
+      params.set("date_start", start.toISOString());
+      params.set("date_end", end.toISOString());
+    }
+  }
   if (filters.status === "final") params.set("order", "desc");
   if (["matchday", "today_results"].includes(filters.status)) {
     const now = new Date();
