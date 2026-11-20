@@ -17,6 +17,7 @@ from app.schemas.predictions import (
 )
 from app.services.prediction_service import (
     MatchNotFoundError,
+    MatchNotPredictableError,
     PredictionUnavailableError,
     UnsupportedSportError,
 )
@@ -91,6 +92,7 @@ def test_prediction_request_validation_rejects_invalid_payloads():
 def test_prediction_endpoint_maps_controlled_errors():
     cases = [
         (MatchNotFoundError("missing"), 404, "missing"),
+        (MatchNotPredictableError("Match 1 is not scheduled"), 422, "not scheduled"),
         (UnsupportedSportError("NBA"), 422, "NBA"),
         (PredictionUnavailableError("private detail"), 503, "temporarily unavailable"),
     ]

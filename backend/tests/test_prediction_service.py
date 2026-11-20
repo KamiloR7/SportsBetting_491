@@ -8,6 +8,7 @@ from app.services.prediction_service import (
     MatchContext,
     MatchHistoryRepository,
     MatchNotFoundError,
+    MatchNotPredictableError,
     PredictionService,
     UnsupportedSportError,
 )
@@ -72,6 +73,7 @@ def test_history_lookup_builds_prior_game_features():
     selected = SimpleNamespace(
         id=42,
         start_time="2026-10-20T18:00:00Z",
+        status="scheduled",
         sport="NFL",
         home_team_id=10,
         home_team_name="Home Team",
@@ -108,6 +110,7 @@ def test_history_lookup_returns_zero_features_for_cold_start():
     first.first.return_value = SimpleNamespace(
         id=7,
         start_time="2026-10-20T18:00:00Z",
+        status="scheduled",
         sport="MLB",
         home_team_id=1,
         home_team_name="New Home",
@@ -131,11 +134,32 @@ def test_history_lookup_reports_unknown_match():
         MatchHistoryRepository(db).get_context(999)
 
 
+@pytest.mark.parametrize("status", ["final", "cancelled", "postponed", "in_progress"])
+def test_history_lookup_rejects_non_scheduled_match(status):
+    db = MagicMock()
+    db.execute.return_value.first.return_value = SimpleNamespace(
+        id=8,
+        start_time="2026-10-20T18:00:00Z",
+        status=status,
+        sport="NFL",
+        home_team_id=1,
+        home_team_name="Home",
+        away_team_id=2,
+        away_team_name="Away",
+    )
+
+    with pytest.raises(MatchNotPredictableError, match="not scheduled"):
+        MatchHistoryRepository(db).get_context(8)
+
+    assert db.execute.call_count == 1
+
+
 def test_history_lookup_rejects_unsupported_league():
     db = MagicMock()
     db.execute.return_value.first.return_value = SimpleNamespace(
         id=8,
         start_time="2026-10-20T18:00:00Z",
+        status="scheduled",
         sport="NBA",
         home_team_id=1,
         home_team_name="Home",

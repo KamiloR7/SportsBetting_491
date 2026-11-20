@@ -11,6 +11,7 @@ from app.schemas.predictions import PredictionOut, PredictionRequest, Prediction
 from app.services.match_prediction import predict_probabilities
 from app.services.prediction_service import (
     MatchNotFoundError,
+    MatchNotPredictableError,
     PredictionService,
     PredictionUnavailableError,
     UnsupportedSportError,
@@ -33,6 +34,8 @@ def create_prediction(
         return service.predict(request.match_id)
     except MatchNotFoundError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    except MatchNotPredictableError as exc:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(exc)) from exc
     except UnsupportedSportError as exc:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(exc)) from exc
     except PredictionUnavailableError as exc:

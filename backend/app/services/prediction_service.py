@@ -26,6 +26,10 @@ class MatchNotFoundError(PredictionServiceError):
     pass
 
 
+class MatchNotPredictableError(PredictionServiceError):
+    pass
+
+
 class UnsupportedSportError(PredictionServiceError):
     pass
 
@@ -57,7 +61,7 @@ class MatchHistoryRepository:
         match = self.db.execute(
             text(
                 """
-                SELECT m.id, m.start_time, l.abbreviation AS sport,
+                SELECT m.id, m.start_time, m.status, l.abbreviation AS sport,
                        ht.id AS home_team_id, ht.name AS home_team_name,
                        at.id AS away_team_id, at.name AS away_team_name
                 FROM matches m
@@ -71,6 +75,10 @@ class MatchHistoryRepository:
         ).first()
         if match is None:
             raise MatchNotFoundError(f"Match {match_id} was not found")
+        if match.status != "scheduled":
+            raise MatchNotPredictableError(
+                f"Match {match_id} is not scheduled and cannot be predicted"
+            )
 
         sport = (match.sport or "").upper()
         if sport not in SUPPORTED_SPORTS:
