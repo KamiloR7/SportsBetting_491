@@ -1,21 +1,16 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 function Login() {
-  const navigate = useNavigate();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
 
   function handleLogin(event) {
     event.preventDefault();
-
-    // Temporary Sprint 1 behavior
-    // Later this will call the real backend
-
-    console.log("Login:", email, password);
-
-    navigate("/dashboard");
+    setPassword("");
+    setMessage(
+      "Sign-in is unavailable in this prototype. The dashboard is public; your password was cleared and was not sent."
+    );
   }
 
   return (
@@ -29,20 +24,26 @@ function Login() {
 
         <form onSubmit={handleLogin}>
 
-          <label>Email</label>
+          <label htmlFor="login-email">Email</label>
 
           <input
+            id="login-email"
             type="email"
             placeholder="Enter email"
+            autoComplete="username"
+            required
             value={email}
             onChange={(event) => setEmail(event.target.value)}
           />
 
-          <label>Password</label>
+          <label htmlFor="login-password">Password</label>
 
           <input
+            id="login-password"
             type="password"
             placeholder="Enter password"
+            autoComplete="current-password"
+            required
             value={password}
             onChange={(event) => setPassword(event.target.value)}
           />
@@ -52,6 +53,8 @@ function Login() {
           </button>
 
         </form>
+
+        {message && <p role="status">{message}</p>}
 
       </div>
 
