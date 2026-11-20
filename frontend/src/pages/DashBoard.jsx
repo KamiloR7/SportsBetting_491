@@ -63,6 +63,12 @@ function LeagueMatches({ sportOption, status, search, teamId, date, offset, onPa
     matches: [],
     error: "",
   });
+  const [retryCount, setRetryCount] = useState(0);
+
+  function retryLoad() {
+    setResult({ loading: true, matches: [], error: "" });
+    setRetryCount((count) => count + 1);
+  }
 
   useEffect(() => {
     let ignore = false;
@@ -115,11 +121,11 @@ function LeagueMatches({ sportOption, status, search, teamId, date, offset, onPa
       ignore = true;
       clearInterval(timer);
     };
-  }, [sportOption.leagueAbbreviation, status, search, teamId, date, offset]);
+  }, [sportOption.leagueAbbreviation, status, search, teamId, date, offset, retryCount]);
 
   if (status === "today_results") {
     if (result.loading) return <p className="results-loading" role="status">Loading today’s completed games…</p>;
-    if (result.error) return <p role="alert">Today’s results are temporarily unavailable.</p>;
+    if (result.error) return <div className="request-error"><p role="alert">Today’s results are temporarily unavailable.</p><button type="button" onClick={retryLoad}>Retry loading today’s results</button></div>;
     if (!result.matches.length) return null;
     return <details className="played-today"><summary><span><span className="section-kicker">THE FINAL WHISTLE</span><strong>Played today</strong></span><span>{result.matches.length} completed {result.matches.length === 1 ? "game" : "games"}<span className="results-chevron" aria-hidden="true">⌄</span></span></summary><p>Final scores and model replays. These games are closed for betting.</p><div className="match-grid">{result.matches.map(match => <MatchCard key={match.id} match={match} returnParams={returnParams}/>)}</div></details>;
   }
@@ -129,7 +135,7 @@ function LeagueMatches({ sportOption, status, search, teamId, date, offset, onPa
   }
 
   if (result.error) {
-    return <><FixtureRefreshStatus compact/><p role="alert">{result.error}</p></>;
+    return <><FixtureRefreshStatus compact/><div className="request-error"><p role="alert">{result.error}</p><button type="button" onClick={retryLoad}>Retry loading matches</button></div></>;
   }
 
   if (!result.matches.length) {
