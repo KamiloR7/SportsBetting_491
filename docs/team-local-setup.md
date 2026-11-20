@@ -80,16 +80,22 @@ Do not repeat the `.env` copy over an existing private file; edit it instead.
 
 These steps are for a **new empty local database**, not a migration of an existing account database.
 
+Starting PostgreSQL does not create the application's database. Complete the role
+and `CREATE DATABASE` commands below before loading the schema. Use the same
+host and port for database creation, schema loading, and `backend/.env`; the
+examples connect to `127.0.0.1:5432`. A connection through a different local socket
+can reach a different PostgreSQL installation.
+
 Open an admin SQL terminal. On Windows this is usually:
 
 ```text
-psql -U postgres -d postgres
+psql -h 127.0.0.1 -U postgres -d postgres
 ```
 
 On a Homebrew Mac, usually:
 
 ```text
-psql postgres
+psql -h 127.0.0.1 -d postgres
 ```
 
 If your installer supplied a different admin role, use it. Enter the following **inside psql**, choosing your own password when prompted:
@@ -103,13 +109,53 @@ CREATE DATABASE sports_betting_local OWNER vigor_local;
 
 For this app's current unescaped database connection string, use a long letters-and-numbers local DB password; punctuation such as `@`, `/` or `#` can be misparsed. This is the database password, not a website account password. If the role or database already exists, inspect it instead of dropping it or rerunning CREATE blindly.
 
-Back in your normal terminal at repository root:
+After `CREATE DATABASE`, expect PostgreSQL to print `CREATE DATABASE`. After
+`\q`, you are back in your normal terminal. From the repository root, verify the
+new database and credentials **before** loading its tables:
 
-```text
+```sh
+psql -h 127.0.0.1 -U vigor_local -d sports_betting_local -c "SELECT current_database(), current_user;"
+```
+
+Expect database `sports_betting_local` and role `vigor_local`. Then load the
+schema into that new empty database:
+
+```sh
 psql -h 127.0.0.1 -U vigor_local -d sports_betting_local -v ON_ERROR_STOP=1 -f backend/app/database/sports_prediction_schema.sql
 ```
 
 This is the actual checked-in schema path. It creates tables and is not safe to rerun on a populated database. `relation already exists` means stop and inspect that database. Never drop your team's database to make this command pass.
+
+### If PostgreSQL says the database does not exist
+
+`FATAL: database "sports_betting_local" does not exist` means the server is
+reachable, but the named database is absent on that server. Create the database
+using an administrator connection to the existing `postgres` database. On a
+Homebrew Mac, after creating the `vigor_local` role above:
+
+```sh
+psql -h 127.0.0.1 -d postgres -c 'CREATE DATABASE sports_betting_local OWNER vigor_local;'
+```
+
+Then repeat the connection verification and schema-loading commands above. If
+PostgreSQL reports a missing role or a permission error, stop and use the admin
+role supplied by your installation; do not drop an existing database.
+
+For the separate Sprint 5 database names used in Dang's local testing, the
+corresponding commands are below. The role `vigor_sprint5` must already exist.
+Run these in your **normal macOS terminal**, from the repository root:
+
+```sh
+psql -h 127.0.0.1 -d postgres -c 'CREATE DATABASE sports_betting_sprint5 OWNER vigor_sprint5;'
+psql -h 127.0.0.1 -U vigor_sprint5 -d sports_betting_sprint5 -c "SELECT current_database(), current_user;"
+psql -h 127.0.0.1 -U vigor_sprint5 -d sports_betting_sprint5 -v ON_ERROR_STOP=1 -f backend/app/database/sports_prediction_schema.sql
+```
+
+Use `DATABASE_NAME=sports_betting_sprint5` and `DATABASE_USER=vigor_sprint5` in
+`backend/.env` for that variant. These replace the generic database/role names
+throughout the guide. Skip creation/schema loading if they already succeeded.
+The missing-database recovery and subsequent schema load were confirmed by Dang;
+this confirms those steps, not the full application/data/model setup.
 
 ## 5. Set backend/.env
 
@@ -203,6 +249,17 @@ macOS Terminal:
 ./.venv/bin/python Run-LocalApp.py
 ```
 
+If your existing Mac environment is `backend/venv` instead of the fresh-install
+`.venv` directory, use that interpreter from the repository root:
+
+```sh
+./backend/venv/bin/python Run-LocalApp.py --check
+./backend/venv/bin/python Run-LocalApp.py
+```
+
+Use the same environment for the earlier backend setup commands. The launcher
+starts both backend and frontend; it does not prepare the database for you.
+
 The basic check verifies prerequisites/port availability/database reachability, **not** database credentials, schema or trained models. Read the backend log messages if startup fails. The launcher installs nothing, imports no data, creates no database and never kills a process already using a port. Keep its terminal open. If either app service exits, it stops the other one. Ctrl+C stops both launched services and preserves data; PostgreSQL is managed separately by your OS. It does not run automatically when the computer starts.
 
 Open **http://127.0.0.1:5173/dashboard**, then **Sign in / Join → Create account**. Register a new email/password; successful registration logs you in and starts a 1,000-point virtual wallet. There are no shared universal demo credentials. Existing accounts, bets and wallet activity belong to the local database you configured.
@@ -233,6 +290,7 @@ Stop each with Ctrl+C. Do not expose PostgreSQL or use `--host 0.0.0.0` to solve
 | Backend `http://127.0.0.1:8000/health` | Expect `status: ok`; this alone does not verify schema/model readiness. |
 | `http://127.0.0.1:8000/leagues` | Expect JSON including NFL/MLB/EPL after reference seeding. |
 | Backend unreachable / connection refused | Start local PostgreSQL, check DB host/port and read backend terminal errors. |
+| `FATAL: database "..." does not exist` | Complete database creation on the same host/port before loading tables; see the recovery commands in step 4. Starting PostgreSQL alone does not create the app database. |
 | password authentication failed | Confirm role/database/password with `psql -h 127.0.0.1 -U vigor_local -d sports_betting_local`; fix private .env and restart backend. |
 | Missing tables / incompatible users schema | Apply the current base schema only to a new empty database, then additive setup. Existing databases need a reviewed migration. |
 | `No module named ...` | Use the same .venv interpreter for installs, setup and startup. Run backend modules from backend/. |

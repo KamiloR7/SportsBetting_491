@@ -1,0 +1,14 @@
+
+> frontend@0.0.0 build
+> vite build
+
+vite v8.3.8 building client environment for production...
+transforming...
+✓ 56 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.45 kB │ gzip:   0.29 kB
+dist/assets/index-DxXzSv7h.css   69.76 kB │ gzip:  15.91 kB
+dist/assets/index-CG6W5W4d.js   351.44 kB │ gzip: 108.11 kB
+
+✓ built in 118ms

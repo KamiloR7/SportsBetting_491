@@ -1,0 +1,27 @@
+
+> frontend@0.0.0 test:e2e
+> playwright test
+
+
+Running 8 tests using 2 workers
+
+  ✓  2 [chromium] › e2e/sprint5-ui.spec.js:35:1 › SCRUM-227/229 empty and unavailable lists remain navigable (3.1s)
+  ✓  1 [chromium] › e2e/sprint5-ui.spec.js:16:1 › Scenario 2 / SCRUM-229 dashboard to selected match, team history and contextual back navigation (3.1s)
+  ✓  4 [chromium] › e2e/sprint5-ui.spec.js:79:1 › Scenario 2 / SCRUM-229/230 mobile board and match details pass layout and axe smoke (2.6s)
+  ✓  3 [chromium] › e2e/sprint5-ui.spec.js:49:1 › Scenario 2 / SCRUM-229/230 sport, status, search and keyboard filtering (2.9s)
+  ✓  6 [webkit] › e2e/sprint5-ui.spec.js:35:1 › SCRUM-227/229 empty and unavailable lists remain navigable (7.9s)
+  ✓  5 [webkit] › e2e/sprint5-ui.spec.js:16:1 › Scenario 2 / SCRUM-229 dashboard to selected match, team history and contextual back navigation (8.5s)
+  ✓  8 [webkit] › e2e/sprint5-ui.spec.js:79:1 › Scenario 2 / SCRUM-229/230 mobile board and match details pass layout and axe smoke (4.9s)
+  ✓  7 [webkit] › e2e/sprint5-ui.spec.js:49:1 › Scenario 2 / SCRUM-229/230 sport, status, search and keyboard filtering (6.0s)
+
+  8 passed (21.9s)
+[WebServer] (node:71960) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+(node:71962) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:71961) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:71978) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:71979) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)

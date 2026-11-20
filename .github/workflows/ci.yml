@@ -176,6 +176,21 @@ jobs:
         working-directory: frontend
         run: npm run lint
 
+      - name: Run frontend component and mocked API regression tests (SCRUM-194)
+        working-directory: frontend
+        run: npm test
+
+      - name: Upload frontend component evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sprint5-component-tests-${{ github.sha }}
+          path: |
+            build/sprint5-qa/component-results.xml
+            build/sprint5-qa/component-results.json
+          if-no-files-found: error
+          retention-days: 30
+
       - name: Build frontend
         working-directory: frontend
         run: npm run build
@@ -193,6 +208,39 @@ jobs:
         with:
           name: frontend-${{ steps.metadata.outputs.build_id }}
           path: frontend/dist/
+          if-no-files-found: error
+          retention-days: 30
+
+  frontend-browser:
+    name: Sprint 5 browser UI and accessibility (mock API)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install locked dependencies and Chromium/WebKit
+        working-directory: frontend
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium webkit
+      - name: Record browser evidence provenance
+        env:
+          SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          mkdir -p build/sprint5-qa
+          node --input-type=module -e "import fs from 'node:fs'; fs.writeFileSync('build/sprint5-qa/ci-provenance.json', JSON.stringify({source_commit:process.env.SOURCE_SHA, run_id:process.env.GITHUB_RUN_ID, started_utc:new Date().toISOString(), kind:'automated browser UI; mock API; not real database integration'}, null, 2))"
+      - name: Test desktop browser paths, keyboard and axe checks
+        working-directory: frontend
+        run: npm run test:e2e
+      - name: Upload browser test reports and timestamped screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sprint5-browser-ui-${{ github.sha }}
+          path: build/sprint5-qa/
           if-no-files-found: error
           retention-days: 30
 

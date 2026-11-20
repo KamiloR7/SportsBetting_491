@@ -1,0 +1,97 @@
+{
+  "record_type": "Automated local execution; personal manual evidence pending",
+  "checked_utc": "2026-11-20T02:51:58.112584+00:00",
+  "base_commit": "2d41ce0271ec0f65d17128b124f1657769f8a4a3",
+  "source_state": "Uncommitted local Sprint 5 QA changes",
+  "current_reports": "desktop-closeout-20261119/",
+  "checks": {
+    "component-results.xml": {
+      "tests": 39,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 39
+    },
+    "browser-results.xml": {
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 10
+    },
+    "login-api-results.xml": {
+      "tests": 103,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 52,
+      "passed": 51
+    }
+  },
+  "backend_regression": {
+    "passed": 771,
+    "skipped": 187,
+    "evidence": "desktop-closeout-20261119/backend-regression.log"
+  },
+  "https_smoke": {
+    "result": "pass",
+    "transport": "real loopback HTTPS; generated test certificate explicitly verified",
+    "database": "ephemeral SQLite",
+    "data": "synthetic only",
+    "checks": [
+      "anonymous denial",
+      "login",
+      "Secure/HttpOnly/SameSite cookie",
+      "authorized read",
+      "cross-account denial",
+      "CSRF denial",
+      "authorized write",
+      "logout revocation"
+    ],
+    "source_commit": "see evidence index"
+  },
+  "browser": {
+    "startTime": "2026-11-20T02:45:02.791Z",
+    "duration": 14549.381000000001,
+    "expected": 10,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "accessibility": {
+    "selected_desktop_scans": 6,
+    "reported_violations": 0,
+    "incomplete_items_require_review": true
+  },
+  "jira_status": {
+    "SCRUM-218": "Done",
+    "SCRUM-219": "Done",
+    "SCRUM-220": "In Progress",
+    "SCRUM-221": "In Progress",
+    "SCRUM-226": "Done",
+    "SCRUM-227": "Done",
+    "SCRUM-229": "In Progress",
+    "SCRUM-230": "In Review",
+    "SCRUM-194": "In Progress",
+    "SCRUM-195": "In Progress",
+    "SCRUM-319": "In Progress"
+  },
+  "remaining": [
+    "Personal desktop screenshots and completed checklist",
+    "Live dry-run and teammate cross-run",
+    "PR review and CI on the exact submitted commit"
+  ],
+  "limitations": [
+    "Mock API responses in frontend component/browser checks",
+    "Backend test sets overlap; counts are not additive",
+    "Optional skipped integration tests are not passes",
+    "Current application launcher uses local HTTP demo mode; HTTPS smoke uses an isolated test harness",
+    "Read-only registration preflight does not create or validate a working application account",
+    "Earlier timestamped reports are retained as historical evidence"
+  ],
+  "publication": {
+    "committed": false,
+    "pushed": false,
+    "merged": false
+  },
+  "main_integration_validation": "main-integration-20261119.json"
+}

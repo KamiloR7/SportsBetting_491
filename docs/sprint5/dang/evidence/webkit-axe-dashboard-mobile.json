@@ -1,0 +1,1729 @@
+{
+  "timestamp": "2026-11-19T20:54:56.426Z",
+  "violations": [],
+  "incomplete": [
+    {
+      "id": "color-contrast",
+      "impact": "serious",
+      "tags": [
+        "cat.color",
+        "wcag2aa",
+        "wcag143",
+        "TTv5",
+        "TT13.c",
+        "EN-301-549",
+        "EN-9.1.4.3",
+        "ACT",
+        "RGAAv4",
+        "RGAA-3.2.1"
+      ],
+      "description": "Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds",
+      "help": "Elements must meet minimum color contrast ratio thresholds",
+      "helpUrl": "https://dequeuniversity.com/rules/axe/4.14/color-contrast?application=axeAPI",
+      "nodes": [
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "13.5pt (18px)",
+                "fontWeight": "bold",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<header class=\"site-header\">",
+                  "target": [
+                    ".site-header"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<a class=\"brand\" href=\"/dashboard\" data-discover=\"true\"><span class=\"brand-mark\">V</span>VIGOR<span class=\"brand-tag\">THE SPORTS LAB</span></a>",
+          "target": [
+            ".brand[href$=\"dashboard\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "6.8pt (9px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<a class=\"header-join\" href=\"/login\" data-discover=\"true\">Sign in / Join ↗</a>",
+                  "target": [
+                    ".header-join"
+                  ]
+                },
+                {
+                  "html": "<header class=\"site-header\">",
+                  "target": [
+                    ".site-header"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<a class=\"header-join\" href=\"/login\" data-discover=\"true\">Sign in / Join ↗</a>",
+          "target": [
+            ".header-join"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "messageKey": "nonBmp"
+              },
+              "relatedNodes": [],
+              "impact": "serious",
+              "message": "Element content contains only non-text characters"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span class=\"nav-symbol\" aria-hidden=\"true\">◈</span>",
+          "target": [
+            ".active > .nav-symbol[aria-hidden=\"true\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "6.8pt (9px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<a aria-current=\"page\" class=\"active\" href=\"/dashboard\" data-discover=\"true\"><span class=\"nav-symbol\" aria-hidden=\"true\">◈</span><span>Explore games</span></a>",
+                  "target": [
+                    ".active"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span>Explore games</span>",
+          "target": [
+            ".active > span:nth-child(2)"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "messageKey": "nonBmp"
+              },
+              "relatedNodes": [],
+              "impact": "serious",
+              "message": "Element content contains only non-text characters"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span class=\"nav-symbol\" aria-hidden=\"true\">▤</span>",
+          "target": [
+            "a[href$=\"standings\"] > .nav-symbol[aria-hidden=\"true\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "6.8pt (9px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<a class=\"\" href=\"/standings\" data-discover=\"true\"><span class=\"nav-symbol\" aria-hidden=\"true\">▤</span><span>Standings</span></a>",
+                  "target": [
+                    "a[href$=\"standings\"]"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span>Standings</span>",
+          "target": [
+            "a[href$=\"standings\"] > span:nth-child(2)"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "messageKey": "nonBmp"
+              },
+              "relatedNodes": [],
+              "impact": "serious",
+              "message": "Element content contains only non-text characters"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span class=\"nav-symbol\" aria-hidden=\"true\">◎</span>",
+          "target": [
+            "a[href$=\"insights\"] > .nav-symbol[aria-hidden=\"true\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "6.8pt (9px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<a class=\"\" href=\"/insights\" data-discover=\"true\"><span class=\"nav-symbol\" aria-hidden=\"true\">◎</span><span>Model insights</span></a>",
+                  "target": [
+                    "nav > a[href$=\"insights\"]"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span>Model insights</span>",
+          "target": [
+            "a[href$=\"insights\"] > span:nth-child(2)"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "messageKey": "nonBmp"
+              },
+              "relatedNodes": [],
+              "impact": "serious",
+              "message": "Element content contains only non-text characters"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span class=\"nav-symbol\" aria-hidden=\"true\">⊕</span>",
+          "target": [
+            "a[href$=\"parlay\"] > .nav-symbol[aria-hidden=\"true\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "6.8pt (9px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<a class=\"\" href=\"/parlay\" data-discover=\"true\"><span class=\"nav-symbol\" aria-hidden=\"true\">⊕</span><span>Parlay builder</span></a>",
+                  "target": [
+                    "a[href$=\"parlay\"]"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span>Parlay builder</span>",
+          "target": [
+            "a[href$=\"parlay\"] > span:nth-child(2)"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "messageKey": "nonBmp"
+              },
+              "relatedNodes": [],
+              "impact": "serious",
+              "message": "Element content contains only non-text characters"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span class=\"nav-symbol\" aria-hidden=\"true\">◷</span>",
+          "target": [
+            "a[href$=\"active\"] > .nav-symbol[aria-hidden=\"true\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "6.8pt (9px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<a class=\"\" href=\"/bets/active\" data-discover=\"true\"><span class=\"nav-symbol\" aria-hidden=\"true\">◷</span><span>Active bets</span></a>",
+                  "target": [
+                    "a[href$=\"active\"]"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span>Active bets</span>",
+          "target": [
+            "a[href$=\"active\"] > span:nth-child(2)"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "messageKey": "nonBmp"
+              },
+              "relatedNodes": [],
+              "impact": "serious",
+              "message": "Element content contains only non-text characters"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span class=\"nav-symbol\" aria-hidden=\"true\">≡</span>",
+          "target": [
+            "a[href$=\"history\"] > .nav-symbol[aria-hidden=\"true\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "6.8pt (9px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<a class=\"\" href=\"/bets/history\" data-discover=\"true\"><span class=\"nav-symbol\" aria-hidden=\"true\">≡</span><span>Bet history</span></a>",
+                  "target": [
+                    "a[href$=\"history\"]"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span>Bet history</span>",
+          "target": [
+            "a[href$=\"history\"] > span:nth-child(2)"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "messageKey": "nonBmp"
+              },
+              "relatedNodes": [],
+              "impact": "serious",
+              "message": "Element content contains only non-text characters"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span class=\"nav-symbol\" aria-hidden=\"true\">◇</span>",
+          "target": [
+            "a[href$=\"wallet\"] > .nav-symbol[aria-hidden=\"true\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "6.8pt (9px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<a class=\"\" href=\"/wallet\" data-discover=\"true\"><span class=\"nav-symbol\" aria-hidden=\"true\">◇</span><span>Wallet activity</span></a>",
+                  "target": [
+                    "a[href$=\"wallet\"]"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span>Wallet activity</span>",
+          "target": [
+            "a[href$=\"wallet\"] > span:nth-child(2)"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "7.5pt (10px)",
+                "fontWeight": "bold",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<header class=\"dashboard-header\"><div class=\"eyebrow\"><span></span> THE MATCHDAY DESK</div><h1>Every game.<br><em>Make your call.</em></h1><p>Explore the fixtures. Read the model. Make your pick.</p><div class=\"hero-label\">NFL <span>•</span> MLB <span>•</span> PREMIER LEAGUE</div></header>",
+                  "target": [
+                    ".dashboard-header"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<div class=\"eyebrow\"><span></span> THE MATCHDAY DESK</div>",
+          "target": [
+            ".eyebrow"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "42.8pt (57px)",
+                "fontWeight": "bold",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "3:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<header class=\"dashboard-header\"><div class=\"eyebrow\"><span></span> THE MATCHDAY DESK</div><h1>Every game.<br><em>Make your call.</em></h1><p>Explore the fixtures. Read the model. Make your pick.</p><div class=\"hero-label\">NFL <span>•</span> MLB <span>•</span> PREMIER LEAGUE</div></header>",
+                  "target": [
+                    ".dashboard-header"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<h1>Every game.<br><em>Make your call.</em></h1>",
+          "target": [
+            "h1"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "42.8pt (57px)",
+                "fontWeight": "bold",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "3:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<header class=\"dashboard-header\"><div class=\"eyebrow\"><span></span> THE MATCHDAY DESK</div><h1>Every game.<br><em>Make your call.</em></h1><p>Explore the fixtures. Read the model. Make your pick.</p><div class=\"hero-label\">NFL <span>•</span> MLB <span>•</span> PREMIER LEAGUE</div></header>",
+                  "target": [
+                    ".dashboard-header"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<em>Make your call.</em>",
+          "target": [
+            "em"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "8.3pt (11px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<header class=\"dashboard-header\"><div class=\"eyebrow\"><span></span> THE MATCHDAY DESK</div><h1>Every game.<br><em>Make your call.</em></h1><p>Explore the fixtures. Read the model. Make your pick.</p><div class=\"hero-label\">NFL <span>•</span> MLB <span>•</span> PREMIER LEAGUE</div></header>",
+                  "target": [
+                    ".dashboard-header"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<p>Explore the fixtures. Read the model. Make your pick.</p>",
+          "target": [
+            ".dashboard-header > p"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.8pt (13px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<button class=\"sport-option\" type=\"button\" aria-pressed=\"true\"><span class=\"sport-option-name\"><span class=\"sport-symbol\" aria-hidden=\"true\">◈</span>Football</span><span class=\"sport-option-league\">NFL</span></button>",
+                  "target": [
+                    ".sport-option[type=\"button\"]:nth-child(1)"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span class=\"sport-option-name\"><span class=\"sport-symbol\" aria-hidden=\"true\">◈</span>Football</span>",
+          "target": [
+            ".sport-option[type=\"button\"]:nth-child(1) > .sport-option-name"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "messageKey": "nonBmp"
+              },
+              "relatedNodes": [],
+              "impact": "serious",
+              "message": "Element content contains only non-text characters"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span class=\"sport-symbol\" aria-hidden=\"true\">◈</span>",
+          "target": [
+            ".sport-option[type=\"button\"]:nth-child(1) > .sport-option-name > .sport-symbol[aria-hidden=\"true\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "13.5pt (18px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<button class=\"sport-option\" type=\"button\" aria-pressed=\"true\"><span class=\"sport-option-name\"><span class=\"sport-symbol\" aria-hidden=\"true\">◈</span>Football</span><span class=\"sport-option-league\">NFL</span></button>",
+                  "target": [
+                    ".sport-option[type=\"button\"]:nth-child(1)"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span class=\"sport-option-league\">NFL</span>",
+          "target": [
+            ".sport-option[type=\"button\"]:nth-child(1) > .sport-option-league"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.8pt (13px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<button class=\"sport-option\" type=\"button\" aria-pressed=\"false\"><span class=\"sport-option-name\"><span class=\"sport-symbol\" aria-hidden=\"true\">◉</span>Baseball</span><span class=\"sport-option-league\">MLB</span></button>",
+                  "target": [
+                    ".sport-option[type=\"button\"]:nth-child(2)"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span class=\"sport-option-name\"><span class=\"sport-symbol\" aria-hidden=\"true\">◉</span>Baseball</span>",
+          "target": [
+            ".sport-option[type=\"button\"]:nth-child(2) > .sport-option-name"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "messageKey": "nonBmp"
+              },
+              "relatedNodes": [],
+              "impact": "serious",
+              "message": "Element content contains only non-text characters"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span class=\"sport-symbol\" aria-hidden=\"true\">◉</span>",
+          "target": [
+            ".sport-option[type=\"button\"]:nth-child(2) > .sport-option-name > .sport-symbol[aria-hidden=\"true\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "13.5pt (18px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<button class=\"sport-option\" type=\"button\" aria-pressed=\"false\"><span class=\"sport-option-name\"><span class=\"sport-symbol\" aria-hidden=\"true\">◉</span>Baseball</span><span class=\"sport-option-league\">MLB</span></button>",
+                  "target": [
+                    ".sport-option[type=\"button\"]:nth-child(2)"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span class=\"sport-option-league\">MLB</span>",
+          "target": [
+            ".sport-option[type=\"button\"]:nth-child(2) > .sport-option-league"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.8pt (13px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<button class=\"sport-option\" type=\"button\" aria-pressed=\"false\"><span class=\"sport-option-name\"><span class=\"sport-symbol\" aria-hidden=\"true\">⬡</span>Soccer</span><span class=\"sport-option-league\">EPL</span></button>",
+                  "target": [
+                    ".sport-option[type=\"button\"]:nth-child(3)"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span class=\"sport-option-name\"><span class=\"sport-symbol\" aria-hidden=\"true\">⬡</span>Soccer</span>",
+          "target": [
+            ".sport-option[type=\"button\"]:nth-child(3) > .sport-option-name"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "14.3pt (19px)",
+                "fontWeight": "normal",
+                "messageKey": "shortTextContent",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<button class=\"sport-option\" type=\"button\" aria-pressed=\"false\"><span class=\"sport-option-name\"><span class=\"sport-symbol\" aria-hidden=\"true\">⬡</span>Soccer</span><span class=\"sport-option-league\">EPL</span></button>",
+                  "target": [
+                    ".sport-option[type=\"button\"]:nth-child(3)"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element content is too short to determine if it is actual text content"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span class=\"sport-symbol\" aria-hidden=\"true\">⬡</span>",
+          "target": [
+            ".sport-option[type=\"button\"]:nth-child(3) > .sport-option-name > .sport-symbol[aria-hidden=\"true\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element content is too short to determine if it is actual text content"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "13.5pt (18px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<button class=\"sport-option\" type=\"button\" aria-pressed=\"false\"><span class=\"sport-option-name\"><span class=\"sport-symbol\" aria-hidden=\"true\">⬡</span>Soccer</span><span class=\"sport-option-league\">EPL</span></button>",
+                  "target": [
+                    ".sport-option[type=\"button\"]:nth-child(3)"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span class=\"sport-option-league\">EPL</span>",
+          "target": [
+            ".sport-option[type=\"button\"]:nth-child(3) > .sport-option-league"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "10.5pt (14px)",
+                "fontWeight": "bold",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div class=\"fixture-day-heading\"><h3>Saturday, January 10, 2099</h3><span>1 game</span></div>",
+                  "target": [
+                    ".fixture-day-heading"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<h3>Saturday, January 10, 2099</h3>",
+          "target": [
+            "h3"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "8.3pt (11px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<div class=\"fixture-day-heading\"><h3>Saturday, January 10, 2099</h3><span>1 game</span></div>",
+                  "target": [
+                    ".fixture-day-heading"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span>1 game</span>",
+          "target": [
+            ".fixture-day-heading > span"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "fontSize": "9.0pt (12px)",
+                "fontWeight": "normal",
+                "messageKey": "pseudoContent",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article class=\"match-card fixture-card sport-football fixture-open\" style=\"--home-color: #64748b; --away-color: #64748b; --home-rgb: 100 116 139; --away-rgb: 100 116 139; --home-glow: 0.65; --away-glow: 0.42; --home-odds-alpha: 0.48; --away-odds-alpha: 0.48;\">",
+                  "target": [
+                    ".match-card"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a pseudo element"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<time datetime=\"2099-01-10T20:00:00Z\">12:00 PM</time>",
+          "target": [
+            "time"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a pseudo element"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "fontSize": "6.0pt (8px)",
+                "fontWeight": "normal",
+                "messageKey": "pseudoContent",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article class=\"match-card fixture-card sport-football fixture-open\" style=\"--home-color: #64748b; --away-color: #64748b; --home-rgb: 100 116 139; --away-rgb: 100 116 139; --home-glow: 0.65; --away-glow: 0.42; --home-odds-alpha: 0.48; --away-odds-alpha: 0.48;\">",
+                  "target": [
+                    ".match-card"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a pseudo element"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span class=\"status-chip scheduled\">scheduled</span>",
+          "target": [
+            ".status-chip"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a pseudo element"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "fontSize": "12.8pt (17px)",
+                "fontWeight": "bold",
+                "messageKey": "pseudoContent",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article class=\"match-card fixture-card sport-football fixture-open\" style=\"--home-color: #64748b; --away-color: #64748b; --home-rgb: 100 116 139; --away-rgb: 100 116 139; --home-glow: 0.65; --away-glow: 0.42; --home-odds-alpha: 0.48; --away-odds-alpha: 0.48;\">",
+                  "target": [
+                    ".match-card"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a pseudo element"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span class=\"team-badge badge-home \" aria-hidden=\"true\" style=\"--badge-primary: #64748b; --badge-secondary: #64748b;\">CB</span>",
+          "target": [
+            ".badge-home"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a pseudo element"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "fontSize": "6.0pt (8px)",
+                "fontWeight": "normal",
+                "messageKey": "pseudoContent",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article class=\"match-card fixture-card sport-football fixture-open\" style=\"--home-color: #64748b; --away-color: #64748b; --home-rgb: 100 116 139; --away-rgb: 100 116 139; --home-glow: 0.65; --away-glow: 0.42; --home-odds-alpha: 0.48; --away-odds-alpha: 0.48;\">",
+                  "target": [
+                    ".match-card"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a pseudo element"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<small>HOME</small>",
+          "target": [
+            ".fixture-team:nth-child(3) > .team-pick-button[type=\"button\"] > .team-identity > .team-copy > small"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a pseudo element"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "fontSize": "10.5pt (14px)",
+                "fontWeight": "bold",
+                "messageKey": "pseudoContent",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article class=\"match-card fixture-card sport-football fixture-open\" style=\"--home-color: #64748b; --away-color: #64748b; --home-rgb: 100 116 139; --away-rgb: 100 116 139; --home-glow: 0.65; --away-glow: 0.42; --home-odds-alpha: 0.48; --away-odds-alpha: 0.48;\">",
+                  "target": [
+                    ".match-card"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a pseudo element"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<strong>Cincinnati Bengals</strong>",
+          "target": [
+            ".fixture-team:nth-child(3) > .team-pick-button[type=\"button\"] > .team-identity > .team-copy > strong"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a pseudo element"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "fontSize": "6.8pt (9px)",
+                "fontWeight": "normal",
+                "messageKey": "pseudoContent",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article class=\"match-card fixture-card sport-football fixture-open\" style=\"--home-color: #64748b; --away-color: #64748b; --home-rgb: 100 116 139; --away-rgb: 100 116 139; --home-glow: 0.65; --away-glow: 0.42; --home-odds-alpha: 0.48; --away-odds-alpha: 0.48;\">",
+                  "target": [
+                    ".match-card"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a pseudo element"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span class=\"team-pick-hint\">Pick →</span>",
+          "target": [
+            ".fixture-team:nth-child(3) > .team-pick-button[type=\"button\"] > .team-pick-hint"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a pseudo element"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "fontSize": "12.8pt (17px)",
+                "fontWeight": "bold",
+                "messageKey": "pseudoContent",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article class=\"match-card fixture-card sport-football fixture-open\" style=\"--home-color: #64748b; --away-color: #64748b; --home-rgb: 100 116 139; --away-rgb: 100 116 139; --home-glow: 0.65; --away-glow: 0.42; --home-odds-alpha: 0.48; --away-odds-alpha: 0.48;\">",
+                  "target": [
+                    ".match-card"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a pseudo element"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span class=\"team-badge badge-away \" aria-hidden=\"true\" style=\"--badge-primary: #64748b; --badge-secondary: #64748b;\">KCC</span>",
+          "target": [
+            ".badge-away"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a pseudo element"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "fontSize": "6.0pt (8px)",
+                "fontWeight": "normal",
+                "messageKey": "pseudoContent",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article class=\"match-card fixture-card sport-football fixture-open\" style=\"--home-color: #64748b; --away-color: #64748b; --home-rgb: 100 116 139; --away-rgb: 100 116 139; --home-glow: 0.65; --away-glow: 0.42; --home-odds-alpha: 0.48; --away-odds-alpha: 0.48;\">",
+                  "target": [
+                    ".match-card"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a pseudo element"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<small>AWAY</small>",
+          "target": [
+            ".fixture-team:nth-child(4) > .team-pick-button[type=\"button\"] > .team-identity > .team-copy > small"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a pseudo element"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "fontSize": "10.5pt (14px)",
+                "fontWeight": "bold",
+                "messageKey": "pseudoContent",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article class=\"match-card fixture-card sport-football fixture-open\" style=\"--home-color: #64748b; --away-color: #64748b; --home-rgb: 100 116 139; --away-rgb: 100 116 139; --home-glow: 0.65; --away-glow: 0.42; --home-odds-alpha: 0.48; --away-odds-alpha: 0.48;\">",
+                  "target": [
+                    ".match-card"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a pseudo element"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<strong>Kansas City Chiefs</strong>",
+          "target": [
+            ".fixture-team:nth-child(4) > .team-pick-button[type=\"button\"] > .team-identity > .team-copy > strong"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a pseudo element"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "fontSize": "6.8pt (9px)",
+                "fontWeight": "normal",
+                "messageKey": "pseudoContent",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article class=\"match-card fixture-card sport-football fixture-open\" style=\"--home-color: #64748b; --away-color: #64748b; --home-rgb: 100 116 139; --away-rgb: 100 116 139; --home-glow: 0.65; --away-glow: 0.42; --home-odds-alpha: 0.48; --away-odds-alpha: 0.48;\">",
+                  "target": [
+                    ".match-card"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a pseudo element"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span class=\"team-pick-hint\">Pick →</span>",
+          "target": [
+            ".fixture-team:nth-child(4) > .team-pick-button[type=\"button\"] > .team-pick-hint"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a pseudo element"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "fontSize": "7.5pt (10px)",
+                "fontWeight": "normal",
+                "messageKey": "pseudoContent",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article class=\"match-card fixture-card sport-football fixture-open\" style=\"--home-color: #64748b; --away-color: #64748b; --home-rgb: 100 116 139; --away-rgb: 100 116 139; --home-glow: 0.65; --away-glow: 0.42; --home-odds-alpha: 0.48; --away-odds-alpha: 0.48;\">",
+                  "target": [
+                    ".match-card"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a pseudo element"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<p>Model odds · match winner</p>",
+          "target": [
+            ".browse-market > p"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a pseudo element"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "fontSize": "6.8pt (9px)",
+                "fontWeight": "normal",
+                "messageKey": "pseudoContent",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article class=\"match-card fixture-card sport-football fixture-open\" style=\"--home-color: #64748b; --away-color: #64748b; --home-rgb: 100 116 139; --away-rgb: 100 116 139; --home-glow: 0.65; --away-glow: 0.42; --home-odds-alpha: 0.48; --away-odds-alpha: 0.48;\">",
+                  "target": [
+                    ".match-card"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a pseudo element"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<small>Cincinnati Bengals</small>",
+          "target": [
+            ".odds-home > small"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a pseudo element"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "fontSize": "18.8pt (25px)",
+                "fontWeight": "bold",
+                "messageKey": "pseudoContent",
+                "expectedContrastRatio": "3:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article class=\"match-card fixture-card sport-football fixture-open\" style=\"--home-color: #64748b; --away-color: #64748b; --home-rgb: 100 116 139; --away-rgb: 100 116 139; --home-glow: 0.65; --away-glow: 0.42; --home-odds-alpha: 0.48; --away-odds-alpha: 0.48;\">",
+                  "target": [
+                    ".match-card"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a pseudo element"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<strong>1.60</strong>",
+          "target": [
+            ".odds-home > strong"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a pseudo element"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "fontSize": "7.5pt (10px)",
+                "fontWeight": "normal",
+                "messageKey": "pseudoContent",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article class=\"match-card fixture-card sport-football fixture-open\" style=\"--home-color: #64748b; --away-color: #64748b; --home-rgb: 100 116 139; --away-rgb: 100 116 139; --home-glow: 0.65; --away-glow: 0.42; --home-odds-alpha: 0.48; --away-odds-alpha: 0.48;\">",
+                  "target": [
+                    ".match-card"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a pseudo element"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span>Bet / Parlay +</span>",
+          "target": [
+            ".odds-home > span"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a pseudo element"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "fontSize": "6.8pt (9px)",
+                "fontWeight": "normal",
+                "messageKey": "pseudoContent",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article class=\"match-card fixture-card sport-football fixture-open\" style=\"--home-color: #64748b; --away-color: #64748b; --home-rgb: 100 116 139; --away-rgb: 100 116 139; --home-glow: 0.65; --away-glow: 0.42; --home-odds-alpha: 0.48; --away-odds-alpha: 0.48;\">",
+                  "target": [
+                    ".match-card"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a pseudo element"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<small>Kansas City Chiefs</small>",
+          "target": [
+            ".odds-away > small"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a pseudo element"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "fontSize": "18.8pt (25px)",
+                "fontWeight": "bold",
+                "messageKey": "pseudoContent",
+                "expectedContrastRatio": "3:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article class=\"match-card fixture-card sport-football fixture-open\" style=\"--home-color: #64748b; --away-color: #64748b; --home-rgb: 100 116 139; --away-rgb: 100 116 139; --home-glow: 0.65; --away-glow: 0.42; --home-odds-alpha: 0.48; --away-odds-alpha: 0.48;\">",
+                  "target": [
+                    ".match-card"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a pseudo element"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<strong>2.40</strong>",
+          "target": [
+            ".odds-away > strong"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a pseudo element"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "fontSize": "7.5pt (10px)",
+                "fontWeight": "normal",
+                "messageKey": "pseudoContent",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article class=\"match-card fixture-card sport-football fixture-open\" style=\"--home-color: #64748b; --away-color: #64748b; --home-rgb: 100 116 139; --away-rgb: 100 116 139; --home-glow: 0.65; --away-glow: 0.42; --home-odds-alpha: 0.48; --away-odds-alpha: 0.48;\">",
+                  "target": [
+                    ".match-card"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a pseudo element"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span>Bet / Parlay +</span>",
+          "target": [
+            ".odds-away > span"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a pseudo element"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "fontSize": "11.3pt (15px)",
+                "fontWeight": "bold",
+                "messageKey": "pseudoContent",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article class=\"match-card fixture-card sport-football fixture-open\" style=\"--home-color: #64748b; --away-color: #64748b; --home-rgb: 100 116 139; --away-rgb: 100 116 139; --home-glow: 0.65; --away-glow: 0.42; --home-odds-alpha: 0.48; --away-odds-alpha: 0.48;\">",
+                  "target": [
+                    ".match-card"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a pseudo element"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<button type=\"button\" class=\"board-bet-now\" aria-expanded=\"false\">Place a bet <span aria-hidden=\"true\">→</span></button>",
+          "target": [
+            ".board-bet-now"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a pseudo element"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "messageKey": "nonBmp"
+              },
+              "relatedNodes": [],
+              "impact": "serious",
+              "message": "Element content contains only non-text characters"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span aria-hidden=\"true\">→</span>",
+          "target": [
+            ".board-bet-now > span[aria-hidden=\"true\"]"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "fontSize": "8.3pt (11px)",
+                "fontWeight": "normal",
+                "messageKey": "pseudoContent",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<article class=\"match-card fixture-card sport-football fixture-open\" style=\"--home-color: #64748b; --away-color: #64748b; --home-rgb: 100 116 139; --away-rgb: 100 116 139; --home-glow: 0.65; --away-glow: 0.42; --home-odds-alpha: 0.48; --away-odds-alpha: 0.48;\">",
+                  "target": [
+                    ".match-card"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a pseudo element"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<a href=\"/matches/901?league=football&amp;status=scheduled\" data-discover=\"true\">Model insights &amp; match details ↗</a>",
+          "target": [
+            ".board-bet-actions > a"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a pseudo element"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "7.5pt (10px)",
+                "fontWeight": "bold",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<section id=\"insights\" class=\"model-lab\">",
+                  "target": [
+                    "#insights"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span class=\"section-kicker\">BEHIND THE FORECAST</span>",
+          "target": [
+            ".lab-intro > div > .section-kicker"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "18.8pt (25px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "3:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<section id=\"insights\" class=\"model-lab\">",
+                  "target": [
+                    "#insights"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<h2>Numbers, with context.</h2>",
+          "target": [
+            ".lab-intro > div > h2"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "5.3pt (7px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<section id=\"insights\" class=\"model-lab\">",
+                  "target": [
+                    "#insights"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<span class=\"outline-pill\">CHRONOLOGICAL HOLDOUT</span>",
+          "target": [
+            ".outline-pill"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.0pt (12px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<section id=\"insights\" class=\"model-lab\">",
+                  "target": [
+                    "#insights"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<p>The pricing models were measured on later games kept out of training, before being refitted on available history for deployment. Three-way EPL accuracy is a different task from two-way NFL and MLB.</p>",
+          "target": [
+            "#insights > p:nth-child(2)"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "9.0pt (12px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<section id=\"insights\" class=\"model-lab\">",
+                  "target": [
+                    "#insights"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<a class=\"odds-insights-link\" href=\"/insights#ml-evaluation\" data-discover=\"true\">Explore confusion matrices and probability reliability →</a>",
+          "target": [
+            ".odds-insights-link"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        },
+        {
+          "any": [
+            {
+              "id": "color-contrast",
+              "data": {
+                "contrastRatio": 0,
+                "fontSize": "7.5pt (10px)",
+                "fontWeight": "normal",
+                "messageKey": "bgGradient",
+                "expectedContrastRatio": "4.5:1"
+              },
+              "relatedNodes": [
+                {
+                  "html": "<section id=\"insights\" class=\"model-lab\">",
+                  "target": [
+                    "#insights"
+                  ]
+                }
+              ],
+              "impact": "serious",
+              "message": "Element's background color could not be determined due to a background gradient"
+            }
+          ],
+          "all": [],
+          "none": [],
+          "impact": "serious",
+          "html": "<p class=\"fine-print\">EPL: home win / draw / away win. NFL and MLB: two-way winner; ties refunded. Model probabilities are estimates.</p>",
+          "target": [
+            ".fine-print"
+          ],
+          "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient"
+        }
+      ]
+    }
+  ],
+  "passes": 24
+}

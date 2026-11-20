@@ -1,0 +1,18 @@
+
+> frontend@0.0.0 test
+> vitest run
+
+
+ RUN  v5.1.1 ./frontend
+
+ ✓ src/services/api.test.js (13 tests) 13ms
+ ✓ src/components/PredictionPanel.test.jsx (8 tests) 217ms
+ ✓ src/components/MatchCard.test.jsx (12 tests) 240ms
+
+ Test Files  3 passed (3)
+      Tests  33 passed (33)
+   Start at  12:54:33
+   Duration  1.18s (environment 62%, tests 17%, setup 15%, import 4%, transform 1%)
+
+JSON report written to ./build/sprint5-qa/component-results.json
+JUNIT report written to ./build/sprint5-qa/component-results.xml

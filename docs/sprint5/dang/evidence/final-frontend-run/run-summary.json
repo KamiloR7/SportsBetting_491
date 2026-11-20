@@ -1,0 +1,39 @@
+{
+  "started_utc": "2026-11-19T20:54:33.122493+00:00",
+  "started_local": "2026-11-19T12:54:33.122493-08:00",
+  "timezone": "America/Los_Angeles",
+  "executor": "Automated execution; not a student-operated dry-run",
+  "base_commit": "2d41ce0271ec0f65d17128b124f1657769f8a4a3",
+  "source_state": "See git diff and submission source manifest; local changes may be uncommitted",
+  "checks": [
+    {
+      "name": "components",
+      "started_utc": "2026-11-19T20:54:33.146194+00:00",
+      "finished_utc": "2026-11-19T20:54:34.864835+00:00",
+      "exit_code": 0,
+      "log": "components.log"
+    },
+    {
+      "name": "lint",
+      "started_utc": "2026-11-19T20:54:34.865213+00:00",
+      "finished_utc": "2026-11-19T20:54:36.960133+00:00",
+      "exit_code": 0,
+      "log": "lint.log"
+    },
+    {
+      "name": "build",
+      "started_utc": "2026-11-19T20:54:36.960528+00:00",
+      "finished_utc": "2026-11-19T20:54:37.414984+00:00",
+      "exit_code": 0,
+      "log": "build.log"
+    },
+    {
+      "name": "browser-mock-api",
+      "started_utc": "2026-11-19T20:54:37.415300+00:00",
+      "finished_utc": "2026-11-19T20:54:59.894025+00:00",
+      "exit_code": 0,
+      "log": "browser-mock-api.log"
+    }
+  ],
+  "finished_utc": "2026-11-19T20:54:59.894535+00:00"
+}

@@ -1,0 +1,29 @@
+{
+  "started_utc": "2026-11-19T20:55:59.503036+00:00",
+  "executor": "Automated verification in actual repository; student dry-run pending",
+  "checks": [
+    {
+      "name": "locked-install",
+      "exit_code": 0,
+      "finished_utc": "2026-11-19T20:56:26.107642+00:00"
+    },
+    {
+      "name": "components",
+      "exit_code": 0,
+      "finished_utc": "2026-11-19T20:56:29.946881+00:00"
+    },
+    {
+      "name": "lint",
+      "exit_code": 0,
+      "finished_utc": "2026-11-19T20:56:34.467155+00:00"
+    },
+    {
+      "name": "build",
+      "exit_code": 0,
+      "finished_utc": "2026-11-19T20:56:35.701835+00:00"
+    }
+  ],
+  "secrets_certs_stashes_sprint4_preserved": true,
+  "no_application_database_migration": true,
+  "no_push_commit_or_merge": true
+}

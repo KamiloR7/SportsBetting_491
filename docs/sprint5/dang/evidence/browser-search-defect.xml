@@ -1,0 +1,110 @@
+<testsuites id="" name="" tests="8" failures="2" skipped="0" errors="0" time="19.910889000000005">
+<testsuite name="sprint5-ui.spec.js" timestamp="2026-11-19T20:48:41.975Z" hostname="chromium" tests="4" failures="1" skipped="0" time="14.554" errors="0">
+<testcase name="Scenario 2 / SCRUM-229 dashboard to selected match, team history and contextual back navigation" classname="sprint5-ui.spec.js" time="2.962">
+</testcase>
+<testcase name="SCRUM-227/229 empty and unavailable lists remain navigable" classname="sprint5-ui.spec.js" time="3.035">
+</testcase>
+<testcase name="Scenario 2 / SCRUM-229/230 sport, status, search and keyboard filtering" classname="sprint5-ui.spec.js" time="6.426">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|browser-artifacts/sprint5-ui-Scenario-2-SCRU-e0fd8-arch-and-keyboard-filtering-chromium/test-failed-1.png]]
+
+[[ATTACHMENT|browser-artifacts/sprint5-ui-Scenario-2-SCRU-e0fd8-arch-and-keyboard-filtering-chromium/video.webm]]
+
+[[ATTACHMENT|browser-artifacts/sprint5-ui-Scenario-2-SCRU-e0fd8-arch-and-keyboard-filtering-chromium/error-context.md]]
+]]>
+</system-out>
+<failure message="expect(locator).toBeAttached() failed" type="expect.toBeAttached">
+<![CDATA[  [chromium] › sprint5-ui.spec.js:49:1 › Scenario 2 / SCRUM-229/230 sport, status, search and keyboard filtering
+
+    Error: expect(locator).toBeAttached() failed
+
+    Locator: getByRole('heading', { name: 'Cincinnati Bengals vs Kansas City Chiefs' })
+    Expected: attached
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeAttached" getByRole('heading', { name: 'Cincinnati Bengals vs Kansas City Chiefs' }) with timeout 5000ms
+      - waiting for getByRole('heading', { name: 'Cincinnati Bengals vs Kansas City Chiefs' })
+
+
+      53 |   await search.focus()
+      54 |   await page.keyboard.type('Bengals')
+    > 55 |   await expect(page.getByRole('heading', { name: 'Cincinnati Bengals vs Kansas City Chiefs' })).toBeAttached()
+         |                                                                                                 ^
+      56 |   await evidence(page, testInfo, 'filtered-search')
+      57 |   await page.keyboard.press('Tab')
+      58 |   await expect(page.getByLabel('Match status')).toBeFocused()
+        at ./frontend/e2e/sprint5-ui.spec.js:55:97
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../build/sprint5-qa/browser-artifacts/sprint5-ui-Scenario-2-SCRU-e0fd8-arch-and-keyboard-filtering-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../build/sprint5-qa/browser-artifacts/sprint5-ui-Scenario-2-SCRU-e0fd8-arch-and-keyboard-filtering-chromium/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../build/sprint5-qa/browser-artifacts/sprint5-ui-Scenario-2-SCRU-e0fd8-arch-and-keyboard-filtering-chromium/error-context.md
+]]>
+</failure>
+</testcase>
+<testcase name="Scenario 2 / SCRUM-229/230 mobile board and match details pass layout and axe smoke" classname="sprint5-ui.spec.js" time="2.131">
+</testcase>
+</testsuite>
+<testsuite name="sprint5-ui.spec.js" timestamp="2026-11-19T20:48:41.975Z" hostname="webkit" tests="4" failures="1" skipped="0" time="20.798" errors="0">
+<testcase name="Scenario 2 / SCRUM-229 dashboard to selected match, team history and contextual back navigation" classname="sprint5-ui.spec.js" time="4.383">
+</testcase>
+<testcase name="SCRUM-227/229 empty and unavailable lists remain navigable" classname="sprint5-ui.spec.js" time="5.636">
+</testcase>
+<testcase name="Scenario 2 / SCRUM-229/230 sport, status, search and keyboard filtering" classname="sprint5-ui.spec.js" time="8.382">
+<system-out>
+<![CDATA[
+[[ATTACHMENT|browser-artifacts/sprint5-ui-Scenario-2-SCRU-e0fd8-arch-and-keyboard-filtering-webkit/test-failed-1.png]]
+
+[[ATTACHMENT|browser-artifacts/sprint5-ui-Scenario-2-SCRU-e0fd8-arch-and-keyboard-filtering-webkit/video.webm]]
+
+[[ATTACHMENT|browser-artifacts/sprint5-ui-Scenario-2-SCRU-e0fd8-arch-and-keyboard-filtering-webkit/error-context.md]]
+]]>
+</system-out>
+<failure message="expect(locator).toBeAttached() failed" type="expect.toBeAttached">
+<![CDATA[  [webkit] › sprint5-ui.spec.js:49:1 › Scenario 2 / SCRUM-229/230 sport, status, search and keyboard filtering
+
+    Error: expect(locator).toBeAttached() failed
+
+    Locator: getByRole('heading', { name: 'Cincinnati Bengals vs Kansas City Chiefs' })
+    Expected: attached
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeAttached" getByRole('heading', { name: 'Cincinnati Bengals vs Kansas City Chiefs' }) with timeout 5000ms
+      - waiting for getByRole('heading', { name: 'Cincinnati Bengals vs Kansas City Chiefs' })
+
+
+      53 |   await search.focus()
+      54 |   await page.keyboard.type('Bengals')
+    > 55 |   await expect(page.getByRole('heading', { name: 'Cincinnati Bengals vs Kansas City Chiefs' })).toBeAttached()
+         |                                                                                                 ^
+      56 |   await evidence(page, testInfo, 'filtered-search')
+      57 |   await page.keyboard.press('Tab')
+      58 |   await expect(page.getByLabel('Match status')).toBeFocused()
+        at ./frontend/e2e/sprint5-ui.spec.js:55:97
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ../../build/sprint5-qa/browser-artifacts/sprint5-ui-Scenario-2-SCRU-e0fd8-arch-and-keyboard-filtering-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ../../build/sprint5-qa/browser-artifacts/sprint5-ui-Scenario-2-SCRU-e0fd8-arch-and-keyboard-filtering-webkit/video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ../../build/sprint5-qa/browser-artifacts/sprint5-ui-Scenario-2-SCRU-e0fd8-arch-and-keyboard-filtering-webkit/error-context.md
+]]>
+</failure>
+</testcase>
+<testcase name="Scenario 2 / SCRUM-229/230 mobile board and match details pass layout and axe smoke" classname="sprint5-ui.spec.js" time="2.397">
+</testcase>
+</testsuite>
+</testsuites>
