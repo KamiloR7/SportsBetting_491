@@ -17,9 +17,13 @@ export function getMatches(leagueId, filters = {}, options = {}) {
   params.set("offset", String(filters.offset || 0));
   if (filters.search) params.set("search", filters.search);
   if (filters.teamId) params.set("team_id", String(filters.teamId));
-  if (filters.date) {
+  if (typeof filters.date === "string" && filters.date) {
     const start = new Date(`${filters.date}T00:00:00`);
-    if (!Number.isNaN(start.getTime()) && start.toISOString().slice(0, 10) === filters.date) {
+    const [year, month, day] = filters.date.split("-").map(Number);
+    // A local midnight can fall on the previous UTC calendar date.
+    if (/^\d{4}-\d{2}-\d{2}$/.test(filters.date)
+        && !Number.isNaN(start.getTime())
+        && start.getFullYear() === year && start.getMonth() === month - 1 && start.getDate() === day) {
       const end = new Date(start);
       end.setDate(end.getDate() + 1);
       params.set("date_start", start.toISOString());
