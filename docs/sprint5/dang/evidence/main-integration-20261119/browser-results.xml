@@ -1,0 +1,26 @@
+<testsuites id="" name="" tests="10" failures="0" skipped="0" errors="0" time="12.203539000000001">
+<testsuite name="sprint5-ui.spec.js" timestamp="2026-11-20T03:15:07.733Z" hostname="chromium" tests="5" failures="0" skipped="0" time="7.795" errors="0">
+<testcase name="Scenario 1 / SCRUM-227/229/230 desktop sport, status, search and keyboard filtering" classname="sprint5-ui.spec.js" time="2.155">
+</testcase>
+<testcase name="Scenario 2 / SCRUM-229 desktop selected match, team history and contextual return" classname="sprint5-ui.spec.js" time="1.974">
+</testcase>
+<testcase name="Scenario 3 / SCRUM-227/229 desktop empty list remains navigable" classname="sprint5-ui.spec.js" time="1.025">
+</testcase>
+<testcase name="Scenario 4 / SCRUM-227 desktop unavailable API and successful recovery" classname="sprint5-ui.spec.js" time="1.163">
+</testcase>
+<testcase name="Scenario 5 / SCRUM-226/229/230 desktop completed games and final scores" classname="sprint5-ui.spec.js" time="1.478">
+</testcase>
+</testsuite>
+<testsuite name="sprint5-ui.spec.js" timestamp="2026-11-20T03:15:07.733Z" hostname="webkit" tests="5" failures="0" skipped="0" time="11.68" errors="0">
+<testcase name="Scenario 1 / SCRUM-227/229/230 desktop sport, status, search and keyboard filtering" classname="sprint5-ui.spec.js" time="3.479">
+</testcase>
+<testcase name="Scenario 2 / SCRUM-229 desktop selected match, team history and contextual return" classname="sprint5-ui.spec.js" time="2.853">
+</testcase>
+<testcase name="Scenario 3 / SCRUM-227/229 desktop empty list remains navigable" classname="sprint5-ui.spec.js" time="1.617">
+</testcase>
+<testcase name="Scenario 4 / SCRUM-227 desktop unavailable API and successful recovery" classname="sprint5-ui.spec.js" time="1.755">
+</testcase>
+<testcase name="Scenario 5 / SCRUM-226/229/230 desktop completed games and final scores" classname="sprint5-ui.spec.js" time="1.976">
+</testcase>
+</testsuite>
+</testsuites>

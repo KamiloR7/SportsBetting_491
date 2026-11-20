@@ -59,11 +59,13 @@ describe('SCRUM-226 MatchCard rendering and eligibility', () => {
     vi.spyOn(Element.prototype, 'scrollIntoView').mockImplementation(() => {});
     vi.stubGlobal('fetch', vi.fn().mockImplementation(async () => response([market])));
     render(card(match));
-    await userEvent.click(await screen.findByRole('button', { name: /HOME\s*Cincinnati Bengals\s*Pick →/ }));
+    const trigger = await screen.findByRole('button', { name: /HOME\s*Cincinnati Bengals\s*Pick →/ });
+    await userEvent.click(trigger);
     expect(await screen.findByLabelText('Stake in points')).toHaveValue(100);
     expect(screen.getByLabelText('Bet slip for this match')).toHaveFocus();
     await userEvent.click(screen.getByRole('button', { name: 'Close bet slip' }));
     expect(screen.queryByLabelText('Stake in points')).toBeNull();
+    expect(trigger).toHaveFocus();
   });
   it('does not offer the previous match price when a card receives another match', async () => {
     let finish;

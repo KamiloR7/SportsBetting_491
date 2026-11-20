@@ -1,0 +1,61 @@
+{
+  "record_type": "Automated validation after combining main with the Sprint 5 feature branch",
+  "feature_parent": "b8c2bad3fd3e9a016132adf7efbcf503161e1dc5",
+  "main_parent": "37f1cc99bf50170add66747c747973af4c19cdd9",
+  "finished_utc": "2026-11-20T03:16:27.871442+00:00",
+  "checks": {
+    "component-results.xml": {
+      "tests": 39,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 39
+    },
+    "browser-results.xml": {
+      "tests": 10,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": 10
+    },
+    "backend-results.xml": {
+      "tests": 958,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 187,
+      "passed": 771
+    }
+  },
+  "lint": "passed",
+  "build": "passed",
+  "conflict_resolution": [
+    "Keep upstream versioned frontend build artifacts and metadata",
+    "Keep upstream team/date filters and prediction-history changes",
+    "Keep upstream keyboard focus restoration and add return-focus assertion",
+    "Retain Sprint 5 test jobs, accessible names and stale-odds reset",
+    "Extend browser mock data with the new teams endpoint"
+  ],
+  "source_sha256": {
+    ".github/workflows/ci.yml": "a4907285b82284e81fa2e18a2e9898e768f1254f8a36c388d4fbb92e2eae1463",
+    ".gitignore": "9532634d7d780ce3d553b0850603a425bee4c23d6884ba093291b201547c15cb",
+    "frontend/e2e/fixtures.js": "44039472bacf7cc275083658b4cc7313b212f4141ca3cb12f2ac28d332d267ac",
+    "frontend/e2e/sprint5-ui.spec.js": "cfc3da5ed4f203d3c63593f75d50a0e75c1ac473117930047087a58d393bd138",
+    "frontend/eslint.config.js": "ea8a8882220cfaf9b0dddbd6b95852b7ffd56aa45df34a5c832abe66c50bdbf2",
+    "frontend/package-lock.json": "ca86a2d0c7b4a6e5c443aba106b4bac6c323e5f8743e41e97fea2139e6083dd1",
+    "frontend/package.json": "8e208e0d0ea851c509ec583f030234019b9502914b9b4deb39a625613fb019df",
+    "frontend/playwright.config.js": "34fd0434e3b5d6bf5feb67c44c434053144db35bb96b97c8e93a008639449013",
+    "frontend/src/App.css": "782cdce3d04cb7fac9f7eb55f9f84dcfc4565220596d350b5b42f3a166257b98",
+    "frontend/src/components/MatchCard.jsx": "aaf9f161baef732da199f2ef0dcdd69e0b1a75fc392f4ce0ab626c44bf59cba5",
+    "frontend/src/components/MatchCard.test.jsx": "f7fdfb09f3a388ba577a4c67a3712145745b7fa48789d4f5c57d8fb4ff512a97",
+    "frontend/src/components/PredictionPanel.test.jsx": "d4ef9b79363a9145e1adab916771d03dcd85ec0214e7a2c15b0d9fad9ec7dc07",
+    "frontend/src/components/TeamSearch.jsx": "32e727e9ec39750cd5b3cb19e908d8778cd8f6d567e6e9a63243c0f86237cd35",
+    "frontend/src/pages/DashBoard.jsx": "6ae7b0fc9da33e52c4ad98be56f6d0f371adec341ae23fd048f0835315f21dbb",
+    "frontend/src/pages/Login.test.jsx": "ab72e3b7c5117448aab96af80670e50e7fa48b68f6080f64e4fa39b9addfb4bb",
+    "frontend/src/services/api.test.js": "0aed17950689834109687dac72dcb9066e1a66b6eca0ee59c4ff7a81e88f3d27",
+    "frontend/src/test/fixtures.js": "ac9bdc7e6774d8d7b4d7a75f7a6d7fa3f566d350d4dfcb4991a24278fcafdbee",
+    "frontend/src/test/setup.js": "569ea9f2adf0d166b55479beb3dafac92842a7b6811419ee242c00edd3b406bf",
+    "frontend/vitest.config.js": "82de065945ed0415d2eb8d021c9e92e986044984e14e498c6f1cb0bb26b33a63",
+    "scripts/run_sprint5_checks.py": "f3fb8b77c19abff659956e49140b03600303713a356b5834defdbbf9ebdbdb08"
+  },
+  "screenshots": "Rerun screenshots remain in the local timestamped run; PR CI uploads its own artifacts."
+}

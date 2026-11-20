@@ -1,0 +1,46 @@
+{
+  "started_utc": "2026-11-20T03:15:02.429800+00:00",
+  "started_local": "2026-11-19T19:15:02.429800-08:00",
+  "timezone": "America/Los_Angeles",
+  "executor": "Automated execution; not a student-operated dry-run",
+  "base_commit": "b8c2bad3fd3e9a016132adf7efbcf503161e1dc5",
+  "source_state": "See git diff and submission source manifest; local changes may be uncommitted",
+  "checks": [
+    {
+      "name": "components",
+      "started_utc": "2026-11-20T03:15:02.442115+00:00",
+      "finished_utc": "2026-11-20T03:15:04.372210+00:00",
+      "exit_code": 0,
+      "log": "components.log"
+    },
+    {
+      "name": "lint",
+      "started_utc": "2026-11-20T03:15:04.372705+00:00",
+      "finished_utc": "2026-11-20T03:15:06.302306+00:00",
+      "exit_code": 0,
+      "log": "lint.log"
+    },
+    {
+      "name": "build",
+      "started_utc": "2026-11-20T03:15:06.310361+00:00",
+      "finished_utc": "2026-11-20T03:15:06.911003+00:00",
+      "exit_code": 0,
+      "log": "build.log"
+    },
+    {
+      "name": "browser-mock-api",
+      "started_utc": "2026-11-20T03:15:06.911235+00:00",
+      "finished_utc": "2026-11-20T03:15:19.517536+00:00",
+      "exit_code": 0,
+      "log": "browser-mock-api.log"
+    },
+    {
+      "name": "backend-regression",
+      "started_utc": "2026-11-20T03:15:19.517896+00:00",
+      "finished_utc": "2026-11-20T03:16:27.871140+00:00",
+      "exit_code": 0,
+      "log": "backend-regression.log"
+    }
+  ],
+  "finished_utc": "2026-11-20T03:16:27.871442+00:00"
+}

@@ -1,0 +1,27 @@
+..................................ssssssssssssssssssssssss.s.s.s....ssss [  7%]
+.s.s.s.s.s.s.s.ss....................................................... [ 15%]
+.....................................ssss............................... [ 22%]
+.............................ssssss.s..............s.sss................ [ 30%]
+...................sss.s.s.s....ss.s.s.s................................ [ 37%]
+........................................................sssss.s.s.s.ssss [ 45%]
+s............ssssssssssss............................................... [ 52%]
+.......................................s.s.s.s.s.s.s.s.s.s.s.s.......... [ 60%]
+.........................sss.........sssssssss...sss.s.s..ss.s.sssss.sss [ 67%]
+............................ssssssssssssssssssssssssssss.....sssss.s.... [ 75%]
+....ssssssss.s.sssssssss.s.s.s.......................................... [ 82%]
+........................................................................ [ 90%]
+........................................................................ [ 97%]
+.....................                                                    [100%]
+=============================== warnings summary ===============================
+backend/tests/test_matchday_and_reset.py: 36 warnings
+backend/tests/test_ml_insights.py: 4 warnings
+backend/tests/test_model_odds.py: 33 warnings
+backend/tests/test_parlays.py: 69 warnings
+backend/tests/test_sprint3_flow.py: 3 warnings
+backend/tests/test_virtual_betting.py: 223 warnings
+backend/tests/test_wallet_activity.py: 9 warnings
+  .venv/lib/python3.13/site-packages/sqlalchemy/engine/default.py:1180: DeprecationWarning: The default datetime adapter is deprecated as of Python 3.12; see the sqlite3 documentation for suggested replacement recipes
+    cursor.execute(statement, parameters)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+771 passed, 187 skipped, 377 warnings in 67.25s (0:01:07)

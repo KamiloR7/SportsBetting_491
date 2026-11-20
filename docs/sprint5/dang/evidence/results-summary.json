@@ -92,5 +92,6 @@
     "committed": false,
     "pushed": false,
     "merged": false
-  }
+  },
+  "main_integration_validation": "main-integration-20261119.json"
 }

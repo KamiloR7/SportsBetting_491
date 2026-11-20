@@ -19,6 +19,7 @@ export async function mockApi(page, { listMode = 'normal' } = {}) {
     else if (['/wallet/transactions', '/bets', '/parlays'].includes(path)) data = []
     else if (path === '/health') data = { status: 'ok', fixture_refresh: { enabled: false } }
     else if (path === '/leagues') data = [{ id: 1, abbreviation: 'NFL', name: 'National Football League' }, { id: 2, abbreviation: 'MLB', name: 'Major League Baseball' }, { id: 3, abbreviation: 'EPL', name: 'English Premier League' }]
+    else if (path === '/teams') data = ['football', 'baseball', 'soccer'].flatMap((slug, index) => [{ id: index * 2 + 1, name: ['Cincinnati Bengals', 'San Francisco Giants', 'Arsenal'][index], sport: { slug } }, { id: index * 2 + 2, name: ['Kansas City Chiefs', 'Los Angeles Dodgers', 'Chelsea'][index], sport: { slug } }])
     else if (path === '/matches') {
       if (listMode === 'error') { status = 503; data = { detail: 'Match data is unavailable.' } }
       else {
