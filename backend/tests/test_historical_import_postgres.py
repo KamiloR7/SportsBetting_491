@@ -90,10 +90,15 @@ def test_postgres_concurrent_imports_serialize(postgres):
     with ThreadPoolExecutor(max_workers=2) as pool:
         reports = list(pool.map(lambda _: load_historical_matches(postgres, [record()]), range(2)))
     assert all(not report["transaction_failures"] for report in reports)
+    assert all(report["committed"] for report in reports)
     assert sum(report["matches_inserted"] for report in reports) == 1
-    assert sum(report["matches_updated"] for report in reports) == 1
+    # An identical replay is a committed no-op, not a corrective update.
+    assert sum(report["matches_updated"] for report in reports) == 0
+    assert sum(report["matches_unchanged"] for report in reports) == 1
     with postgres.connect() as conn:
-        assert conn.execute(text("SELECT count(*) FROM matches")).scalar_one() == 1
+        match_id = conn.execute(text("SELECT id FROM matches")).scalar_one()
+        mapped_id = conn.execute(text("SELECT entity_id FROM external_mappings WHERE entity_type='match'")).scalar_one()
+        assert mapped_id == match_id
 
 
 def test_postgres_dangling_mapping_and_missing_reference(postgres):
